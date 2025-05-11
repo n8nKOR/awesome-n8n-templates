@@ -1,0 +1,891 @@
+{
+  "nodes": [
+    {
+      "id": "c17e444e-0a5e-4bfe-8de6-c3185de4465d",
+      "name": "Grants to List",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        -240,
+        -180
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "oppHits"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9251d39c-6098-42fa-aadd-3a22464dee64",
+      "name": "Get Grant Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        280,
+        -280
+      ],
+      "parameters": {
+        "url": "https://apply07.grants.gov/grantsws/rest/opportunity/details",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "oppId",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "ade994d6-a1f8-45bf-a82e-83eb38da08d6",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        440,
+        -120
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4d81b20e-0038-48d3-840c-3fcf8b798a0d",
+      "name": "Summarize Synopsis",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        460,
+        -280
+      ],
+      "parameters": {
+        "text": "=Agency: {{ $json.synopsis.agencyName }}\nTitle: {{ $json.opportunityTitle }}\nSynopsis: {{ $json.synopsis.synopsisDesc }}",
+        "options": {
+          "systemPromptTemplate": "You've been given a grant opportunity listing. Help summarize the opportunity in simple terms."
+        },
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n \"goal\": { \"type\": [\"string\", \"null\"] },\n \"duration\": { \"type\": \"string\" },\n \"success_criteria\": {\n \"type\": \"array\",\n \"items\": { \"type\": \"string\" }\n },\n \"good_to_know\": {\n\t\t \"type\": \"array\",\n \"items\": { \"type\": \"string\" }\n }\n\t}\n}"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "71e1a2e9-6690-4247-aae3-f5bd61019553",
+      "name": "Eligibility Factors",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        640,
+        -120
+      ],
+      "parameters": {
+        "text": "=Agency: {{ $json.synopsis.agencyName }}\nTitle: {{ $json.opportunityTitle }}\nSynopsis: {{ $json.synopsis.synopsisDesc }}\nEligibility: {{ $json.synopsis.applicantEligibilityDesc }}",
+        "options": {
+          "systemPromptTemplate": "Help determine if we are eligible for this grant.\n\nWe are AI Consultants Limited (“Company”) and are the controllers of your personal data. Our registered office is Unit 29, Intelligent Park, Milton Road, Cambridge Cambridgeshire CB9 RDW, and our registered company number is 1234567.\n\nWe are part of a group of companies which provides consultancy services across the globe. Our other group companies are:\n\nAI Consultants Inc. of 2 Drydock Avenue, Suite 1210, Boston, MA 02210, USA\nAI Consultants (Singapore) Pte Ltd of 300 Beach Road, Singapore 199555\nAI Consultants Japan Inc, of 3-1-3 Minamiaoyama, Minato-ku, Tokyo, 107-0062\nIn the UK we are registered with the Information Commissioner’s Office under registration number Z9888888.\n\nIn the US we are registered with the Data Privacy Framework Program (DPF). To view the Company’s certification, please visit https://www.dataprivacyframework.gov/list.\n\nWe are a leading, worldwide product development service provider. We specialise in design engineering services, professional technical services and product technical support services (“Services”).\n\nAs the deep tech powerhouse of Capgemini, CC spearheads transformative projects to solve the toughest scientific and engineering challenges. Ambitious clients collaborate with us to create new-to-the-world technologies, services and products that have never been seen before. Our unique combination of technical, commercial and market expertise yields market-leading solutions that are hard to copy. This creates valuable intellectual property that generates protectable long-term value.\n\nWe work with some of the world’s biggest brands and most ambitious technology start-up ventures across a wide range of markets. From aerospace to agritech, consumer to industry, communications to healthcare, our knowledge of one sector can often be applied to another to create new breakthroughs. We focus on our clients’ success and we are trusted as integral partners in the future of their businesses.\n\nWe do important, difficult, radical and impactful things that benefit society. We helped develop the world's first 24/7 wrist-worn activity monitor, wireless pacemaker and wireless patient monitor, as well as the first connected drug inhaler. Our work led to the most densely packed cellular network in the world – orchestrating swarms of bots across highly automated warehouses. It produced the Bluetooth chip that connects your phone to your car and the latest satellite technology that lets people in remote locations across the world keep in touch."
+        },
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"eligibility_matches\": {\n\t\t \"type\": \"array\",\n \"items\": { \"type\": \"string\" }\n }\n\t}\n}"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d741ef63-dcf3-452d-978c-8cbc27f55a33",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        600,
+        20
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7354ed6d-50f5-4234-90d8-2d9d0c7eccd4",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1000,
+        -120
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "2dffda98-18c6-4c7b-8fc3-0e6539642ea2",
+      "name": "Save to Tracker",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        1420,
+        -20
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appiNoPRvhJxz9crl",
+          "cachedResultUrl": "https://airtable.com/appiNoPRvhJxz9crl",
+          "cachedResultName": "US Grants.gov Tracker"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblX93C9MNzizhibd",
+          "cachedResultUrl": "https://airtable.com/appiNoPRvhJxz9crl/tblX93C9MNzizhibd",
+          "cachedResultName": "Table 1"
+        },
+        "columns": {
+          "value": {
+            "URL": "=https://grants.gov/search-results-detail/{{ $('Get Grant Details').item.json.id }}",
+            "Goal": "={{ $json.output.goal }}",
+            "Notes": "={{ $json.output.good_to_know.join('\\n') }}",
+            "Title": "={{ $('Get Grant Details').item.json.opportunityTitle }}",
+            "Agency": "={{ $('Get Grant Details').item.json.synopsis.agencyContactName }}",
+            "Status": "New",
+            "Funding": "={{ $('Get Grant Details').item.json.synopsis.estimatedFunding }}",
+            "Duration": "={{ $json.output.duration }}",
+            "Award Floor": "={{ $('Get Grant Details').item.json.synopsis.awardFloor }}",
+            "Posted Date": "={{ $('Get Grant Details').item.json.synopsis.postingDate }}",
+            "Agency Email": "={{ $('Get Grant Details').item.json.synopsis.agencyContactEmail }}",
+            "Agency Phone": "={{ $('Get Grant Details').item.json.synopsis.agencyContactPhone }}",
+            "Eligibility?": "={{ $json.output.eligibility_matches.length > 0 ? 'Yes' : 'No' }}",
+            "Award Ceiling": "={{ $('Get Grant Details').item.json.synopsis.awardCeiling }}",
+            "Response Date": "={{ $('Get Grant Details').item.json.synopsis.responseDate }}",
+            "Success Criteria": "={{ $json.output.success_criteria.join('\\n') }}",
+            "Eligibility Notes": "={{ $json.output.eligibility_matches.join('\\n') }}",
+            "Opportunity Number": "={{ $('Get Grant Details').item.json.opportunityNumber }}"
+          },
+          "schema": [
+            {
+              "id": "Opportunity Number",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Opportunity Number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "New",
+                  "value": "New"
+                },
+                {
+                  "name": "Under Review",
+                  "value": "Under Review"
+                },
+                {
+                  "name": "Interested",
+                  "value": "Interested"
+                },
+                {
+                  "name": "Not Interested",
+                  "value": "Not Interested"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Title",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "URL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Goal",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Goal",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Success Criteria",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Success Criteria",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Notes",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Eligibility?",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "name": "No",
+                  "value": "No"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Eligibility?",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Eligibility Notes",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Eligibility Notes",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Duration",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Duration",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Agency",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Agency",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Agency Email",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Agency Email",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Agency Phone",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Agency Phone",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Posted Date",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Posted Date",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Response Date",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Response Date",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Funding",
+              "type": "number",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Funding",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Award Ceiling",
+              "type": "number",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Award Ceiling",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Award Floor",
+              "type": "number",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Award Floor",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": []
+        },
+        "options": {},
+        "operation": "create"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "f0712788-b801-4070-a5c2-2f7ed620588e",
+      "name": "Only New Grants",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "position": [
+        -60,
+        -180
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.id }}"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "fb4ac14d-0bdd-40f7-9b31-3a23450b1f0b",
+      "name": "AI Grants since Yesterday",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -420,
+        -180
+      ],
+      "parameters": {
+        "url": "https://apply07.grants.gov/grantsws/rest/opportunities/search",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "{\n \"keyword\": \"ai\",\n \"cfda\": null,\n \"agencies\": null,\n \"sortBy\": \"openDate|desc\",\n \"rows\": 5000,\n \"eligibilities\": null,\n \"fundingCategories\": null,\n \"fundingInstruments\": null,\n \"dateRange\": \"1\",\n \"oppStatuses\": \"forecasted|posted\"\n}",
+        "sendBody": true,
+        "specifyBody": "json"
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "0446c882-764a-4c94-8c49-f368c50586a0",
+      "name": "Get New Eligible Grants Today",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        -400,
+        500
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appiNoPRvhJxz9crl",
+          "cachedResultUrl": "https://airtable.com/appiNoPRvhJxz9crl",
+          "cachedResultName": "US Grants.gov Tracker"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblX93C9MNzizhibd",
+          "cachedResultUrl": "https://airtable.com/appiNoPRvhJxz9crl/tblX93C9MNzizhibd",
+          "cachedResultName": "Table 1"
+        },
+        "options": {},
+        "operation": "search",
+        "filterByFormula": "=AND(\n {Status} = 'New',\n {Eligibility?} = 'Yes',\n IS_SAME(DATETIME_FORMAT(Created, 'YYYY-MM-DD'), DATETIME_FORMAT(TODAY(), 'YYYY-MM-DD'))\n)"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "70bca43a-d00e-4ee6-828a-9926ba1d8fdb",
+      "name": "Generate Email",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        -160,
+        500
+      ],
+      "parameters": {
+        "html": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional //EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n<head>\n<!--[if gte mso 9]>\n<xml>\n <o:OfficeDocumentSettings>\n <o:AllowPNG/>\n <o:PixelsPerInch>96</o:PixelsPerInch>\n </o:OfficeDocumentSettings>\n</xml>\n<![endif]-->\n <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n <meta name=\"x-apple-disable-message-reformatting\">\n <!--[if !mso]><!--><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><!--<![endif]-->\n <title></title>\n \n <style type=\"text/css\">\n @media only screen and (min-width: 520px) {\n .u-row {\n width: 500px !important;\n }\n .u-row .u-col {\n vertical-align: top;\n }\n\n .u-row .u-col-100 {\n width: 500px !important;\n }\n\n}\n\n@media (max-width: 520px) {\n .u-row-container {\n max-width: 100% !important;\n padding-left: 0px !important;\n padding-right: 0px !important;\n }\n .u-row .u-col {\n min-width: 320px !important;\n max-width: 100% !important;\n display: block !important;\n }\n .u-row {\n width: 100% !important;\n }\n .u-col {\n width: 100% !important;\n }\n .u-col > div {\n margin: 0 auto;\n }\n}\nbody {\n margin: 0;\n padding: 0;\n}\n\ntable,\ntr,\ntd {\n vertical-align: top;\n border-collapse: collapse;\n}\n\np {\n margin: 0;\n}\n\n.ie-container table,\n.mso-container table {\n table-layout: fixed;\n}\n\n* {\n line-height: inherit;\n}\n\na[x-apple-data-detectors='true'] {\n color: inherit !important;\n text-decoration: none !important;\n}\n\ntable, td { color: #000000; } </style>\n \n \n\n</head>\n\n<body class=\"clean-body u_body\" style=\"margin: 0;padding: 0;-webkit-text-size-adjust: 100%;background-color: #F7F8F9;color: #000000\">\n <!--[if IE]><div class=\"ie-container\"><![endif]-->\n <!--[if mso]><div class=\"mso-container\"><![endif]-->\n <table style=\"border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;min-width: 320px;Margin: 0 auto;background-color: #F7F8F9;width:100%\" cellpadding=\"0\" cellspacing=\"0\">\n <tbody>\n <tr style=\"vertical-align: top\">\n <td style=\"word-break: break-word;border-collapse: collapse !important;vertical-align: top\">\n <!--[if (mso)|(IE)]><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td align=\"center\" style=\"background-color: #F7F8F9;\"><![endif]-->\n \n \n \n<div class=\"u-row-container\" style=\"padding: 0px;background-color: #f7f8f9\">\n <div class=\"u-row\" style=\"margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;\">\n <div style=\"border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;\">\n <!--[if (mso)|(IE)]><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td style=\"padding: 0px;background-color: #f7f8f9;\" align=\"center\"><table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:500px;\"><tr style=\"background-color: #ffffff;\"><![endif]-->\n \n<!--[if (mso)|(IE)]><td align=\"center\" width=\"500\" style=\"background-color: #f7f8f9;width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\" valign=\"top\"><![endif]-->\n<div class=\"u-col u-col-100\" style=\"max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;\">\n <div style=\"background-color: #f7f8f9;height: 100%;width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\">\n <!--[if (!mso)&(!IE)]><!--><div style=\"box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\"><!--<![endif]-->\n \n<table style=\"font-family:arial,helvetica,sans-serif;\" role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\">\n <tbody>\n <tr>\n <td style=\"overflow-wrap:break-word;word-break:break-word;padding:32px 10px;font-family:arial,helvetica,sans-serif;\" align=\"left\">\n \n <!--[if mso]><table width=\"100%\"><tr><td><![endif]-->\n <h1 style=\"margin: 0px; line-height: 140%; text-align: center; word-wrap: break-word; font-family: arial black,AvenirNext-Heavy,avant garde,arial; font-size: 22px; font-weight: 400;\"><span><span><span><span><span><span>Latest AI Grants</span></span></span></span></span></span></h1>\n <!--[if mso]></td></tr></table><![endif]-->\n\n </td>\n </tr>\n </tbody>\n</table>\n\n <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->\n </div>\n</div>\n<!--[if (mso)|(IE)]></td><![endif]-->\n <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->\n </div>\n </div>\n </div>\n \n\n\n \n \n<div class=\"u-row-container\" style=\"padding: 0px;background-color: #f7f8f9\">\n <div class=\"u-row\" style=\"margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;\">\n <div style=\"border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;\">\n <!--[if (mso)|(IE)]><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td style=\"padding: 0px;background-color: #f7f8f9;\" align=\"center\"><table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:500px;\"><tr style=\"background-color: transparent;\"><![endif]-->\n \n<!--[if (mso)|(IE)]><td align=\"center\" width=\"500\" style=\"background-color: #ffffff;width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\" valign=\"top\"><![endif]-->\n<div class=\"u-col u-col-100\" style=\"max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;\">\n <div style=\"background-color: #ffffff;height: 100%;width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\">\n <!--[if (!mso)&(!IE)]><!--><div style=\"box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\"><!--<![endif]-->\n \n<table style=\"font-family:arial,helvetica,sans-serif;\" role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\">\n <tbody>\n <tr>\n <td style=\"overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;\" align=\"left\">\n{{\n$input.all().map((input,idx) => {\nreturn `\n <div>\n <div style=\"padding-top:14px;padding-bottom:24px\">\n <h3 style=\"margin-top:0;margin-bottom:7px;font-size:16px\">\n ${idx+1}. ${input.json.Title}\n </h3>\n <div style=\"margin-bottom:14px;font-size:12px;\">\n <strong>${input.json.Agency}</strong>\n &middot;\n <a href=\"${input.json.URL}\">See details</a>\n </div>\n <p style=\"margin-bottom:14px;font-size:14px\">\n <strong>Synopsis:</strong> ${input.json.Goal}\n </p>\n <ul style=\"font-size:14px;\">\n ${input.json['Success Criteria']\n .split('\\n')\n .map(text => `<li>${text}</li>`)\n .join('')\n }\n </ul>\n <div style=\"font-size:12px;\">\n <strong>Posted By</strong> ${input.json['Posted Date']\n .toDateTime()\n .format('EEE, dd MMM yyyy t')}\n <br/>\n <strong>Respond By</strong> ${input.json['Response Date']\n .toDateTime()\n .format('EEE, dd MMM yyyy t')}\n \n </div>\n</div> \n`\n}).join('<hr/>')\n}} \n </td>\n </tr>\n </tbody>\n</table>\n\n <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->\n </div>\n</div>\n<!--[if (mso)|(IE)]></td><![endif]-->\n <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->\n </div>\n </div>\n </div>\n \n\n\n \n \n<div class=\"u-row-container\" style=\"padding: 0px;background-color: transparent\">\n <div class=\"u-row\" style=\"margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;\">\n <div style=\"border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;\">\n <!--[if (mso)|(IE)]><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td style=\"padding: 0px;background-color: transparent;\" align=\"center\"><table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:500px;\"><tr style=\"background-color: transparent;\"><![endif]-->\n \n<!--[if (mso)|(IE)]><td align=\"center\" width=\"500\" style=\"width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\" valign=\"top\"><![endif]-->\n<div class=\"u-col u-col-100\" style=\"max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;\">\n <div style=\"height: 100%;width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\">\n <!--[if (!mso)&(!IE)]><!--><div style=\"box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;\"><!--<![endif]-->\n \n<table style=\"font-family:arial,helvetica,sans-serif;\" role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\">\n <tbody>\n <tr>\n <td style=\"overflow-wrap:break-word;word-break:break-word;padding:24px 10px;font-family:arial,helvetica,sans-serif;\" align=\"left\">\n \n <div style=\"font-size: 14px; color: #7e8c8d; line-height: 140%; text-align: center; word-wrap: break-word;\">\n <p style=\"line-height: 140%;\">Autogenerated by n8n.</p>\n<p style=\"line-height: 140%;\">Brought to you by workflow #{{ $workflow.id }}</p>\n </div>\n\n </td>\n </tr>\n </tbody>\n</table>\n\n <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->\n </div>\n</div>\n<!--[if (mso)|(IE)]></td><![endif]-->\n <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->\n </div>\n </div>\n </div>\n \n\n\n <!--[if (mso)|(IE)]></td></tr></table><![endif]-->\n </td>\n </tr>\n </tbody>\n </table>\n <!--[if mso]></div><![endif]-->\n <!--[if IE]></div><![endif]-->\n</body>\n\n</html>\n"
+      },
+      "executeOnce": true,
+      "typeVersion": 1.2
+    },
+    {
+      "id": "12bd72f5-3028-4572-b59e-1cc143e44a86",
+      "name": "Everyday @ 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -720,
+        460
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "ca62c507-bce5-4a63-be0e-e60591408668",
+      "name": "Everyday @ 8.30am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -720,
+        -220
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "032bec7e-5aff-4103-b81e-e5bc4a88ddde",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -540,
+        -420
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 700,
+        "height": 480,
+        "content": "## 1. 최신 AI 보조금 가져오기, 이미 본 것 무시\n\n[Remove Duplicates 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.removeduplicates/)\n\nn8n의 중복 제거 노드의 멋진 기능은 실행 간에 작동한다는 것입니다. 이 템플릿에 대해 이것이 의미하는 것은 이 노드가 보조금 ID를 추적하여 이미 처리했는지 확인하고, 그렇다면 필터링하여 중복 알림이 발생하지 않도록 도와준다는 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "07147665-3571-4512-adce-2727dcb95240",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        -520
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1000,
+        "height": 720,
+        "content": "## 2. AI를 사용하여 빠르게 적격성을 결정하다\n\n[정보 추출기 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor/)\n\n잠재 고객 자격 확인은 상업, 위치 및 자격 기준과 같은 많은 요인을 고려한 많은 맥락적 추론을 필요로 합니다. AI가 당신의 특정 요구사항에 대해 이를 해결할 수 있거나 할 것이라고 보장되지 않지만, 그래도 당신을 그곳까지 상당히 이끌 수 있습니다!\n\n이 템플릿의 AI는 팀 멤버가 각 보조금 목록에 대해 소비하는 시간을 (그리고 따라서 비용을) 줄이거나, 용량 때문에 그렇지 않으면 놓칠 보조금의 커버리지를 증가시키는 것을 의도합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f4758b4d-727a-4ce8-b071-3388eb16b219",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 520,
+        "height": 480,
+        "content": "## 3. 결과를 Grant Tracker에 저장\n\n[Airtable Node에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.airtable/)\n\nn8n에서 데이터를 어디든 쉽게 보내서 자신으로 관리하거나, 팀과 공유하거나, 다른 워크플로와 재사용할 수 있습니다. 여기서는 데모 목적으로 각 그랜트를 우리 Airtable 데이터베이스의 행으로 저장하겠습니다.\n\n여기 샘플 Airtable을 확인하세요: https://airtable.com/appiNoPRvhJxz9crl/shrRdP6zstgsxjDKL"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a7861a21-021f-4629-b863-2163c7436d13",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -540,
+        240
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 620,
+        "height": 500,
+        "content": "## 4. 최신 AI 보조금 알림 이메일 생성\n\n[HTML 템플릿 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.html/)\n\n새로 수집한 AI 보조금을 사용하여 팀 구성원과 이메일로 공유하는 것이 좋을 것입니다. HTML 템플릿 노드를 사용하여 보기 좋게 형식화된 이메일 요약을 생성할 수 있으며, 추가 링크로 더 큰 영향을 줄 수 있습니다.\n\n이 데모에서, 우리는 모든 적격한 새 보조금을 반복하여 HTML 노드를 사용하여 뉴스레터 형식으로 컴파일할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4d09af53-92cb-4288-86d7-dcf695bfb358",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        100,
+        240
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 640,
+        "height": 500,
+        "content": "## 5. 구독자 목록에 보내기  \n[ Gmail 노드에 대해 자세히 알아보기 ](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.gmail/)  \n\n마침내, 생성된 이메일 뉴스레터를 보내기 위해 구독자 목록을 가져올 수 있습니다.  \n\n여기서, 우리의 구독자 목록은 우리의 보조금 테이블 옆에 있는 또 다른 테이블로, Airtable 노드를 사용하여 그 목록을 가져올 수 있습니다. HTML을 지원하는 어떤 이메일 제공자도 사용할 수 있지만, 이 데모를 위해 간단함을 위해 Gmail을 사용하고 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "784d59f3-5b1f-4404-bc04-4bd58cf03585",
+      "name": "Get Subscribers",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        240,
+        500
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appiNoPRvhJxz9crl",
+          "cachedResultUrl": "https://airtable.com/appiNoPRvhJxz9crl",
+          "cachedResultName": "US Grants.gov Tracker"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblaS91hyhguntfaC",
+          "cachedResultUrl": "https://airtable.com/appiNoPRvhJxz9crl/tblaS91hyhguntfaC",
+          "cachedResultName": "Subscribers"
+        },
+        "options": {},
+        "operation": "search",
+        "filterByFormula": "AND({Status} = 'Active')"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "executeOnce": true,
+      "typeVersion": 2.1
+    },
+    {
+      "id": "3be0788b-90ef-4648-aa25-1170208a685d",
+      "name": "Send Subscriber Email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        480,
+        500
+      ],
+      "webhookId": "37eeec7a-1982-4137-8473-313bfb6c5b42",
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "message": "={{ $('Generate Email').first().json.html }}",
+        "options": {},
+        "subject": "Daily Newletter for Intersting US Grants"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Sf5Gfl9NiFTNXFWb",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "14a65482-b314-4a2f-9ce3-87e3aae126f9",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        300
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 460,
+        "height": 200,
+        "content": "## 예약된 트리거\n[예약된 트리거에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger)\n\n예약된 트리거는 이 템플릿을 아침에 자동으로 실행하여 팀이 근무일을 시작하기 전에 준비되게 하는 훌륭한 방법입니다.\n\n간격을 당신에게 맞는 시간으로 자유롭게 조정하세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b172eb7a-58bc-4d4a-be22-796d34a59897",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        -620
+      ],
+      "parameters": {
+        "width": 460,
+        "height": 900,
+        "content": "## 시도해 보세요!\n\n### 이 n8n 템플릿은 정기적으로 리드 소스를 자동으로 수집하고 n8n의 중복 제거 노드를 활용하여 중복 감지를 간소화하는 방법을 보여줍니다.  \n또한 리드가 수집된 후, 간단한 알림을 생성하여 팀원들과 공유할 수 있습니다.\n\n### 작동 원리\n* 스케줄된 트리거가 grants.gov 웹사이트에서 지난 1일 동안 등록된 AI 그랜트 목록을 가져오도록 설정됩니다.\n* 중복 제거 노드가 그랜트 ID를 추적하여 워크플로우에서 이미 처리된 항목을 필터링합니다.\n* 새로운 그랜트는 AI 노드에 의해 요약 및 분석되어 적격성과 관심도를 판단한 후 Airtable 데이터베이스에 저장됩니다.\n* 첫 번째 트리거보다 약간 늦게 시작되는 또 다른 스케줄된 트리거가 새로운 그랜트를 수집 및 요약합니다.\n* 결과가 HTML 노드를 사용하여 이메일 템플릿으로 컴파일되며, 이는 새로운 AI 그랜트에 대한 뉴스레터 형태로 팀원들에게 알림과 브리핑을 제공하도록 설계됩니다.\n* 이 이메일은 Gmail 노드를 사용하여 구독자 목록에 전송됩니다.\n\n## 사용 방법\n* 샘플 Airtable을 복사하세요: https://airtable.com/appiNoPRvhJxz9crl/shrRdP6zstgsxjDKL\n* 그랜트 가져오기 필터는 현재 \"AI\" 카테고리로 설정되어 있습니다. 더 많은 카테고리를 포함하도록 변경하세요.\n* 그랜트에 관심이 없으시면, 이 템플릿은 다른 리드 소스에도 적용할 수 있습니다. 엔드포인트와 항목 ID 정의 방식을 변경하세요.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d) 에 참여하세요 또는 [Forum](https://community.n8n.io/) 에 물어보세요!\n\n즐거운 해킹!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f9849413-4dad-44dc-92ec-8879d123bfd3",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        40
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 120,
+        "content": "### 여기에 귀하의 회사 세부 정보를 추가하세요!  \n회사 세부 정보는 AI가 적격성을 판단하는 데 도움이 되도록 시스템 프롬프트에 추가됩니다. 세부 정보가 많을수록 좋습니다!"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Save to Tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Everyday @ 9am": {
+      "main": [
+        [
+          {
+            "node": "Get New Eligible Grants Today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Email": {
+      "main": [
+        [
+          {
+            "node": "Get Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grants to List": {
+      "main": [
+        [
+          {
+            "node": "Only New Grants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Send Subscriber Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only New Grants": {
+      "main": [
+        [
+          {
+            "node": "Get Grant Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Tracker": {
+      "main": [
+        []
+      ]
+    },
+    "Everyday @ 8.30am": {
+      "main": [
+        [
+          {
+            "node": "AI Grants since Yesterday",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Grant Details": {
+      "main": [
+        [
+          {
+            "node": "Summarize Synopsis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Eligibility Factors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarize Synopsis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Eligibility Factors",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Synopsis": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eligibility Factors": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Grants since Yesterday": {
+      "main": [
+        [
+          {
+            "node": "Grants to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New Eligible Grants Today": {
+      "main": [
+        [
+          {
+            "node": "Generate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

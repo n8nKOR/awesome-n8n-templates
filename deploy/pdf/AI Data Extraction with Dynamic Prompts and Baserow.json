@@ -1,0 +1,1300 @@
+{
+  "nodes": [
+    {
+      "id": "065d7ec9-edc5-46f6-b8ac-d62ed0e5c8e3",
+      "name": "Baserow Event",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -1180,
+        -140
+      ],
+      "webhookId": "267ea500-e2cd-4604-a31f-f0773f27317c",
+      "parameters": {
+        "path": "267ea500-e2cd-4604-a31f-f0773f27317c",
+        "options": {},
+        "httpMethod": "POST"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "ac1403b4-9d45-404d-9892-0bed39b9ec82",
+      "name": "Event Type",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -220,
+        -140
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "rows.updated",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "2162daf8-d23d-4b8f-8257-bdfc5400a3a8",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.event_type }}",
+                    "rightValue": "rows.updated"
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "field.created",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "48e112f6-afe8-40bf-b673-b37446934a62",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.event_type }}",
+                    "rightValue": "field.created"
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "field.updated",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "5aa258cd-15c2-4156-a32d-afeed662a38e",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.event_type }}",
+                    "rightValue": "field.updated"
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 3.2
+    },
+    {
+      "id": "c501042d-f9e7-4c1a-b01d-b11392b1a804",
+      "name": "Table Fields API",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -900,
+        -140
+      ],
+      "parameters": {
+        "url": "=https://api.baserow.io/api/database/fields/table/{{ $json.body.table_id }}/",
+        "options": {},
+        "sendQuery": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "user_field_names",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "F28aPWK5NooSHAg0",
+          "name": "Baserow (n8n-local)"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "af6c3b7f-bb8b-4037-8e3b-337d81ca5632",
+      "name": "Get Prompt Fields",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -720,
+        -140
+      ],
+      "parameters": {
+        "jsCode": "const fields = $input.all()\n .filter(item => item.json.description)\n .map(item => ({\n id: item.json.id,\n order: item.json.order,\n name: item.json.name,\n description: item.json.description,\n }));\n\nreturn { json: { fields } };"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "e1f8f740-c784-4f07-9265-76db518f3ebc",
+      "name": "Get Event Body",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -380,
+        -140
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "={{ $('Baserow Event').first().json.body }}"
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "e303b7c3-639a-4136-8aa4-074eedeb273f",
+      "name": "List Table API",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        480,
+        220
+      ],
+      "parameters": {
+        "url": "=https://api.baserow.io/api/database/rows/table/{{ $json.table_id }}/",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "nextURL": "={{ $response.body.next || `https://api.baserow.io/api/database/rows/table/${$json.table_id}/?user_field_names=true&size=20&page=9999` }}",
+              "maxRequests": 3,
+              "paginationMode": "responseContainsNextURL",
+              "requestInterval": 1000,
+              "limitPagesFetched": true,
+              "completeExpression": "={{ $response.body.isEmpty() || $response.statusCode >= 400 }}",
+              "paginationCompleteWhen": "other"
+            }
+          }
+        },
+        "sendQuery": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "user_field_names",
+              "value": "true"
+            },
+            {
+              "name": "size",
+              "value": "20"
+            },
+            {
+              "name": "include",
+              "value": "id,order,_id,name,created_at,last_modified_at"
+            },
+            {
+              "name": "filters",
+              "value": "{\"filter_type\":\"AND\",\"filters\":[{\"type\":\"not_empty\",\"field\":\"File\",\"value\":\"\"}],\"groups\":[]}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "F28aPWK5NooSHAg0",
+          "name": "Baserow (n8n-local)"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "9ad2e0c8-c92d-460d-be7a-237ce29b34c2",
+      "name": "Get Valid Rows",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        640,
+        220
+      ],
+      "parameters": {
+        "jsCode": "return $input.all()\n .filter(item => item.json.results?.length)\n .flatMap(item => item.json.results);"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "72b137e9-2e87-4580-9282-0ab7c5147f68",
+      "name": "Get File Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1320,
+        320
+      ],
+      "parameters": {
+        "url": "={{ $json.File[0].url }}",
+        "options": {}
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "d479ee4e-4a87-4a0e-b9ca-4aa54afdc67a",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        1480,
+        320
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "pdf"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "717e36f8-7dd7-44a6-bcef-9f20735853d2",
+      "name": "Update Row",
+      "type": "n8n-nodes-base.httpRequest",
+      "notes": "Execute Once",
+      "onError": "continueRegularOutput",
+      "maxTries": 2,
+      "position": [
+        2280,
+        380
+      ],
+      "parameters": {
+        "url": "=https://api.baserow.io/api/database/rows/table/{{ $('Event Ref').first().json.table_id }}/{{ $('Row Reference').item.json.id }}/",
+        "method": "PATCH",
+        "options": {},
+        "jsonBody": "={{\n{\n ...$input.all()\n .reduce((acc, item) => ({\n ...acc,\n [item.json.field]: item.json.value\n }), {})\n}\n}}",
+        "sendBody": true,
+        "sendQuery": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "user_field_names",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "F28aPWK5NooSHAg0",
+          "name": "Baserow (n8n-local)"
+        }
+      },
+      "executeOnce": true,
+      "notesInFlow": true,
+      "retryOnFail": false,
+      "typeVersion": 4.2,
+      "waitBetweenTries": 3000
+    },
+    {
+      "id": "b807a9c0-2334-491c-a259-1e0e266f89df",
+      "name": "Get Result",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2100,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ad72567-1d17-4910-b916-4c34a43b1060",
+              "name": "field",
+              "type": "string",
+              "value": "={{ $('Event Ref').first().json.field.name }}"
+            },
+            {
+              "id": "e376ba60-8692-4962-9af7-466b6a3f44a2",
+              "name": "value",
+              "type": "string",
+              "value": "={{ $json.text.trim() }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "d29a58db-f547-4a4b-bc20-10e14529e474",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        900,
+        220
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "233b2e96-7873-42f0-989f-c3df5a8e4542",
+      "name": "Row Reference",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1080,
+        320
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "396eb9c0-dcde-4735-9e15-bf6350def086",
+      "name": "Generate Field Value",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1640,
+        320
+      ],
+      "parameters": {
+        "text": "=<file>\n{{ $json.text }}\n</file>\n\nData to extract: {{ $('Event Ref').first().json.field.description }}\noutput format is: {{ $('Event Ref').first().json.field.type }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You assist the user in extracting the required data from the given file.\n* Keep you answer short.\n* If you cannot extract the requested data, give you response as \"n/a\"."
+            }
+          ]
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.5
+    },
+    {
+      "id": "4be0a9e5-e77e-4cea-9dd3-bc6e7de7a72b",
+      "name": "Get Row",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        640,
+        -420
+      ],
+      "parameters": {
+        "url": "=https://api.baserow.io/api/database/rows/table/{{ $('Event Ref1').first().json.table_id }}/{{ $json.id }}/",
+        "options": {},
+        "sendQuery": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "user_field_names",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "F28aPWK5NooSHAg0",
+          "name": "Baserow (n8n-local)"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "40fc77b8-a986-40ab-a78c-da05a3f171c2",
+      "name": "Rows to List",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        320,
+        -420
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "items"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4c5bc9c8-1bcb-48b1-82d0-5cf04535108c",
+      "name": "Fields to Update",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1640,
+        -300
+      ],
+      "parameters": {
+        "jsCode": "const row = $('Row Ref').first().json;\nconst fields = $('Get Prompt Fields').first().json.fields;\nconst missingFields = fields\n .filter(field => field.description && !row[field.name]);\n\nreturn missingFields;"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "85d5c817-e5f8-45ea-bf7f-efc7913f542c",
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        900,
+        -420
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "69005b35-9c66-4c14-80a9-ef8e945dab30",
+      "name": "Row Ref",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1080,
+        -300
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "1b0e14da-13a8-4023-9006-464578bf0ff5",
+      "name": "Get File Data1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1320,
+        -300
+      ],
+      "parameters": {
+        "url": "={{ $('Row Ref').item.json.File[0].url }}",
+        "options": {}
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "47cf67bc-a3e2-4796-b5a7-4f6a6aef3e90",
+      "name": "Extract from File1",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        1480,
+        -300
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "pdf"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3dc743cc-0dde-4349-975c-fa453d99dbaf",
+      "name": "Update Row1",
+      "type": "n8n-nodes-base.httpRequest",
+      "notes": "Execute Once",
+      "onError": "continueRegularOutput",
+      "maxTries": 2,
+      "position": [
+        2440,
+        -260
+      ],
+      "parameters": {
+        "url": "=https://api.baserow.io/api/database/rows/table/{{ $('Event Ref1').first().json.table_id }}/{{ $('Row Ref').first().json.id }}/",
+        "method": "PATCH",
+        "options": {},
+        "jsonBody": "={{\n{\n ...$input.all()\n .reduce((acc, item) => ({\n ...acc,\n [item.json.field]: item.json.value\n }), {})\n}\n}}",
+        "sendBody": true,
+        "sendQuery": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "user_field_names",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "F28aPWK5NooSHAg0",
+          "name": "Baserow (n8n-local)"
+        }
+      },
+      "executeOnce": true,
+      "notesInFlow": true,
+      "retryOnFail": false,
+      "typeVersion": 4.2,
+      "waitBetweenTries": 3000
+    },
+    {
+      "id": "49c53281-d323-4794-919a-d807d7ccc25e",
+      "name": "Get Result1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2260,
+        -260
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ad72567-1d17-4910-b916-4c34a43b1060",
+              "name": "field",
+              "type": "string",
+              "value": "={{ $('Fields to Update').item.json.name }}"
+            },
+            {
+              "id": "e376ba60-8692-4962-9af7-466b6a3f44a2",
+              "name": "value",
+              "type": "string",
+              "value": "={{ $json.text.trim() }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "bc23708a-b177-47db-8a30-4330198710e0",
+      "name": "Generate Field Value1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1800,
+        -300
+      ],
+      "parameters": {
+        "text": "=<file>\n{{ $('Extract from File1').first().json.text }}\n</file>\n\nData to extract: {{ $json.description }}\noutput format is: {{ $json.type }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You assist the user in extracting the required data from the given file.\n* Keep you answer short.\n* If you cannot extract the requested data, give you response as \"n/a\" followed by \"(reason)\" where reason is replaced with reason why data could not be extracted."
+            }
+          ]
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.5
+    },
+    {
+      "id": "c0297c19-04b8-4d56-9ce0-320b399f73bd",
+      "name": "Filter Valid Rows",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        480,
+        -420
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "7ad58f0b-0354-49a9-ab2f-557652d7b416",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.File[0].url }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "5aab6971-1d6f-4b82-a218-4e25c7b28052",
+      "name": "Filter Valid Fields",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        320,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "5b4a7393-788c-42dc-ac1f-e76f833f8534",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.field.description }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "bc144115-f3a2-4e99-a35c-4a780754d0fb",
+      "name": "Event Ref",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        160,
+        220
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "13fd10c0-d4eb-463a-a8b6-5471380f3710",
+      "name": "Event Ref1",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        160,
+        -420
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "e07053a4-a130-41b0-85d3-dfa3983b1547",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1000,
+        -340
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 480,
+        "height": 440,
+        "content": "### 1. 테이블 스키마 가져오기  \n[HTTP 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest)  \n\n이 작업을 위해 Baserow API를 내장 노드 대신 사용해야 합니다. 그러나 이 방법은 쿼리 매개변수와 함께 더 많은 유연성을 허용합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "675b9d6a-1ba6-49ce-b569-38cc0ba04dcb",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -260,
+        -440
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 330,
+        "height": 80,
+        "content": "2a. 최소 수의 행 업데이트  \n이 브랜치가 영향을 받은 행만 업데이트합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "021d51f9-7a5b-4f93-baad-707144aeb7ba",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        140
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 390,
+        "height": 120,
+        "content": "2b. 필드 아래의 모든 행 업데이트  \n이 브랜치가 필드/열이 생성되거나 변경될 때 필드 아래의 모든 적용 가능한 행을 업데이트합니다. 주의하세요 - 행이 수천 개 있으면 시간이 오래 걸릴 수 있습니다!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ae49cfb0-ac83-4501-bc01-d98be32798f0",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1780,
+        -1060
+      ],
+      "parameters": {
+        "width": 520,
+        "height": 1160,
+        "content": "## 직접 해보세요!\n### 이 n8n 템플릿은 Baserow 테이블에 대한 PDF 워크플로 패턴에서 \"동적\" 또는 \"사용자 정의\" 프롬프트를 구동합니다. 간단히 말해, 사용자가 기본 템플릿을 건드리지 않고 프롬프트를 사용하여 스프레드시트를 채울 수 있게 합니다.\n\n**n8n Studio용 비디오 데모를 확인하세요**: https://www.youtube.com/watch?v=_fNAD1u8BZw\n\n이 템플릿은 Baserow의 웹훅 소스로 사용하도록 설계되었습니다. **Airtable 버전이 필요하세요? [여기 클릭](https://n8n.io/workflows/2771-ai-data-extraction-with-dynamic-prompts-and-airtable/)**\n\n## 작동 원리\n* Baserow.io 테이블은 테이블 변경 사항을 접근 가능한 웹훅으로 이벤트로 보내는 통합 기능을 제공합니다. 이는 반응형 트리거 패턴을 가능하게 하며, 우리의 경우에는 `row_updated`, `field_created` 및 `field_updated` 이벤트를 캡처합니다.\n* 다음으로, Baserow.io 테이블에 \"input\" 열이 필요합니다. 이 열은 프롬프트를 평가할 컨텍스트가 저장되는 곳입니다. 이 예시에서 \"input\" 열 이름은 \"file\"이며, 여기에 PDF를 업로드합니다. 이 \"input\" 필드는 사람이 제어하며, 이 템플릿에서 업데이트되지 않습니다.\n* 이제 열(즉, Baserow에서 \"fields\")에 대해 설명하겠습니다. 각 필드는 이름, 유형 및 설명을 정의할 수 있으며, 이들이 함께 스키마를 형성합니다. 처음 두 가지는 자명하지만, \"description\"은 사용자가 프롬프트를 제공하는 곳으로, 필드가 포함해야 할 데이터를 지정합니다.\n* 이 템플릿에서 웹훅 트리거는 행이나 열이 업데이트될 때 대기합니다. 들어오는 이벤트에는 영향을 받은 테이블, 행 및/또는 열 ID와 같은 많은 세부 정보가 포함됩니다.\n* 이 정보를 사용하여 테이블의 스키마를 가져와 열의 설명(즉, 동적 프롬프트)을 가져옵니다.\n* 각 트리거된 이벤트에 대해 입력(즉, PDF)을 다운로드하여 AI/LLM에 준비합니다. 사용 가능한 열을 반복하며 동적 프롬프트를 제공하여 LLM이 PDF에 대해 프롬프트를 실행하고 각 셀에 대한 값 응답을 생성합니다.\n* 이러한 값들을 수집하여 Baserow 테이블을 업데이트합니다.\n\n## 사용 방법\n* 이 워크플로를 게시하여 Baserow 인스턴스에서 접근 가능하게 해야 합니다. 한 번만 하면 되며, 여러 Baserow 테이블에 재사용할 수 있습니다.\n* Baserow 테이블을 구성하여 `row_updated`, `field_created` 및 `field_updated` 이벤트를 이 n8n 워크플로로 보내게 합니다.\n* 이 워크플로는 클라우드 호스팅 버전과 자체 호스팅 버전의 Baserow 모두에서 작동합니다.\n\n### 도움이 필요하세요?\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 참여하거나 [Forum](https://community.n8n.io/)에서 문의하세요!\n\n즐거운 플로우그램밍!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "23ea63f5-e1ad-4326-95a4-945bf98d03f4",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -500,
+        -340
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 580,
+        "height": 440,
+        "content": "### 2. 이벤트 라우터 패턴\n\n[Switch 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.switch/)\n\n단순한 switch 노드를 사용하여 처리할 이벤트를 결정할 수 있습니다. 우리 행 이벤트와 필드 이벤트의 차이점은 행 이벤트가 하나의 행에 영향을 미치는 반면 필드 이벤트는 모든 행에 영향을 미친다는 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "179f9459-43d0-4342-ab94-e248730182a5",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        100,
+        -620
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 700,
+        "height": 400,
+        "content": "### 3. 유효 입력이 있는 행만 필터링  \n[Split Out 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.splitout/)  \n\n이 단계는 하나 이상의 업데이트된 행을 처리합니다. 여기서 \"업데이트된\"은 해당 행의 \"input\" 열(예: 우리 예제의 \"file\")이 변경되었음을 의미합니다. 각 영향을 받은 행에 대해, 전체 행을 가져와 업데이트해야 할 열들만 식별합니다. 이는 이미 값이 있는 열에 대해 불필요한 작업을 피하기 위한 최적화입니다. 즉, 이미 값이 있는 열에 대해 값을 생성하지 않도록 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7124a8c0-549e-4b82-8e1f-c6428d2bfb44",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2140,
+        -480
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 520,
+        "height": 440,
+        "content": "### 6. Baserow 테이블 행 업데이트\n\n[필드 편집 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set/)\n\n마침내, 우리는 LLM 응답을 수집하고 이를 결합하여 Baserow 테이블 행을 업데이트하기 위한 API 요청을 구축할 수 있습니다 - 이 행의 ID는 초기 웹훅에서 얻었습니다. 이 작업이 완료된 후, 우리는 다음 행으로 이동하여 프로세스를 반복할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c55ce945-10ba-440b-a444-81cb4ed63539",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1260,
+        -580
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 860,
+        "height": 580,
+        "content": "### 5. PDF, LLM 및 동적 프롬프트? 오 마이!\n\n[기본 LLM 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm/)\n\n이 단계에서 모든 것이 합쳐집니다! 간단히 말해서, 우리는 LLM에 PDF 내용을 컨텍스트로 제공하고, 이전에 가져온 스키마에서 동적 프롬프트를 우리 행에 대해 반복합니다. 결국, 우리 LLM은 요청된 각 열에 대한 값을 생성해야 합니다.\n\n**노트**: PDF를 캐싱하기 위한 최적화가 확실히 가능하지만, 이는 이 데모의 범위를 벗습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1a0ff82e-64aa-479e-8dec-c29b512b0686",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        820,
+        -580
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 420,
+        "height": 460,
+        "content": "### 4. 항목 루프 사용  \n[배치로 분할 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.splitinbatches/)  \n\n배치로 분할 노드가 여기에서 한 번에 하나의 행을 업데이트하도록 사용됩니다. 그러나 이는 사용자 경험을 위한 선호 사항입니다 - 변경 사항이 Baserow에서 더 빠르게 표시됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f4562d44-4fc0-4c59-ba90-8b65f1162aac",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        100,
+        40
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 680,
+        "height": 360,
+        "content": "### 7. 해당 열 아래의 모든 행 나열\n\n[코드 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code)\n\n우리는 Baserow의 List API와 HTTP 노드의 페이지네이션 기능을 사용하여 영향을 받은 필드 아래의 모든 적합한 행을 가져올 수 있습니다 - API의 필터 쿼리가 여기서 도움이 됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "979983e9-1002-444c-a018-50ce525ef02a",
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1260,
+        140
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 700,
+        "height": 500,
+        "content": "### 9. LLM을 사용하여 값 생성\n[Extract From File 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.extractfromfile/)\n\nStep 5와 거의 동일하지만, 모든 필드/컬럼을 업데이트하는 대신, 하나의 값만 생성하면 됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f38aa7a3-479b-4876-87bf-769ada3089f2",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1800,
+        -140
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "a5061210-2e6b-4b62-994f-594fc10a0ac6",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        820,
+        40
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 420,
+        "height": 460,
+        "content": "8. 항목 루프 사용  \n[Split in Batches 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.splitinbatches/)  \n\n4단계와 유사하게, Split in Batches 노드는 사용자 경험을 위한 선호 사항입니다 - 변경 사항이 Baserow에서 더 빠르게 표시됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e47e36d4-bf6d-48d3-9e52-d8bbac06c4b4",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1640,
+        500
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "52501eab-861e-4de9-837d-65879cd43e5b",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1980,
+        200
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 500,
+        "height": 380,
+        "content": "### 10. Baserow 테이블 행 업데이트\n\n[Edit Fields 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set/)\n\nStep 6과 마찬가지로, LLM 응답은 행을 업데이트하는 데 사용되지만, 생성되거나 변경된 필드에서만입니다. 완료되면, 루프가 계속되어 다음 행이 처리됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6d9fb2e9-6aca-4276-b9b3-d409be24e40e",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1780,
+        -1200
+      ],
+      "parameters": {
+        "color": 7,
+        "height": 120,
+        "content": "베이스로우.아이오"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "bccfc32b-fd18-4de7-88d5-0aeb02ab7954",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        -1280
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 820,
+        "height": 800,
+        "content": "## ⭐️ Baserow 웹훅 생성\nBaserow 웹훅은 UI를 통해 생성되며, 옵션은 툴바의 3점 버튼을 클릭하여 접근할 수 있습니다.\n\n* 이 템플릿에서 찾은 n8n 웹훅 URL에 대한 POST 웹훅을 생성하세요.\n* \"ID 대신 필드 이름 사용\" 옵션을 선택하세요.\n* \"개별 이벤트를 선택하게 하다\" 옵션을 선택하세요.\n* 선택할 이벤트는 \"행 업데이트\", \"필드 생성\" 및 \"필드 업데이트\"입니다.\n* \"행 업데이트\" 이벤트의 경우, 입력 필드를 지정하세요 - 이 경우, \"File\"."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Row Ref": {
+      "main": [
+        [
+          {
+            "node": "Get File Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Ref": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Ref1": {
+      "main": [
+        [
+          {
+            "node": "Rows to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Type": {
+      "main": [
+        [
+          {
+            "node": "Event Ref1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Event Ref",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Event Ref",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Result": {
+      "main": [
+        [
+          {
+            "node": "Update Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Result1": {
+      "main": [
+        [
+          {
+            "node": "Update Row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Row1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rows to List": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baserow Event": {
+      "main": [
+        [
+          {
+            "node": "Table Fields API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File Data": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Row Reference": {
+      "main": [
+        [
+          {
+            "node": "Get File Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Event Body": {
+      "main": [
+        [
+          {
+            "node": "Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File Data1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Valid Rows": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Table API": {
+      "main": [
+        [
+          {
+            "node": "Get Valid Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Row Reference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fields to Update": {
+      "main": [
+        [
+          {
+            "node": "Generate Field Value1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Row Ref",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Table Fields API": {
+      "main": [
+        [
+          {
+            "node": "Get Prompt Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Generate Field Value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Rows": {
+      "main": [
+        [
+          {
+            "node": "Get Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Prompt Fields": {
+      "main": [
+        [
+          {
+            "node": "Get Event Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Field Value1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Fields to Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Field Value",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Fields": {
+      "main": [
+        [
+          {
+            "node": "List Table API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Field Value": {
+      "main": [
+        [
+          {
+            "node": "Get Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Field Value1": {
+      "main": [
+        [
+          {
+            "node": "Get Result1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

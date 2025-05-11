@@ -1,0 +1,525 @@
+{
+  "id": "7cXvgkl9170QXzT2",
+  "meta": {
+    "instanceId": "69133932b9ba8e1ef14816d0b63297bb44feb97c19f759b5d153ff6b0c59e18d",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RAG Workflow For Company Documents stored in Google Drive",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "753455a3-ddc8-4a74-b043-70a0af38ff9e",
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        680,
+        0
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {},
+        "pineconeIndex": {
+          "__rl": true,
+          "mode": "list",
+          "value": "company-files",
+          "cachedResultName": "company-files"
+        }
+      },
+      "credentials": {
+        "pineconeApi": {
+          "id": "bQTNry52ypGLqt47",
+          "name": "PineconeApi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a7c8fa7f-cad2-4497-a295-30aa2e98cacc",
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "position": [
+        640,
+        280
+      ],
+      "parameters": {
+        "modelName": "models/text-embedding-004"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jLOqyTR4yTT1nYKi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "215f0519-4359-4e4b-a90c-7e54b1cc52b5",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        840,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "dataType": "binary",
+        "binaryMode": "specificField"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "863d3d1d-1621-406e-8320-688f64b07b09",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        820,
+        420
+      ],
+      "parameters": {
+        "options": {},
+        "chunkOverlap": 100
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5af1efb1-ea69-466e-bb3b-2b7e6b1ceef7",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        420,
+        840
+      ],
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful HR assistant designed to answer employee questions based on company policies.\n\nRetrieve relevant information from the provided internal documents and provide a concise, accurate, and informative answer to the employee's question.\n\nUse the tool called \"company_documents_tool\" to retrieve any information from the company's documents.\n\nIf the answer cannot be found in the provided documents, respond with \"I cannot find the answer in the available resources.\""
+        }
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "825632ac-1edf-4e63-948d-b1a498b2b962",
+      "name": "Vector Store Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "position": [
+        820,
+        1060
+      ],
+      "parameters": {
+        "name": "company_documents_tool",
+        "description": "Retrieve information from any company documents"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "72d2f685-bcc3-4e62-a5e3-72c0fe65f8e8",
+      "name": "Pinecone Vector Store (Retrieval)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        720,
+        1240
+      ],
+      "parameters": {
+        "options": {},
+        "pineconeIndex": {
+          "__rl": true,
+          "mode": "list",
+          "value": "company-files",
+          "cachedResultName": "company-files"
+        }
+      },
+      "credentials": {
+        "pineconeApi": {
+          "id": "bQTNry52ypGLqt47",
+          "name": "PineconeApi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "eeff81cb-6aec-4e7f-afe0-432d87085fb2",
+      "name": "Embeddings Google Gemini (retrieval)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "position": [
+        700,
+        1400
+      ],
+      "parameters": {
+        "modelName": "models/text-embedding-004"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jLOqyTR4yTT1nYKi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8bb6ebb1-1deb-498b-8da4-b809a736e097",
+      "name": "Download File From Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        460,
+        0
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {
+          "fileName": "={{ $json.name }}"
+        },
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uixLsi5TmrfwXPeB",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "bd83bacf-dff1-4b7c-af5c-b249fb16c113",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        420,
+        660
+      ],
+      "parameters": {
+        "content": "회사 문서와 채팅"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7b90daab-0fb2-4c8a-93e6-b138bb04f282",
+      "name": "Google Drive File Updated",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        140,
+        140
+      ],
+      "parameters": {
+        "event": "fileUpdated",
+        "options": {},
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1evDIoHePhjw_LgVFZXSZyK1sZm2GHp9W",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1evDIoHePhjw_LgVFZXSZyK1sZm2GHp9W",
+          "cachedResultName": "INNOVI PRO"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uixLsi5TmrfwXPeB",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3a6c6cef-7a19-42ef-8092-eaf57dae4cdd",
+      "name": "Google Drive File Created",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        140,
+        -120
+      ],
+      "parameters": {
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1evDIoHePhjw_LgVFZXSZyK1sZm2GHp9W",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1evDIoHePhjw_LgVFZXSZyK1sZm2GHp9W",
+          "cachedResultName": "INNOVI PRO"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uixLsi5TmrfwXPeB",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1e38f1c8-7bd0-4eeb-addc-62339582d350",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        500,
+        1140
+      ],
+      "parameters": {},
+      "typeVersion": 1.3
+    },
+    {
+      "id": "4b0ab858-99b1-4337-8c5c-a223519e3662",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        80,
+        840
+      ],
+      "webhookId": "5f1c0c82-0ff9-40c7-9e2e-b1a96ffe24cd",
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "bfb684d1-e5c1-41da-8305-b2606a2eade6",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        440,
+        -240
+      ],
+      "parameters": {
+        "width": 320,
+        "content": "## Google Drive에서 문서를 업데이트하거나 새 문서를 생성할 때 벡터 저장소에 문서를 추가"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8f627ec6-4b3f-43ad-a4a3-e2b199a7fe58",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        320,
+        1140
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jLOqyTR4yTT1nYKi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f2133a06-0088-46de-9f74-a3f9fe478f98",
+      "name": "Google Gemini Chat Model (retrieval)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1080,
+        1240
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jLOqyTR4yTT1nYKi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "578deb96-8393-4850-9757-fa97b2bc9992",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -540,
+        220
+      ],
+      "parameters": {
+        "width": 420,
+        "height": 720,
+        "content": "## 설정 단계\n\n1. Google Cloud 프로젝트 및 Vertex AI API:\n* Google Cloud 프로젝트를 생성하세요.\n* 프로젝트에 Vertex AI API를 활성화하세요.\n2. Google AI API 키:\n* Google AI Studio에서 Google AI API 키를 얻으세요.\n3. Pinecone 계정:\n* Pinecone 웹사이트에서 무료 계정을 생성하세요.\n* Pinecone 대시보드에서 API 키를 얻으세요.\n* Pinecone 프로젝트에서 company-files라는 인덱스를 생성하세요.\n4. Google Drive:\n* 회사 문서가 저장될 Google Drive에 전용 폴더를 생성하세요.\n5. n8n의 자격 증명: n8n 환경에서 다음 자격 증명을 구성하세요:\n* Google Drive OAuth2\n* Google Gemini(PaLM) API (Google AI API 키 사용)\n* Pinecone API (Pinecone API 키 사용)\n5. 워크플로우 가져오기:\n* 이 워크플로우를 n8n 인스턴스에 가져오세요.\n6. 워크플로우 구성:\n* Google Drive 트리거 노드를 둘 다 업데이트하여 Google Drive에 생성한 특정 폴더를 감시하도록 하세요.\n* Pinecone Vector Store 노드를 구성하여 company-files 인덱스를 사용하세요."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "33b252fb-5d87-4a29-a0a7-97308140699c",
+  "connections": {
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        []
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive File Created": {
+      "main": [
+        [
+          {
+            "node": "Download File From Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive File Updated": {
+      "main": [
+        [
+          {
+            "node": "Download File From Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File From Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store (Retrieval)": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini (retrieval)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store (Retrieval)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model (retrieval)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1664 @@
+{
+  "meta": {
+    "instanceId": "408f9fb9940c3cb18ffdef0e0150fe342d6e655c3a9fac21f0f644e8bedabcd9"
+  },
+  "nodes": [
+    {
+      "id": "f55b3110-f960-4d89-afba-d47bc58102eb",
+      "name": "Twilio Trigger",
+      "type": "n8n-nodes-base.twilioTrigger",
+      "position": [
+        100,
+        180
+      ],
+      "webhookId": "bfc8f587-8183-46f8-9e76-3576caddf8c0",
+      "parameters": {
+        "updates": [
+          "com.twilio.messaging.inbound-message.received"
+        ]
+      },
+      "credentials": {
+        "twilioApi": {
+          "id": "TJv4H4lXxPCLZT50",
+          "name": "Twilio account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8472f5b0-329f-45ac-b35f-c42558daa7c7",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1140,
+        1360
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4b3e8a26-c808-46e5-bbcf-2e1279989a0b",
+      "name": "Find Follow-Up Candidates",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        720,
+        1240
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appO2nHiT9XPuGrjN",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN",
+          "cachedResultName": "Twilio-Scheduling-Agent"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblokH7uw63RpIlQ0",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN/tblokH7uw63RpIlQ0",
+          "cachedResultName": "Lead Tracker"
+        },
+        "options": {},
+        "operation": "search",
+        "filterByFormula": "=AND(\n {appointment_id} = '',\n {status} != 'STOP',\n {followup_count} < 3,\n DATETIME_DIFF(TODAY(), {last_followup_at}, 'days') >= 3\n)"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "04dc979c-ad36-4e57-93d4-905929fe1af0",
+      "name": "Send Follow Up Message",
+      "type": "n8n-nodes-base.twilio",
+      "position": [
+        1880,
+        1240
+      ],
+      "parameters": {
+        "to": "={{ $('Find Follow-Up Candidates').item.json.session_id }}",
+        "from": "={{ $('Find Follow-Up Candidates').item.json.twilio_service_number }}",
+        "message": "={{ $('Generate Follow Up Message').item.json.text }}\nReply STOP to stop recieving these messages.",
+        "options": {}
+      },
+      "credentials": {
+        "twilioApi": {
+          "id": "TJv4H4lXxPCLZT50",
+          "name": "Twilio account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "55e222af-fb59-4ffd-9661-350b1972e802",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        570,
+        943
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 408.6631332343324,
+        "height": 515.2449997772154,
+        "content": "6단계. Airtable에서 열린 문의를 필터링\n\n### 💡후속 후보 기준\n* 예정된 약속 없음\n* STOP 요청 없음\n* 지난 3일 동안 이전 후속 없음\n* 후속이 3회 미만"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "50d0c632-233b-4b31-b396-3fa603aecd03",
+      "name": "Update Follow-Up Count and Date",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        1700,
+        1240
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appO2nHiT9XPuGrjN",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN",
+          "cachedResultName": "Twilio-Scheduling-Agent"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblokH7uw63RpIlQ0",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN/tblokH7uw63RpIlQ0",
+          "cachedResultName": "Lead Tracker"
+        },
+        "columns": {
+          "value": {
+            "session_id": "={{ $('Find Follow-Up Candidates').item.json.session_id }}",
+            "followup_count": "={{ ($('Find Follow-Up Candidates').item.json.followup_count ?? 0) + 1 }}",
+            "last_followup_at": "={{ $now.toISO() }}"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true
+            },
+            {
+              "id": "session_id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "session_id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "ACTIVE",
+                  "value": "ACTIVE"
+                },
+                {
+                  "name": "STOP",
+                  "value": "STOP"
+                }
+              ],
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "customer_name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_summary",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "customer_summary",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_messages",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "chat_messages",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scheduled_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "scheduled_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "appointment_id",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "appointment_id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_message_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "last_message_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_followup_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "last_followup_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "followup_count",
+              "type": "number",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "followup_count",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assignee",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "assignee",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ]
+        },
+        "options": {},
+        "operation": "update"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "e1331352-c3da-4586-9d64-4be4dab49748",
+      "name": "Create/Update Session",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        2240,
+        269
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appO2nHiT9XPuGrjN",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN",
+          "cachedResultName": "Twilio-Scheduling-Agent"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblokH7uw63RpIlQ0",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN/tblokH7uw63RpIlQ0",
+          "cachedResultName": "Lead Tracker"
+        },
+        "columns": {
+          "value": {
+            "session_id": "={{ $('Twilio Trigger').item.json.From }}",
+            "scheduled_at": "={{\n$('Appointment Scheduling Agent').item.json.output.has_appointment_scheduled\n ? $('Appointment Scheduling Agent').item.json.output.appointment.scheduled_at\n : (\n $('Get Existing Chat Session').item.json.isNotEmpty()\n ? $('Get Existing Chat Session').item.json.scheduled_at\n : $now.toISO()\n )\n}}",
+            "chat_messages": "={{\nJSON.stringify(\n ($('Get Existing Chat Session').item.json.chat_messages ? JSON.parse($('Get Existing Chat Session').item.json.chat_messages) : [])\n .concat(\n { \"role\": \"human\", \"message\": $('Twilio Trigger').item.json.Body },\n { \"role\": \"assistant\", \"message\": $('Appointment Scheduling Agent').item.json.output.reply }\n )\n)\n}}",
+            "customer_name": "={{\n !$('Get Existing Chat Session').item.json.customer_name &&\n $('Appointment Scheduling Agent').item.json.output.customer_name\n ? $('Appointment Scheduling Agent').item.json.output.customer_name\n : ($('Get Existing Chat Session').item.json.customer_name ?? '')\n}}",
+            "appointment_id": "={{\n$('Appointment Scheduling Agent').item.json.output.has_appointment_scheduled\n ? $('Appointment Scheduling Agent').item.json.output.appointment.appointment_id\n : (\n $('Get Existing Chat Session').item.json.isNotEmpty()\n ? $('Get Existing Chat Session').item.json.appointment_id\n : ''\n )\n}}",
+            "followup_count": "={{\n !$('Get Existing Chat Session').item.json.followup_count\n ? 0\n : $('Get Existing Chat Session').item.json.followup_count\n}}",
+            "last_message_at": "={{ $now.toISO() }}",
+            "customer_summary": "={{\n !$('Get Existing Chat Session').item.json.appointment_id\n && $('Appointment Scheduling Agent').item.json.output.has_appointment_scheduled\n ? $json.output.enquiry_summary\n : $('Get Existing Chat Session').item.json.customer_summary\n}}",
+            "last_followup_at": "={{\n !$('Get Existing Chat Session').item.json.last_followup_at\n ? $now.toISO()\n : $('Get Existing Chat Session').item.json.last_followup_at\n}}",
+            "twilio_service_number": "={{ $('Twilio Trigger').item.json.To }}"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true
+            },
+            {
+              "id": "session_id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "session_id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "ACTIVE",
+                  "value": "ACTIVE"
+                },
+                {
+                  "name": "STOP",
+                  "value": "STOP"
+                }
+              ],
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "customer_name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_summary",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "customer_summary",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_messages",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "chat_messages",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scheduled_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "scheduled_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "appointment_id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "appointment_id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_message_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "last_message_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_followup_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "last_followup_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "followup_count",
+              "type": "number",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "followup_count",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assignee",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "assignee",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "twilio_service_number",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "twilio_service_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ]
+        },
+        "options": {},
+        "operation": "update"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "de8eaa46-2fe8-4afd-a400-9c528f578d24",
+      "name": "Get Existing Chat Session",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        740,
+        240
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appO2nHiT9XPuGrjN",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN",
+          "cachedResultName": "Twilio-Scheduling-Agent"
+        },
+        "limit": 1,
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblokH7uw63RpIlQ0",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN/tblokH7uw63RpIlQ0",
+          "cachedResultName": "Lead Tracker"
+        },
+        "options": {},
+        "operation": "search",
+        "returnAll": false,
+        "filterByFormula": "={session_id}=\"{{ $('Twilio Trigger').item.json.From }}\""
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "16aabbf0-fdf7-4940-a3a3-962e0b877299",
+      "name": "Every 24hrs",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        220,
+        1160
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "9471b840-3a59-491d-a309-180d5a69fb7e",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.twilio",
+      "position": [
+        2420,
+        269
+      ],
+      "parameters": {
+        "to": "={{ $('Twilio Trigger').item.json.From }}",
+        "from": "={{ $('Twilio Trigger').item.json.To }}",
+        "message": "={{ $('Appointment Scheduling Agent').item.json.output.reply }}",
+        "options": {}
+      },
+      "credentials": {
+        "twilioApi": {
+          "id": "TJv4H4lXxPCLZT50",
+          "name": "Twilio account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "601aa9ea-f3f4-49bd-a391-84e32c47f7ba",
+      "name": "Send Confirmation",
+      "type": "n8n-nodes-base.twilio",
+      "position": [
+        900,
+        -280
+      ],
+      "parameters": {
+        "to": "={{ $('Twilio Trigger').item.json.From }}",
+        "from": "={{ $('Twilio Trigger').item.json.To }}",
+        "message": "Thank you. You won't receive any more messages from us!",
+        "options": {}
+      },
+      "credentials": {
+        "twilioApi": {
+          "id": "TJv4H4lXxPCLZT50",
+          "name": "Twilio account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a8b9fffe-f814-4cb4-9e1a-bf7eb57e7afd",
+      "name": "User Request STOP",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        660,
+        -280
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appO2nHiT9XPuGrjN",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN",
+          "cachedResultName": "Twilio-Scheduling-Agent"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblokH7uw63RpIlQ0",
+          "cachedResultUrl": "https://airtable.com/appO2nHiT9XPuGrjN/tblokH7uw63RpIlQ0",
+          "cachedResultName": "Lead Tracker"
+        },
+        "columns": {
+          "value": {
+            "status": "STOP",
+            "session_id": "={{ $('Twilio Trigger').item.json.From }}"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true
+            },
+            {
+              "id": "session_id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "session_id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "ACTIVE",
+                  "value": "ACTIVE"
+                },
+                {
+                  "name": "STOP",
+                  "value": "STOP"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_messages",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "chat_messages",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scheduled_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "scheduled_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_message_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "last_message_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_followup_at",
+              "type": "dateTime",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "last_followup_at",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "followup_count",
+              "type": "number",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "followup_count",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assignee",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "assignee",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ]
+        },
+        "options": {},
+        "operation": "update"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "3e7797f0-5449-404c-bac9-e0019223cea8",
+      "name": "Check For Command Words",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        295,
+        180
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "STOP",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "leftValue": "={{ $json.Body }}",
+                    "rightValue": "STOP"
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "e636ebb5-16c6-43ef-9fee-fe2b9a8c95a9",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1960,
+        560
+      ],
+      "parameters": {
+        "jsonSchemaExample": "{\n \"reply\": \"\",\n \"customer_name\": \"\",\n \"enquiry_summary\": \"\",\n\t\"has_appointment_scheduled\": false,\n \"appointment\": {\n \"appointment_id\": \"\",\n \"scheduled_at\": \"\"\n }\n}"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "3469740d-bd2f-4d34-a86b-59b088917d74",
+      "name": "Auto-fixing Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "position": [
+        1820,
+        440
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "fc0adfdf-724c-45d2-84f6-cb2b43254cc0",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1840,
+        560
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0e0d8236-0f10-4f8f-88c1-bba2ef084e90",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1080,
+        -50.317404874203476
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1011.8938194478603,
+        "height": 917.533068142247,
+        "content": "## 3단계. AI를 사용한 약속 예약\n\n[AI 에이전트 사용에 대해 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent)\n\nAI 에이전트를 사용하는 것은 최신 AI 기술을 활용해 워크플로를 간소화하고 향상시키는 강력한 방법입니다. 우리의 약속 예약 에이전트는 고객과 대화할 수 있도록 설계되었으며, 약속을 예약, 재예약 및 취소하는 데 필요한 모든 도구를 갖추고 있습니다.\n\n**HTTP Tool** 노드를 사용하면 타사 API 서비스에 쉽게 연결하여 작업을 수행할 수 있습니다. 이 워크플로에서 Cal.com API를 호출하여 예약 이벤트를 처리합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "380b437e-fa29-4ebb-bebd-1984d371bc93",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        549.8696404310444,
+        -49.46972087742148
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 504.0066355303578,
+        "height": 557.8466102697549,
+        "content": "## 2단계. 기존 채팅 기록 확인  \n[Airtable 사용에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.airtable)  \n\n우리는 Airtable을 고객 세션 관리와 채팅 기록 캡처를 위해 사용하고 있습니다. Airtable은 지속적인 데이터베이스로 작용하며 유연한 API를 가지고 있어 추가 확장에 필수적일 수 있습니다.  \n\n이전 채팅 기록을 가져와서 우리 에이전트에게 전달하여 대화를 계속할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f89762f5-8520-4af6-987d-a71381c603e3",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        -52.79744987055557
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 523.6927529886705,
+        "height": 479.4432905734608,
+        "content": "## 1단계. 고객 SMS 대기\n\n[Twilio 트리거에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/trigger-nodes/n8n-nodes-base.twiliotrigger)\n\n이 워크플로우에서 Twilio SMS 트리거를 사용하여 PC 또는 랩탑 수리를 예약하려는 고객의 문의를 받습니다.\n\nSMS를 다루기 때문에 고객이 추가 후속 메시지를 중지(STOP)하기를 원하는지 확인하는 단계를 가집니다. 이는 나중에 다룰 선택적 단계입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "de525648-ef11-4b48-85ea-c6e5463c87cf",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        540,
+        -450.0217713292123
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 563.7797724327219,
+        "height": 358.6710117357418,
+        "content": "## 9단계. 후속 메시지 취소\n\n고객이 봇에게 STOP이라는 단어로 메시지를 보내면, 우리는 Airtable에서 고객 기록을 업데이트하여 추가 후속 메시지가 트리거되는 것을 방지할 것입니다. 그 후 고객에게 확인 메시지가 보내집니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "028e4253-d1e6-4cf8-b181-ba27b03fa66e",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2120,
+        -40
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 521.5259177258192,
+        "height": 558.7093446159199,
+        "content": "## 4단계. Airtable 업데이트 및 고객 응답  \n[Twilio 사용에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.twilio)  \n\n에이전트가 응답을 작성한 후, 약속 테이블을 업데이트하여 대화의 모든 단계를 기록할 수 있습니다.  \n\n약속이 예약되지 않은 경우, 이 워크플로의 후반부로 이동하여 잠재 고객과 그들의 문의에 후속 조치를 취할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f321ded9-c5d3-418d-bf1c-e29bf9845098",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        940
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 509.931737588259,
+        "height": 433.74984757777247,
+        "content": "## 5단계. 열린 문의사항 후속 조치\n\n[예약된 트리거 사용에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger)\n\n이 워크플로의 후반부는 채트봇과 상호작용했으나 아직 약속을 확정하지 않은 고객을 식별하는 데 관한 것입니다. 우리는 문의가 여전히 유효한지 묻는 후속 메시지를 보내고, 고객과 약속을 잡도록 장려할 계획입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4485e39a-3e84-49ee-9d3f-a271a98a330a",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1000,
+        940
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 567.1169284476533,
+        "height": 601.5572296901626,
+        "content": "## 7단계. 후속 메시지 생성\n[Basic LLM Chain에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm)\n\nAirtable에서 세션과 채팅 기록을 검색한 후, AI에게 고객을 다시 참여시키기 위한 잘 작성된 후속 메시지를 생성하도록 간단히 요청할 수 있습니다.\n\n논리가 선형적인 경우, Basic LLM chain은 많은 워크플로에 적합합니다. 에이전트가 항상 필요한 것은 아닙니다!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f2d66e44-cf18-4e8f-80d5-e8d03e10e5ff",
+      "name": "Generate Follow Up Message",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1140,
+        1200
+      ],
+      "parameters": {
+        "text": "=",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an appointment scheduling assistant for PC and Laptop Repairs for a company called \"PC Parts Ltd\". You shall refer to yourself as the \"service team\". You had a conversation with a customer on {{ $json.last_message_at }} but the enquiry did not end with an appointment being scheduled.\n{{ $json.last_followup_at ? `You last sent a follow-up message on ${$json.last_followup_at}` : '' }}.\n\nYou task is to ask if the prospective customer would like to continue with the enquiry using the following information gather to construct a relevant follow-up message. Try to entice the user to continue the conversation and ultimately schedule an appointment.\n\n## About the customer\nname: {{ $json.customer_name ?? '<unknown>' }}\nenquiry summary: {{ $json.customer_summary ?? '<uknown>' }}\n\n# Existing conversation\nHere are the chat logs of the existing conversation:\n{{ $json.chat_messages }}"
+            }
+          ]
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.4
+    },
+    {
+      "id": "0b93a300-b9ab-4c28-8ac0-fddc49247b74",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1600,
+        940
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 496.0833287715134,
+        "height": 526.084030034264,
+        "content": "## 8단계. 팔로업 속성 업데이트 및 메시지 보내기  \n[Twilio 사용에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.twilio/)  \n\n마침내, 우리는 Airtable의 고객 기록의 일부로 팔로업 활동을 업데이트할 것입니다. 팔로업 횟수를 추적하는 것은 고객에게 불필요하게 스팸을 보내는 것을 방지하는 데 도움이 됩니다.  \n\n팔로업 메시지는 Twilio를 통해 보내지며, STOP 키워드를 사용하여 추가 팔로업 메시지를 비활성화하는 지시를 포함합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0e022485-9504-416a-8632-edd65df29bf4",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        -80
+      ],
+      "parameters": {
+        "width": 437.0019498737189,
+        "height": 511.67220311821393,
+        "content": "## 시도해 보세요!\n\n### 이 워크플로는 AI 도구 에이전트에 의해 구동되는 약속 예약 채팅봇을 구현합니다.\n* 워크플로는 SMS를 통해 보내진 고객 문의에 의해 트리거됩니다.\n* 고객 세션 관리와 채팅 기록은 SMS 대화를 가능하게 하기 위해 Airtable에 캡처됩니다.\n* AI 에이전트는 고객을 대신하여 모든 질문을 답변할 뿐만 아니라 예약, 재예약 및 취소를 할 수 있도록 장비되어 있습니다.\n* 에이전트의 답변은 SMS를 통해 고객에게 다시 보내집니다.\n* 추가로, 예약을 하지 않은 고객을 재참여시키기 위한 후속 시스템이 구현됩니다.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 참여하거나 [Forum](https://community.n8n.io/)에서 물어보세요!\n\n즐거운 해킹!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "04681629-0221-47fe-b992-0d5791995523",
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1120,
+        420
+      ],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7633e3b0-daf3-495d-bcd7-ce0db24a73b9",
+      "name": "Get Availability",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1260,
+        440
+      ],
+      "parameters": {
+        "url": "https://api.cal.com/v2/slots/available",
+        "sendQuery": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "eventTypeId",
+              "value": "={{ 648297 }}",
+              "valueProvider": "fieldValue"
+            },
+            {
+              "name": "startTime",
+              "value": "{startTime}",
+              "valueProvider": "fieldValue"
+            },
+            {
+              "name": "endTime",
+              "value": "{endTime}",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "toolDescription": "Call this tool to get the appointment availability. Dates can be variable but times are fixed - startTime must always be 9am and endTime must be 7pm. Strictly use ISO format for dates eg. \"2024-01-01T09:00:00-00:00\". Input schema example: ```{ \"startTime\": \"...\", \"endTime\": \"...\"}```",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "startTime",
+              "type": "string",
+              "description": "start of daterange in ISO format. eg. 2024-01-01T09:00:00-00:00"
+            },
+            {
+              "name": "endTime",
+              "type": "string",
+              "description": "end of daterange in ISO format. eg. 2024-01-01T09:00:00-00:00"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "calApi": {
+          "id": "GPSKPrBhO3Pq6KVF",
+          "name": "Cal account"
+        },
+        "httpHeaderAuth": {
+          "id": "X2Vr2TQSBcOsOMst",
+          "name": "Cal.com API v2"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0f814d08-218e-492e-b1f8-63985d583e80",
+      "name": "Get Existing Booking",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1560,
+        440
+      ],
+      "parameters": {
+        "url": "https://api.cal.com/v2/bookings/{bookingUid}",
+        "sendHeaders": true,
+        "authentication": "predefinedCredentialType",
+        "toolDescription": "Call this tool to get an existing booking using a booking \"uid\".",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "cal-api-version",
+              "value": "2024-08-13",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "nodeCredentialType": "calApi",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "bookingUid",
+              "type": "string",
+              "description": "the uid of the booking (note: this is not the same as the id of the booking)"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "calApi": {
+          "id": "GPSKPrBhO3Pq6KVF",
+          "name": "Cal account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "36a5a2a7-bb78-4091-8b25-5e9f49628542",
+      "name": "Find Existing Booking",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1700,
+        440
+      ],
+      "parameters": {
+        "url": "https://api.cal.com/v2/bookings",
+        "jsonQuery": "{\n \"status\": \"upcoming\",\n \"attendeeEmail\": \"{attendee_email}\",\n \"afterStart\": \"{date}\"\n}",
+        "sendQuery": true,
+        "sendHeaders": true,
+        "specifyQuery": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "toolDescription": "Call this tool to search for an existing bookings with the user's email address and date. Use the \"uid\" field in the results as the primary booking identifier, ignore the \"id\" field.",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "cal-api-version",
+              "value": "2024-08-13",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "attendee_email",
+              "type": "string",
+              "description": "email address of attendee"
+            },
+            {
+              "name": "date",
+              "description": "Filter bookings with start after this date string. The time is always fixed at 9am."
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "calApi": {
+          "id": "GPSKPrBhO3Pq6KVF",
+          "name": "Cal account"
+        },
+        "httpHeaderAuth": {
+          "id": "X2Vr2TQSBcOsOMst",
+          "name": "Cal.com API v2"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "88ee279d-ed85-4dc6-b42a-5e1e50f3d708",
+      "name": "Reschedule Booking",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1560,
+        620
+      ],
+      "parameters": {
+        "url": "https://api.cal.com/v2/bookings/{bookingUid}/reschedule",
+        "method": "POST",
+        "jsonBody": "{\n \"start\": \"{start}\",\n \"reschedulingReason\": \"{reschedulingReason}\"\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "toolDescription": "Call this tool to reschedule a user's booking using a booking \"uid\".",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "cal-api-version",
+              "value": "2024-08-13",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "bookingUid",
+              "type": "string",
+              "description": "the uid of the booking. Note this is not the same as the id of the booking."
+            },
+            {
+              "name": "start",
+              "type": "string",
+              "description": "start datetime of the appointment, for example: \"2024-05-30T12:00:00.000Z\""
+            },
+            {
+              "name": "reschedulingReason",
+              "type": "string",
+              "description": "Reason for rescheduling the booking. If not given, value is \"Declined to give reason.\""
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "calApi": {
+          "id": "GPSKPrBhO3Pq6KVF",
+          "name": "Cal account"
+        },
+        "httpHeaderAuth": {
+          "id": "X2Vr2TQSBcOsOMst",
+          "name": "Cal.com API v2"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ee30c793-d8f4-4e49-9bd1-70e5ac109b68",
+      "name": "Cancel Booking",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1700,
+        620
+      ],
+      "parameters": {
+        "url": "https://api.cal.com/v2/bookings/{bookingUid}/cancel",
+        "method": "POST",
+        "jsonBody": "{\n \"cancellationReason\": \"{cancellationReason}\"\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "toolDescription": "Call this tool to cancel a user's existing booking using a booking \"uid\".",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "cal-api-version",
+              "value": "2024-08-13",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "bookingUid",
+              "type": "string",
+              "description": "the uid of the booking. Note this is not the same as the id of the booking."
+            },
+            {
+              "name": "cancellationReason",
+              "type": "string",
+              "description": "Reason for cancelling the appointment"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "calApi": {
+          "id": "GPSKPrBhO3Pq6KVF",
+          "name": "Cal account"
+        },
+        "httpHeaderAuth": {
+          "id": "X2Vr2TQSBcOsOMst",
+          "name": "Cal.com API v2"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d90aa957-30d7-4b29-93b9-acdc86f1cb17",
+      "name": "Create a Booking",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1400,
+        440
+      ],
+      "parameters": {
+        "url": "https://api.cal.com/v2/bookings",
+        "method": "POST",
+        "jsonBody": "{\n \"eventTypeId\": 648297,\n \"start\": \"{start}\",\n \"attendee\": {\n \"name\": \"{attendee_name}\",\n \"email\": \"{attendee_email}\",\n \"timeZone\": \"{attendee_timezone}\"\n },\n \"bookingFieldsResponses\": {\n \"title\": \"{summary_of_enquiry}\"\n }\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "toolDescription": "Call this tool to create a booking. Strictly use ISO format for dates eg. \"2024-01-01T09:00:00-00:00\" for API compatibility.",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "Content-Type",
+              "value": "application/json",
+              "valueProvider": "fieldValue"
+            },
+            {
+              "name": "cal-api-version",
+              "value": "2024-08-13",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "start",
+              "type": "string",
+              "description": "The start time of the booking in ISO format. eg. \"2024-01-01T09:00:00Z\""
+            },
+            {
+              "name": "attendee_name",
+              "type": "string",
+              "description": "Name of the attendee"
+            },
+            {
+              "name": "attendee_email",
+              "type": "string",
+              "description": "email of the attendee"
+            },
+            {
+              "name": "attendee_timezone",
+              "type": "string",
+              "description": "If timezone is unknown, assume Europe/London."
+            },
+            {
+              "name": "summary_of_enquiry",
+              "type": "string",
+              "description": "short summary of the enquiry or purpose of the meeting"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "calApi": {
+          "id": "GPSKPrBhO3Pq6KVF",
+          "name": "Cal account"
+        },
+        "httpHeaderAuth": {
+          "id": "X2Vr2TQSBcOsOMst",
+          "name": "Cal.com API v2"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "dfcf00ca-8fe1-4517-b64f-fbb4606ab221",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        928.7527821891895,
+        600
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 261.1134437946252,
+        "height": 168.99242033383513,
+        "content": "Cal.com API v2에 대해 사용자 정의 헤더 인증 자격 증명을 설정해야 합니다. 더 많은 정보는 다음 문서를 참조하세요: https://cal.com/docs/api-reference/v2/introduction"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e743b324-ead2-47f8-87c9-2eb969305d4e",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1220,
+        420
+      ],
+      "parameters": {
+        "width": 301.851426117099,
+        "height": 360.9218237282627,
+        "content": "### 🚨 EventTypeID를 여기에서 변경하세요!\n* EventTypeID는 숫자여야 합니다.\n* 귀하의 이벤트 유형이 예약의 허용된 기간을 결정합니다.\n* 이벤트 유형이 30분으로 설정되고 에이전트가 60분을 예약하려고 하면 실패할 것이므로 에이전트가 예약 기간을 얼마나 설정해야 하는지 알려주세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f087e1a4-fffb-44da-afd6-a6277aef84b5",
+      "name": "Appointment Scheduling Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1220,
+        200
+      ],
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are an appointment scheduling helper for a company called \"PC Parts Ltd\". Customers will message you enquirying for PC or laptop repairs and your job is to schedule a repair session for the user.This role is strictly to help schedule appointments so:\n* you may answer questions relating to the company, \"PC Parts Ltd\".\n* you may not answer questions relating to competitors of \"PC Parts Ltd\".\n* you may answer questions relating to general PC or laptop repair from a non-technical perspective.\n* you may not help to customer diagnose or assist in troubleshoot or debugging thei r PC or laptop issues. If the customer does ask, defer them to book an appointment where a suitable professional from PC Parts Ltd can help.\n* If an appointment is scheduled for the user then the conversation is completed and you should not continue to ask the user to schedule an appointment.\n* If an appointment is scheduled for the user, the user may ask for the following actions: ask about details of the existing appointment, reschedule the existing appointment or cancel an existing appointment.\n* If an appointment is scheduled for the user, the user cannot schedule another appointment until the existing appointment is cancelled.\n\n## About the company\nPC Parts Ltd is based in London, UK. They offer to repair low-end to high-end PC and Laptop consumer and small business machines. They also offer custom built machines such as for gaming. There is currently a summer sale going on for 20% selected machines for repairs. The company does not repair other electronic devices such as phones, tablets or monitors.\n\n## About the appointments\nAlways start your conversation by politely asking if the user wants to book a new appointment or enquire about an existing one. The date and time now is {{ $now.toISO() }}. All dates should be given in the ISO format. Each appointment should have a start and end date and time relative to today's date in the future and should be scheduled for 30 minutes.\n\n## To book an appointment\n* Before booking an appointment, ask if the user has an existing appointment.\n* Ensure you have the user's email address, full name and proposed date, preferred start time before booking an appointment.\n* Always check the calendar availability of the user's proposed date and time. If there is no availability, suggest the next available appointment slot.\n* If the appointment booking is successful, notify the user that an email confirmation will be sent to their provided email address.\n* If the appointment booking is unsuccessful, notify the user that you are unable to complete their request at the moment and to try again later.\n\n## To find an existing appointment\n* Ask the user for their email address and the date of the existing booking\n* Use the user's email and date to search for the existing booking.\n* If the user's email and date do not match the results or no results are returned, then the existing booking is not found.\n* If the existing booking is not found, notify the user and suggest a new booking should be made.\n* When the existing booking is found, ensure you tell them the booking's UID field.\n\n# To reschedule or cancel an existing appointment\n* First find the existing appointment so that you may obtain the existing appointment's booking UID.\n* Display this booking UID to the user.\n* Use this booking UID to reschedule or cancel an existing appointment.\n* If an existing appointment ID is not found or given, then notify the user that it is not possible to complete their request at this time and they should contact via email.\n* when user wants to cancel an appointment, ask for a reason for the cancellation and suggest rescheduling as an alternative. Confirm with user before cancelling an appointment.\n\n## About the user\n* The customer's session_id is \"{{ $('Twilio Trigger').item.json.From }}\"\n{{\n$json.chat_messages \n ? '* This is a returning prospective customer.' \n : '* This is a new customer. Ask for the details of their enquiry.'\n}}\n{{\n$json.appointment_id \n ? `* The customer has already scheduled an appointment at ${$json.scheduled_at} and their appointment_id is ${$json.appointment_id}`\n : '* This customer has not scheduled an appointment yet.'\n}}\n\n## Existing Conversation\n{{\n$json.chat_messages\n ? 'Here are the existing chat logs and should be used as context to continue the conversation:\\n```\\n' + JSON.parse($json.chat_messages).map(item => `${item.role}: ${item.message.replaceAll('\\n', ' ')}`).join('\\n') + '\\n```'\n : '* There is no existing conversation so far.'\n}}\n"
+        },
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.6
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every 24hrs": {
+      "main": [
+        [
+          {
+            "node": "Find Follow-Up Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check For Command Words",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Request STOP": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Follow Up Message",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reschedule Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create/Update Session": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Existing Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check For Command Words": {
+      "main": [
+        [
+          {
+            "node": "User Request STOP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Existing Chat Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Follow-Up Candidates": {
+      "main": [
+        [
+          {
+            "node": "Generate Follow Up Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Chat Session": {
+      "main": [
+        [
+          {
+            "node": "Appointment Scheduling Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Follow Up Message": {
+      "main": [
+        [
+          {
+            "node": "Update Follow-Up Count and Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Appointment Scheduling Agent1": {
+      "main": [
+        [
+          {
+            "node": "Create/Update Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Follow-Up Count and Date": {
+      "main": [
+        [
+          {
+            "node": "Send Follow Up Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

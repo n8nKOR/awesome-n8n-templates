@@ -1,0 +1,401 @@
+{
+  "meta": {
+    "instanceId": "408f9fb9940c3cb18ffdef0e0150fe342d6e655c3a9fac21f0f644e8bedabcd9"
+  },
+  "nodes": [
+    {
+      "id": "0b64edf1-57e0-4704-b78c-c8ab2b91f74d",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        480,
+        300
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "a875d1c5-ccfe-4bbf-b429-56a42b0ca778",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1280,
+        720
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-1.5-flash"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dSxo6ns5wn658r8N",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a5e00543-dbaa-4e62-afb0-825ebefae3f3",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1480,
+        720
+      ],
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"caption_title\": \"\",\n\t\"caption_text\": \"\"\n}"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "bb9af9c6-6c81-4e92-a29f-18ab3afbe327",
+      "name": "Get Info",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        1100,
+        400
+      ],
+      "parameters": {
+        "operation": "information"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8a0dbd5d-5886-484a-80a0-486f349a9856",
+      "name": "Resize For AI",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        1100,
+        560
+      ],
+      "parameters": {
+        "width": 512,
+        "height": 512,
+        "options": {},
+        "operation": "resize"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d29f254a-5fa3-46fa-b153-19dfd8e8c6a7",
+      "name": "Calculate Positioning",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2020,
+        720
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const { size, output } = $input.item.json;\n\nconst lineHeight = 35;\nconst fontSize = Math.round(size.height / lineHeight);\nconst maxLineLength = Math.round(size.width/fontSize) * 2;\nconst text = `\"${output.caption_title}\". ${output.caption_text}`;\nconst numLinesOccupied = Math.round(text.length / maxLineLength);\n\nconst verticalPadding = size.height * 0.02;\nconst horizontalPadding = size.width * 0.02;\nconst rectPosX = 0;\nconst rectPosY = size.height - (verticalPadding * 2.5) - (numLinesOccupied * fontSize);\nconst textPosX = horizontalPadding;\nconst textPosY = size.height - (numLinesOccupied * fontSize) - (verticalPadding/2);\n\nreturn {\n caption: {\n fontSize,\n maxLineLength,\n numLinesOccupied,\n rectPosX,\n rectPosY,\n textPosX,\n textPosY,\n verticalPadding,\n horizontalPadding,\n }\n}\n"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "12a7f2d6-8684-48a5-aa41-40a8a4f98c79",
+      "name": "Apply Caption to Image",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        2380,
+        560
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "multiStep",
+        "operations": {
+          "operations": [
+            {
+              "color": "=#0000008c",
+              "operation": "draw",
+              "endPositionX": "={{ $json.size.width }}",
+              "endPositionY": "={{ $json.size.height }}",
+              "startPositionX": "={{ $json.caption.rectPosX }}",
+              "startPositionY": "={{ $json.caption.rectPosY }}"
+            },
+            {
+              "font": "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf",
+              "text": "=\"{{ $json.output.caption_title }}\". {{ $json.output.caption_text }}",
+              "fontSize": "={{ $json.caption.fontSize }}",
+              "fontColor": "#FFFFFF",
+              "operation": "text",
+              "positionX": "={{ $json.caption.textPosX }}",
+              "positionY": "={{ $json.caption.textPosY }}",
+              "lineLength": "={{ $json.caption.maxLineLength }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4d569ec8-04c2-4d21-96e1-86543b26892d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -120,
+        80
+      ],
+      "parameters": {
+        "width": 423.75,
+        "height": 431.76353488372104,
+        "content": "## 직접 해보세요!\n\n### 이 워크플로는 이미지를 가져와 AI를 사용하여 캡션을 생성합니다. OpenAI 노드는 오랫동안 이 작업을 할 수 있었지만, 이 워크플로는 Google의 Gemini와 같은 다른 다중 모달 비전 모델을 사용하여 동일한 것을 달성하는 방법을 보여줍니다.\n\n또한, 생성된 캡션을 이미지에 오버레이하기 위해 Edit Image 노드를 사용할 것입니다. 이는 출판물에 유용할 수 있으며, 저작권 및/또는 워터마크를 위해 재사용할 수 있습니다.\n\n### 도움이 필요하신가요?  \n[Discord](https://discord.com/invite/XPKeKXeB7d)에 가입하거나 [Forum](https://community.n8n.io/)에서 물어보세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "45d37945-5a7a-42eb-8c8c-5940ea276072",
+      "name": "Merge Image & Caption",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1620,
+        400
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "53a26842-ad56-4c8d-a59d-4f6d3f9e2407",
+      "name": "Merge Caption & Positions",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        2200,
+        560
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "b6c28913-b16a-4c59-aa49-47e9bb97f86d",
+      "name": "Get Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "url": "https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "options": {}
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "6c25054d-8103-4be9-bea7-6c3dd47f49a3",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        340,
+        80
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 586.25,
+        "height": 486.25,
+        "content": "## 1. 이미지 가져오기\n\n[HTTP 요청 노드에 대해 자세히 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest)\n\n이 데모를 위해, Pexels.com에서 이미지를 가져올 것입니다 - 인기 있는 무료 스톡 사진 사이트 - HTTP 요청 노드를 사용하여 다운로드합니다.\n\n자신의 워크플로에서, 이는 웹훅과 같은 다른 트리거로 대체할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d1b708e2-31c3-4cd1-a353-678bc33d4022",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        140
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 888.75,
+        "height": 783.75,
+        "content": "## 2. 비전 모델을 사용하여 캡션 생성  \n[기본 LLM 체인에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm)  \n\nn8n의 기본 LLM 노드는 호환되는 LLM에 보낼 바이너리 또는 이미지 URL을 지정할 수 있게 하여 다중 모달 입력을 지원합니다. 이는 시각적 분류나 OCR 작업에 이 강력한 기능을 쉽게 활용할 수 있게 하며, 이전에는 더 전용 OCR 모델에 의존해 왔습니다.  \n\n여기서, 우리는 이미지 바이너리를 \"사용자 메시지\" 옵션으로 간단히 전달하여 LLM에게 주어진 주제에 적합한 캡션 제목과 텍스트를 생성하도록 요청했습니다. 생성된 후, 우리는 이 텍스트를 이미지와 함께 전달하여 둘을 결합할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "36a39871-340f-4c44-90e6-74393b9be324",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1880,
+        280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 753.75,
+        "height": 635,
+        "content": "## 3. 이미지에 캡션 오버레이  \n[Edit Image 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.editimage)  \n\n마지막으로, 생성된 캡션을 이미지에 배치하기 위해 기본적인 계산을 수행하겠습니다. n8n의 사용자 친화적인 이미지 편집 기능을 통해 이는 워크플로우 내에서 완전히 수행할 수 있습니다!  \n\nCode 노드 도구는 이러한 유형의 계산에 이상적이며, 여기에서 캡션을 이미지 하단에 위치시키는 데 사용됩니다. 오버레이를 생성하기 위해 Edit Image 노드는 이미지를 텍스트를 삽입할 수 있게 하며, 이를 통해 생성된 캡션을 추가하겠습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d175fe97-064e-41da-95fd-b15668c330c4",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2660,
+        280
+      ],
+      "parameters": {
+        "width": 563.75,
+        "height": 411.25,
+        "content": "그림 1. AI 생성 캡션이 있는 예시 입력 이미지"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "23db0c90-45b6-4b85-b017-a52ad5a9ad5b",
+      "name": "Image Captioning Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1280,
+        560
+      ],
+      "parameters": {
+        "text": "Generate a caption for this image.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You role is to provide an appropriate image caption for user provided images.\n\nThe individual components of a caption are as follows: who, when, where, context and miscellaneous. For a really good caption, follow this template: who + when + where + context + miscellaneous\n\nGive the caption a punny title."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary"
+            }
+          ]
+        },
+        "promptType": "define",
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.4
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Info": {
+      "main": [
+        [
+          {
+            "node": "Merge Image & Caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Resize For AI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize For AI": {
+      "main": [
+        [
+          {
+            "node": "Image Captioning Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Positioning": {
+      "main": [
+        [
+          {
+            "node": "Merge Caption & Positions",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Image & Caption": {
+      "main": [
+        [
+          {
+            "node": "Calculate Positioning",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Caption & Positions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Captioning Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Image & Caption",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Image Captioning Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Image Captioning Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Caption & Positions": {
+      "main": [
+        [
+          {
+            "node": "Apply Caption to Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

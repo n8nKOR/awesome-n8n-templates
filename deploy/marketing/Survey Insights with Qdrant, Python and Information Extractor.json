@@ -1,0 +1,1272 @@
+{
+  "meta": {
+    "instanceId": "408f9fb9940c3cb18ffdef0e0150fe342d6e655c3a9fac21f0f644e8bedabcd9"
+  },
+  "nodes": [
+    {
+      "id": "0404384b-10b6-4666-84a4-8870db30c607",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        1220,
+        280
+      ],
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a6741f04-5a5b-47a9-ac08-eb562f9f6052",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        1340,
+        280
+      ],
+      "parameters": {
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "question",
+                "value": "={{ $json.question }}"
+              },
+              {
+                "name": "participant",
+                "value": "={{ $json.participant }}"
+              },
+              {
+                "name": "survey",
+                "value": "={{ $('Get Survey Results').params.documentId.cachedResultName }}"
+              }
+            ]
+          }
+        },
+        "jsonData": "={{ $json.answer }}",
+        "jsonMode": "expressionData"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7663c3dd-f713-4034-bef6-0c000285f54f",
+      "name": "Convert to Question Answer Pairs",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        720,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6b593ffb-ffbd-4cf5-a508-cd4f2a6d1004",
+              "name": "data",
+              "type": "array",
+              "value": "={{\n Object.keys($json)\n .filter(key => !['row_number', 'Participant'].includes(key))\n .map(key => ({ question: key, answer: $json[key], participant: $json.Participant }))\n}}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "84873f0c-81ce-442f-a33c-d7c6c2efa11b",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        1340,
+        420
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "da9a8ee8-5e3f-49db-8d1f-26a61ca82344",
+      "name": "Get Survey Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        540,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-168Vm-1kCeHkqGLAs6odha4DhPE93njfHlYIviKE50/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1-168Vm-1kCeHkqGLAs6odha4DhPE93njfHlYIviKE50",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-168Vm-1kCeHkqGLAs6odha4DhPE93njfHlYIviKE50/edit?usp=drivesdk",
+          "cachedResultName": "Remote Working Survey Responses"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.4
+    },
+    {
+      "id": "4bad90b2-eefe-49c8-8caa-41cd4cb5e60f",
+      "name": "Get Survey Headers",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        740,
+        940
+      ],
+      "parameters": {
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "range": "A1:Z2",
+              "rangeDefinition": "specifyRangeA1"
+            }
+          }
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Execute Workflow Trigger').first().json.sheetName }}"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Execute Workflow Trigger').first().json.sheetID }}"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.4
+    },
+    {
+      "id": "47c64994-9d1f-42ca-a849-3eeab5335b66",
+      "name": "Extract Questions",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        940,
+        940
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d655b165-dfa2-46cb-bc27-140399bc4227",
+              "name": "question",
+              "type": "array",
+              "value": "={{\n Object.keys($('Get Survey Headers').item.json)\n .filter(key => key.includes('?'))\n}}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "c237d523-b290-41ca-b323-4cc7c7f6ff37",
+      "name": "Questions to List",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        940,
+        1120
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "question"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7f44a770-4c5d-4404-ae95-d9dee8348380",
+      "name": "Find All Answers",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1460,
+        1120
+      ],
+      "parameters": {
+        "url": "=http://qdrant:6333/collections/{{ $('Set Variables').item.json.collectionName }}/points/scroll",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"limit\": 500,\n \"filter\":{\n \"must\": [\n {\n \"key\": \"metadata.question\",\n \"match\": { \"value\": \"{{ $('For Each Question...').item.json.question }}\" }\n },\n {\n \"key\": \"metadata.survey\",\n \"match\": { \"value\": \"{{ $('Set Variables').item.json.surveyName }}\" }\n }\n ]\n },\n \"with_vector\":true\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "NyinAS3Pgfik66w5",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "2b6dc317-f8f3-4201-a9e1-d35ee578e79e",
+      "name": "Get Payload of Points",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2380,
+        800
+      ],
+      "parameters": {
+        "url": "=http://qdrant:6333/collections/{{ $('Set Variables').first().json.collectionName }}/points",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n {\n \"ids\": $json.points,\n \"with_payload\": true\n }\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "NyinAS3Pgfik66w5",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "d4a37d97-975a-4243-a7ea-81b3e30558a5",
+      "name": "Clusters To List",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        2180,
+        800
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "output"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c78f1bf6-8390-48ee-88f4-7d1a893a8ade",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        200,
+        1060
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b77c94a0-d865-4bd6-b078-a09b2ddb2a99",
+              "name": "collectionName",
+              "type": "string",
+              "value": "ux_survey_insights"
+            },
+            {
+              "id": "7b0a4d14-b5f9-4597-84c0-8cfdb363c3d3",
+              "name": "surveyName",
+              "type": "string",
+              "value": "={{ $json.properties.title }}"
+            },
+            {
+              "id": "45434b3b-3b74-4262-82e0-7ed02155caad",
+              "name": "insightsSheetName",
+              "type": "string",
+              "value": "=Insights-{{ $now.format('yyyyMMdd') }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "fbb1f3c3-06ad-44b5-b020-6fc3c8eda7c4",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2560,
+        980
+      ],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "83d3b413-a661-4c4c-9b8d-6ee395a15348",
+      "name": "Prep Output For Export",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        3160,
+        1300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "={{ {\n ...$json.output,\n \"Number of Response\": $('Get Payload of Points').item.json.result.length,\n \"Participant IDs\": $('Get Payload of Points').item.json.result.map(item =>\n item.payload.metadata.participant\n ).join(','),\n \"Raw Responses\": $('Get Payload of Points').item.json.result.map(item =>\n `Participant ${item.payload.metadata.participant},${item.payload.content.replaceAll('\"', '\\\"')}`\n ).join('\\n')\n} }}\n"
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "14784dff-a8ea-4b6b-8379-b0c9051a8f98",
+      "name": "Export To Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        3360,
+        1300
+      ],
+      "parameters": {
+        "columns": {
+          "value": {},
+          "schema": [
+            {
+              "id": "What is your name?",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "What is your name?",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "The responses indicate that two participants have the same name, 'Kwame Nkosi', which suggests a commonality in names or cultural naming traditions among the respondents. This could highlight the importance of understanding cultural context in survey responses.",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "The responses indicate that two participants have the same name, 'Kwame Nkosi', which suggests a commonality in names or cultural naming traditions among the respondents. This could highlight the importance of understanding cultural context in survey responses.",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "neutral",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "neutral",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "3",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "77,17,54",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "77,17,54",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Participant 77,Kwame Nkosi\nParticipant 17,Kwame Nkosi\nParticipant 54,Kwame Nkansah",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Participant 77,Kwame Nkosi\nParticipant 17,Kwame Nkosi\nParticipant 54,Kwame Nkansah",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": []
+        },
+        "options": {},
+        "operation": "append",
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $('Set Variables').first().json.insightsSheetName }}"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Execute Workflow Trigger').first().json.sheetID }}"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.4
+    },
+    {
+      "id": "779b9411-db3e-44f3-ad2a-c9d40a70580d",
+      "name": "Export To Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2360,
+        1300
+      ],
+      "parameters": {
+        "columns": {
+          "value": {},
+          "schema": [],
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": []
+        },
+        "options": {},
+        "operation": "append",
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $('Set Variables').first().json.insightsSheetName }}"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Execute Workflow Trigger').first().json.sheetID }}"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.4
+    },
+    {
+      "id": "a31ab677-f57c-4b78-a290-d4a913ed4f8e",
+      "name": "For Each Question...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1280,
+        940
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "dcfaf927-6ecd-4ebe-aee0-5fb3367b2725",
+      "name": "Trigger Insights",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        1980,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "workflowId": "={{ $workflow.id }}"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2579adf0-9c00-4b87-b53e-740044577ab0",
+      "name": "Prep Values For Trigger",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1800,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "24dd90ad-390f-444e-ba6c-8c06a41e836e",
+              "name": "sheetID",
+              "type": "string",
+              "value": "={{ $('Get Survey Results').params.documentId.value }}"
+            },
+            {
+              "id": "90199bbb-3938-411c-a7a8-faa7ccba6059",
+              "name": "sheetName",
+              "type": "string",
+              "value": "={{ $('Get Survey Results').params.sheetName.value }}"
+            }
+          ]
+        }
+      },
+      "executeOnce": true,
+      "typeVersion": 3.4
+    },
+    {
+      "id": "9b29e850-b9d0-4358-af62-92c20ab3b088",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        20,
+        900
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "70a0dcec-9f74-4af2-bd64-0ab762a77e51",
+      "name": "Create Insights Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        420,
+        900
+      ],
+      "parameters": {
+        "title": "={{ $('Set Variables').first().json.insightsSheetName }}",
+        "options": {},
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Execute Workflow Trigger').first().json.sheetID }}"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.4,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "f31400fb-dd7a-4c62-90ec-e9d78bbaa5e8",
+      "name": "Prep Values For Export",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2180,
+        1300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "={\n \"Question\": \"{{ $('For Each Question...').item.json.question }}\",\n \"Insight\": \"No Insight Found\"\n}\n"
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "506c20df-5109-422c-8c9e-0eb50fbd3ff9",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        459.27570452141345,
+        -42.168106366729035
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 617.2130261221611,
+        "height": 420.7389587470384,
+        "content": "## 1단계. 설문 응답 가져오기\n\n[Google Sheets에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets)\n\n우리의 접근 방식은 모든 참가자 응답을 벡터로 가져와 이를 답변된 질문에 연결하는 메타데이터를 포함해야 합니다. 이를 위해, 우리는 설문에서 질문과 답변 쌍을 생성할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "bddcafa8-6f54-4829-93c9-37bbb9e7edf3",
+      "name": "QA Pairs to List",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        900,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "data"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8d6e6bf6-c94c-43cb-a29e-5d10207cb8bd",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1100,
+        -102.05898437632061
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 563.8350682199533,
+        "height": 678.1641960508446,
+        "content": "## 2단계. 각 응답을 Qdrant으로 벡터화  \n[Qdrant 사용에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.vectorstoreqdrant)  \n\n메타데이터가 어떻게 캡처되는지에 특별한 주의가 주어지며, 이는 이 워크플로우의 핵심이 데이터의 하위 집합을 분석을 위해 검색할 수 있게 되는 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "613d4a32-a87a-423e-a1d1-ee23db0de6d1",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1680,
+        -30.440883940004255
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 519.6419932444072,
+        "height": 429.11782776909047,
+        "content": "## 단계 3. 인사이트 서브워크플로우 트리거\n\n[워크플로우 트리거에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflow)\n\n서브워크플로우는 설문조사를 위한 분석을 트리거하는 데 사용됩니다. 이 분리는 선택사항이지만, 두 부분 프로세스를 더 잘 보여주기 위해 여기에서 사용됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1e858e4a-b91b-4411-8e2a-6eb76647b796",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -57.47778952966382,
+        710.393394209128
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 668.3083616841852,
+        "height": 528.2386658883073,
+        "content": "## 4단계. 통찰 시트 생성  \n[워크플로우 트리거에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflowtrigger)  \n\n생성된 통찰을 캡처하기 위해, 우리는 설문조사 스프레드시트 내에 새롭고 고유한 시트를 생성할 것입니다. 이는 선택사항이며, 당신의 필요에 따라 다른 데이터 저장소에 캡처할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9170c566-07d3-49dc-aafb-2dbe79940d2c",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        683.5153164275844
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 536.9288458983389,
+        "height": 622.1362463986454,
+        "content": "## 5단계. 설문조사에서 질문 목록 가져오기  \n[Google Sheets 사용에 대해 자세히 읽기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets)  \n\n다음으로 설문조사의 메타데이터와 질문을 가져와 별도의 워크플로우 항목으로 분할할 것입니다. 우리의 의도는 각 질문을 끝까지 처리한 후 다음으로 넘기는 것입니다. 이 접근 방식은 중단이 발생하는 시나리오에서 조금 더 \"안전\"하며, 작업을 모두 잃지 않을 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8488df77-055d-41cc-94f1-92ac5d54ef10",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        673.291535602609
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 823.147012265536,
+        "height": 868.2579789328703,
+        "content": "## 6단계. 각 질문에 대한 유사 답변 그룹 찾기  \n[코드 노드 사용에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/)  \n\nLLM에 모든 응답을 분석하도록 제공하는 것은 일반적이지만 naive한 접근법입니다; 요약은 보통 실제 통찰력을 위한 수준이 너무 높아 많은 세부 사항, 예를 들어 응답자의 수와 신원을 잃습니다. 대신 우리가 하고 싶은 것은 각 질문에 대한 인기 답변을 찾아 그룹화하여 모든 관점을 고려하는 것입니다.  \n\n우리의 접근법은 답변 벡터를 2D 그리드에 매핑한 다음, 벡터 포인트가 '클러스터링'된 곳을 식별합니다; 즉, 포인트 그룹이 서로 가까운 거리에 있는 곳입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f4748b6d-5bd8-48cf-942f-3a0dc681078d",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2060,
+        1180
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 536.9288458983389,
+        "height": 359.90385684071794,
+        "content": "## 7b 단계. 클러스터가 발견되지 않으면 건너뛰기\n\n클러스터가 발견되지 않은 경우, 이는 답변들이 충분히 독특하여 패턴을 보이지 않는다는 의미입니다. 예: \"What's you name?\""
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d55d6a47-da8c-46ae-bd10-0eb671dcd121",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2060,
+        611.6915003841909
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 871.451300407926,
+        "height": 541.1135860445843,
+        "content": "## 7a 단계. 유사 답변의 주요 그룹 요약\n\n[Information Extractor Node 사용에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor)\n\n각 발견된 클러스터는 그룹의 모든 관련 답변을 가져오는 데 사용되는 참조 벡터를 반환합니다.\n그 후 그룹은 요약 및 감정 점수 할당을 위해 LLM에 보내집니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e5d5f88f-5832-43fc-a5b9-f747d08e7e77",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2620,
+        1180
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 924.2798021207429,
+        "height": 363.07347551845976,
+        "content": "## 단계 8. 인사이트 시트에 작성  \n마지막으로, 우리 완성된 인사이트가 이전에 워크플로에서 만든 인사이트 시트에 추가됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "49ac1504-7b43-4fa1-b4ce-15c7a53c9018",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        400
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 323.2987132716669,
+        "height": 80,
+        "content": "### 이것을 한 번만 실행하세요!  \n만약 어떤 이유로 여러 번 실행해야 한다면, 먼저 기존 데이터를 지우십시오."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "450f89c5-ef0f-4bf8-8db9-6347247c7f4d",
+      "name": "Has Clusters?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1820,
+        1120
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "40b6bb62-a2d6-4422-8fbb-7ae49898bad9",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.output }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "1652a108-8fb8-4229-a76d-abf9fbcff626",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        -400
+      ],
+      "parameters": {
+        "width": 400.381109509268,
+        "height": 679.5610243514676,
+        "content": "## 시도해 보세요!\n\n### 이 워크플로는 설문 응답에서 고도로 상세한 통찰을 생성합니다. 많은 참가자가 있을 때 가장 잘 작동합니다.\n\n* 설문 응답을 가져와 Qdrant 벡터 스토어에서 벡터화합니다.\n* K-means 클러스터링 알고리즘을 사용하여 질문에 대한 인기 응답의 클러스터를 식별합니다.\n* 각 유효한 클러스터를 LLM으로 분석하고 요약합니다.\n* LLM 응답과 클러스터 결과를 시트로 다시 내보냅니다.\n\n참조 Google 시트를 여기에서 확인하세요: https://docs.google.com/spreadsheets/d/e/2PACX-1vT6m8XH8JWJTUAfwojc68NAUGC7q0lO7iV738J7aO5fuVjiVzdTRRPkMmT1C4N8TwejaiT0XrmF1Q48/pubhtml\n\n### 도움이 필요하세요?\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 가입하거나 [Forum](https://community.n8n.io/)에서 물어보세요!\n\n해킹을 즐기세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6eef981e-b2ce-433c-b71f-78be64812a56",
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1260,
+        1340
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 323.2987132716669,
+        "height": 110.05160146874424,
+        "content": "첫 번째 실행?  \n첫 번째 실행 시 약간의 지연이 발생합니다. 코드 노드가 필요한 패키지를 다운로드해야 하기 때문입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "fa0c14be-03f4-4ed2-bd60-e93817382ded",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        240,
+        100
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "30323019-59ba-4a19-a46e-196d469f097d",
+      "name": "Get Sheet Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        200,
+        900
+      ],
+      "parameters": {
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.sheetID }}",
+        "options": {},
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "6ced8012-1dd3-4da3-8c27-e4f4dfc959f6",
+      "name": "Only Clusters With 3+ points",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        2180,
+        960
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "328f806c-0792-4d90-9bee-a1e10049e78f",
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              },
+              "leftValue": "={{ $json.points }}",
+              "rightValue": 2
+            }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "8ae81a55-75e2-40a3-bef6-0935ff08128f",
+      "name": "Apply K-means Clustering Algorithm",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1640,
+        1120
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import numpy as np\nfrom sklearn.cluster import KMeans\n\n# get vectors for all answers\npoint_ids = [item.id for item in _input.first().json.result.points]\nvectors = [item.vector.to_py() for item in _input.first().json.result.points]\nvectors_array = np.array(vectors)\n\n# apply k-means clustering where n_clusters = 10\n# this is a max and we'll discard some of these clusters later\nkmeans = KMeans(n_clusters=min(len(vectors), 10), random_state=42).fit(vectors_array)\nlabels = kmeans.labels_\nunique_labels = set(labels)\n\n# Extract and print points in each cluster\nclusters = {}\nfor label in set(labels):\n clusters[label] = vectors_array[labels == label]\n\n# return Qdrant point ids for each cluster\n# we'll use these ids to fetch the payloads from the vector store.\noutput = []\nfor cluster_id, cluster_points in clusters.items():\n points = [point_ids[i] for i in range(len(labels)) if labels[i] == cluster_id]\n output.append({\n \"id\": f\"Cluster {cluster_id}\",\n \"total\": len(cluster_points),\n \"points\": points\n })\n\nreturn {\"json\": {\"output\": output } }"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "cbb42384-d46b-471f-a7d8-27e3de042492",
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        1220,
+        100
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {},
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "list",
+          "value": "ux_survey_insights",
+          "cachedResultName": "ux_survey_insights"
+        }
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "NyinAS3Pgfik66w5",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "17584901-15d6-421f-ad69-3ba872276055",
+      "name": "Survey Insights Agent",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        2580,
+        800
+      ],
+      "parameters": {
+        "text": "=The {{ $json.result.length }} participant responses were:\n{{\n$json.result.map(item =>\n`* Participant ${item.payload.metadata.participant}: \"${item.payload.content.replaceAll('\"', '\\\"')}\"`\n).join('\\n')\n}}",
+        "options": {
+          "systemPromptTemplate": "=You help summarise a selection of participant responses to a specific question for a survey called \"{{ $json.result[0].payload.metadata.survey }}\".\nThe question asked was \"{{ $json.result[0].payload.metadata.question }}\".\nThe {{ $json.result.length }} participant responses were selected because their answers were similar in context.\n\nYour task is to: \n* summarise the given participant responses into a short paragraph. Provide an insight from this summary and what we could learn from the answers.\n* determine if the overall sentiment of all the listed responses to be either negative, mildy negative, neutral, mildy positive or positive."
+        },
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n\t\"Question\": \"What do you enjoy most about working remotely, and why?\",\n\t\"Insight\": \"\",\n \"Sentiment\": \"Positive\"\n}"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Has Clusters?": {
+      "main": [
+        [
+          {
+            "node": "Clusters To List",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prep Values For Export",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Create Insights Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clusters To List": {
+      "main": [
+        [
+          {
+            "node": "Only Clusters With 3+ points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export To Sheets": {
+      "main": [
+        [
+          {
+            "node": "For Each Question...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find All Answers": {
+      "main": [
+        [
+          {
+            "node": "Apply K-means Clustering Algorithm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Pairs to List": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export To Sheets1": {
+      "main": [
+        [
+          {
+            "node": "For Each Question...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Questions": {
+      "main": [
+        [
+          {
+            "node": "Questions to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sheet Details": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Survey Insights Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Questions to List": {
+      "main": [
+        [
+          {
+            "node": "For Each Question...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Survey Headers": {
+      "main": [
+        [
+          {
+            "node": "Extract Questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Survey Results": {
+      "main": [
+        [
+          {
+            "node": "Convert to Question Answer Pairs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Prep Values For Trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Question...": {
+      "main": [
+        null,
+        [
+          {
+            "node": "Find All Answers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Insights Sheet": {
+      "main": [
+        [
+          {
+            "node": "Get Survey Headers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Payload of Points": {
+      "main": [
+        [
+          {
+            "node": "Survey Insights Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Survey Insights Agent": {
+      "main": [
+        [
+          {
+            "node": "Prep Output For Export",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Output For Export": {
+      "main": [
+        [
+          {
+            "node": "Export To Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Values For Export": {
+      "main": [
+        [
+          {
+            "node": "Export To Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Values For Trigger": {
+      "main": [
+        [
+          {
+            "node": "Trigger Insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Sheet Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Clusters With 3+ points": {
+      "main": [
+        [
+          {
+            "node": "Get Payload of Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Question Answer Pairs": {
+      "main": [
+        [
+          {
+            "node": "QA Pairs to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Survey Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply K-means Clustering Algorithm": {
+      "main": [
+        [
+          {
+            "node": "Has Clusters?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

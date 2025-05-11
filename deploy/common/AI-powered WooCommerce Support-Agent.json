@@ -1,0 +1,1087 @@
+{
+  "meta": {
+    "instanceId": "cb484ba7b742928a2048bf8829668bed5b5ad9787579adea888f05980292a4a7"
+  },
+  "nodes": [
+    {
+      "id": "be49d136-6392-481d-8544-d4f4d4fd0357",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        90,
+        260
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1000.427054367056,
+        "height": 572.2734520891689,
+        "content": "## WooCommerce 사용자 ID 찾기  \n사용자 ID는 과거 주문을 조회하는 데 필요합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5932f77b-63e2-4991-aa16-2b8587b2b560",
+      "name": "No email provided",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        400,
+        640
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a06428b-4115-4eee-97f4-8e828c5a7e5a",
+              "name": "response",
+              "type": "string",
+              "value": "No email address got provided."
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "909a9a47-8683-4a1f-a359-8f6a878f8cd7",
+      "name": "If email provided",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        140,
+        460
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "13f7bd32-5760-4ac3-8292-c8beb131a4a5",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.email }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "f5bd2098-090b-4537-8e61-90afb4c85ad8",
+      "name": "If user found",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        620,
+        440
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "0e434771-6a63-420b-89fe-cf4d5b1d8127",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "leftValue": "={{ Object.keys($json).length }}",
+              "rightValue": 0
+            }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "cd2e8f95-363d-47fc-a18b-42eb93f89d0d",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        -346
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 1060.5591882039919,
+        "height": 506.94921487705585,
+        "content": "# 에이전트"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "411d5656-ace2-43a1-8672-0ffc9929f99b",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2040,
+        265
+      ],
+      "parameters": {
+        "width": 2404.755367647059,
+        "height": 559.608748371423,
+        "content": "## DHL 추적 정보 추가  \nDHL에서 배송된 주문의 상태를 조회합니다.  \n\n주문 추적이 사용 불가능하거나 UPS와 같은 다른 서비스로 대체할 경우 생략할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2787a47f-d685-49b2-b4f9-15ed59525d63",
+      "name": "No customer found",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        880,
+        640
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a06428b-4115-4eee-97f4-8e828c5a7e5a",
+              "name": "response",
+              "type": "string",
+              "value": "No customer with that email address could be found."
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "9ff271fb-5013-41a3-bc3c-84af3f36d079",
+      "name": "If contains DHL data",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2400,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "674eff87-834b-4436-8666-66ccd11016d6",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.tracking }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "736adbe9-1141-47b1-9d17-b2a86e0285a3",
+      "name": "Extract Tracking Data",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2140,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c378e8d4-3fdf-49f5-a766-6cfc1d7e898f",
+              "name": "tracking",
+              "type": "array",
+              "value": "={{ $json.meta_data.filter(data => data.key === '_wc_shipment_tracking_items').flatMap(data => data.value) }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "603584d5-85c7-4995-a7a4-1ecb07c9ce2b",
+      "name": "Merge Orders",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        3980,
+        500
+      ],
+      "parameters": {},
+      "typeVersion": 2.1
+    },
+    {
+      "id": "a5f61962-99bd-4e6d-9c4f-4e0fa3685780",
+      "name": "Merge Order and Tracking Data",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        4300,
+        640
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "9aff6c2b-90f5-4cf6-8637-634c1d7f439d",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        -1280
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 478.2162464985994,
+        "height": 558.6043670960834,
+        "content": "# 설정  \n## 일반적으로  \n- 환경 변수 `NODE_FUNCTION_ALLOW_BUILTIN`은 `crypto` 값을 포함하거나 같아야 합니다 (참고: n8n 클라우드에서 기본값입니다). 이는 이 워크플로를 실행하는 데 필요합니다.  \n  \n## 워크플로를 테스트하기 위해  \n1. Mock Node \"Mock Data\"에서 WooCommerce에 존재하는 유효한 사용자 이메일 주소를 설정합니다.  \n2. \"Mock Data\" 노드를 활성화합니다.  \n3. \"Decrypt email address\" 노드를 비활성화합니다.  \n4. \"Chat\" 버튼을 눌러 내장 채팅을 사용합니다.  \n  \n## 프로덕션 사용을 위해:  \n1. \"AI Agent\" 노드의 \"System Message\"를 특정 용도에 맞게 업데이트합니다. 적어도 상점의 이름은 변경해야 합니다.  \n2. 채팅을 웹사이트에 통합합니다. \"Example Website Implementation\" 상자에 예제가 있습니다.  \n3. \"Mock Data\" 노드를 비활성화하거나 삭제합니다.  \n4. \"Decrypt email address\" 노드를 활성화합니다.  \n5. 워크플로를 활성화합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "901be36e-f68a-4052-ad40-2a3a6a596b56",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1140,
+        260
+      ],
+      "parameters": {
+        "width": 277.6742597550393,
+        "height": 568.9672169306307,
+        "content": "주문 가져오기"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7501d8f8-d91e-4cb3-835d-bf3cd0cac69c",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -492,
+        260
+      ],
+      "parameters": {
+        "color": 2,
+        "width": 527.8197815634092,
+        "height": 572.2734520891689,
+        "content": "WooCommerce 주문 도구"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0f2dc782-63c1-43bc-9347-33ebfe00af69",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        2680,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "tracking"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d9b180bc-b4d2-4b94-ac65-b73344a47ad8",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        3600,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "tracking"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6d2a044e-4164-4f0f-a6ef-a1a7a347a0c3",
+      "name": "Merge Tracking Data",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        3360,
+        380
+      ],
+      "parameters": {},
+      "typeVersion": 2.1
+    },
+    {
+      "id": "bca16467-9c24-4f36-b41f-d471d27ae465",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "sessionKey": "={{ $('Mock Data').item.json.sessionId }}",
+        "sessionIdType": "customKey",
+        "contextWindowLength": 10
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "ff432439-2421-4769-bfc8-b58e56742275",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -340,
+        460
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "b8a156a0-bec2-43a5-b2c1-3474701c353b",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1480,
+        260
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 492.0420811160542,
+        "height": 564.8840203332783,
+        "content": "발견된 주문 확인"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "22f86e67-710f-49ae-a967-6e5f9345eab6",
+      "name": "WooCommerce - Get User",
+      "type": "n8n-nodes-base.wooCommerce",
+      "position": [
+        400,
+        440
+      ],
+      "parameters": {
+        "limit": 1,
+        "filters": {
+          "email": "={{ $json.email }}"
+        },
+        "resource": "customer",
+        "operation": "getAll"
+      },
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "Rm7eydPl5IQwnlhw",
+          "name": "WooCommerce account"
+        }
+      },
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "0c23aaa1-b1a4-4890-8df8-4440d32c2308",
+      "name": "If order found",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1520,
+        420
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "0e434771-6a63-420b-89fe-cf4d5b1d8127",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "leftValue": "={{ Object.keys($json).length }}",
+              "rightValue": 0
+            }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "63b155ef-6336-4938-890a-28050ffe5deb",
+      "name": "WooCommerce Get Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1220,
+        420
+      ],
+      "parameters": {
+        "url": "https://woo-pleasantly-swag-werewolf3.wpcomstaging.com/wp-json/wc/v3/orders",
+        "options": {},
+        "sendBody": true,
+        "authentication": "predefinedCredentialType",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "customer",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "include",
+              "value": "={{ $('If email provided').item.json.query.split(',').filter(data => !data.includes('@')).join(',') }}"
+            }
+          ]
+        },
+        "nodeCredentialType": "wooCommerceApi"
+      },
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "Rm7eydPl5IQwnlhw",
+          "name": "WooCommerce account"
+        }
+      },
+      "typeVersion": 4.1,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "6cd01eed-7b28-4fe1-b3a2-33293a978843",
+      "name": "No order found",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1800,
+        620
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a06428b-4115-4eee-97f4-8e828c5a7e5a",
+              "name": "response",
+              "type": "string",
+              "value": "No order could be found."
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "bd45f21a-f30e-4dc2-be8b-527323016fae",
+      "name": "Add Error Information",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        3120,
+        480
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fdb3524-6263-4e0b-a052-742cec8ceac1",
+              "name": "Error",
+              "type": "string",
+              "value": "=No data about the parcel with the tracking ID \"{{ $('Split Out').item.json.tracking_id }}\" could be found."
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "73596711-8b8b-47d9-88b6-84fe1c35fd42",
+      "name": "DHL",
+      "type": "n8n-nodes-base.dhl",
+      "onError": "continueErrorOutput",
+      "position": [
+        2880,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "trackingNumber": "={{ $json.tracking_number }}"
+      },
+      "credentials": {
+        "dhlApi": {
+          "id": "AYAwLZA02lSGlGTd",
+          "name": "DHL account Jan"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ea1a7ab3-d7b7-4651-9232-4724a1adc14f",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        4600,
+        640
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2bb4a8a-40b0-4233-99a8-3b494fb84230",
+              "name": "response",
+              "type": "array",
+              "value": "={{ $input.all().map(item => item.json) }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "606f4731-00cc-4af0-a708-1d0d3d348dfa",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        -1280
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 676.2425958534976,
+        "height": 886.4179654829891,
+        "content": "## 사용자 이메일 공급 방법\n고객들이 자신의 주문에 대한 정보만 조회할 수 있도록 하기 위해, 이메일 주소가 백엔드에서 암호화된 후 이 워크플로우에서 다시 해독됩니다. 이메일이 암호화되지 않고 설정될 수 있다면, 누구나 다른 고객의 정보를 조회할 수 있습니다.\n\n### 이메일 주소는 다음 위치의 채팅 스크립트에서 공급됩니다:\n```\ncreateChat({\n\twebhookUrl: '...',\n\tmetadata: {\n email: 'ENCRYPTED_EMAIL_ADDRESS'\n },\n});\n```\n\n\n## 예시 스크립트:\n\n### 백엔드에서 이메일 암호화\n웹사이트의 백엔드에서 다음 코드를 실행하고, 데이터를 프론트엔드로 보내고, 위에서 정의된 위치에 동적으로 이메일로 설정하세요.\n\n\n\n\n\n\n\n\n\n\n\n\n\n### 워크플로우에서 이메일 해독\n이 스크립트는 이미 이 워크플로우에서 사용되고 있으며, 여기에서 다시 예시로 제공됩니다.\n\n\n### 출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "adbd1b20-0b4e-44ee-9ecc-3fc746691a03",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        60,
+        0
+      ],
+      "parameters": {
+        "model": "gpt-4",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "h7YcjvQLK5VrUYLz",
+          "name": "OpenAi Jan"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b9076a7c-39b6-4205-9b05-90ed1f07115e",
+      "name": "WooCommerce_Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "name": "WooCommerce_Tool",
+        "fields": {
+          "values": [
+            {
+              "name": "email",
+              "stringValue": "={{ $json.metadata.email }}"
+            }
+          ]
+        },
+        "workflowId": "={{ $workflow.id }}",
+        "description": "Call this tool to retrieve the orders in JSON format (compatible with the WooCommerce API). The input should be a list of comma-separated order IDs or nothing at all for all orders. Supply nothing else than the order IDs!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c1f06bc7-04d3-4ad5-b46a-6baa509ee23d",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -440,
+        -220
+      ],
+      "webhookId": "3b63a62a-bfb7-4fb4-a6ec-4c40dcb4d9f6",
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1dcb818f-48d1-4314-8737-509c2484c8af",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        60,
+        -1280
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 517.004057164405,
+        "height": 555.1564335638465,
+        "content": "## 예시 웹사이트 구현\n웹사이트의 예시 코드는 \"Respond to Webhook\" 노드에서 찾을 수 있습니다.\n\n임베디드 채팅에 대한 더 많은 정보는 [여기](https://github.com/n8n-io/n8n/tree/master/packages/%40n8n/chat#installation)에서 찾을 수 있습니다.\n\n필요한 변경사항:\n- \"webhookUrl\"을 \"Chat Trigger\" 노드에 표시된 것으로 변경하세요\n- 암호화된 이메일 주소를 동적으로 설정하세요. 이 값은 진정으로 안전하게 하기 위해 백엔드에서 계산되어야 합니다\n- 이메일 암호화/복호화에 고유한 비밀번호를 사용하세요. 이 비밀번호를 백엔드와 이 워크플로우에서 사용하세요 (\"Decrypt email address\" 노드에서 설정할 수 있습니다)\n\n예시 페이지는 \"Webhook Example Page\" 노드의 프로덕션 Webhook-URL을 호출하여 열 수 있습니다. 왼쪽에 있는 \"For production use\" 단계가 따랐을 때만 작동합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e3a405a1-077d-4b72-bafa-26fd470f0f1c",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        360,
+        -920
+      ],
+      "parameters": {
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "content-type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        },
+        "respondWith": "text",
+        "responseBody": "<doctype html>\n\t<html lang=\"en\">\n\t\t<head>\n\t\t\t<meta charset=\"utf-8\" />\n\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n\t\t\t<title>Chat</title>\n\t\t\t<link\n\t\t\t\thref=\"https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css\"\n\t\t\t\trel=\"stylesheet\"\n\t\t\t/>\n\t\t\t<link href=\"https://cdn.jsdelivr.net/npm/@n8n/chat/style.css\" rel=\"stylesheet\" />\n\t\t</head>\n\t\t<body>\n\t\t\t<script type=\"module\">\n\t\t\t\timport { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat@latest/chat.bundle.es.js';\n\n\t\t\t\t(async function () {\n\t\t\t\t\tcreateChat({\n\t\t\t\t\t\tmode: 'window',\n\t\t\t\t\t\twebhookUrl: 'https://xxx.n8n.cloud/webhook/ea429912-869c-490b-9e04-4401ac9943b6/chat',\n\t\t\t\t\t\tloadPreviousSession: false,\n\t\t\t\t\t\tmetadata: {\n\t\t\t\t\t\t\temail: '352b16c74f73265441c55c37c9c22b04:4a8e614143c9cd31cc7e2389380943f3', // james@brown.com encrypted\n\t\t\t\t\t\t},\n\t\t\t\t\t\twebhookConfig: {\n\t\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t\t'Content-Type': 'application/json',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t})();\n\t\t\t</script>\n\n\t\t\t<h1>WooCommerce Agent Example page</h1>\n\t\t\tClick on the bubble in the lower right corner to open the chat.\n\n\t\t</body>\n\t</html>\n</doctype>"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3ee13508-9400-415f-b435-514131ab8c53",
+      "name": "Webhook Example Page",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        140,
+        -920
+      ],
+      "webhookId": "18474f2d-9472-4a8d-8e63-8128fd2cbefc",
+      "parameters": {
+        "path": "website-chat-example",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "76bfe2b1-2c4a-45b9-a066-1287e735fafd",
+      "name": "Decrypt email",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        860,
+        -580
+      ],
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nconst crypto = require('crypto');\n\nconst password = 'a random password';\n\nconst encryptedData = $input.first().json.email;\n\n\nfunction decrypt(encrypted, password) {\n // Extract the IV and the encrypted text\n const parts = encrypted.split(':');\n const iv = Buffer.from(parts.shift(), 'hex');\n\n // Create a key from the password\n const key = crypto.scryptSync(password, 'salt', 32);\n\n // Create a decipher\n const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);\n\n // Decrypt the text\n let decrypted = decipher.update(parts.join(':'), 'hex', 'utf8');\n decrypted += decipher.final('utf8');\n\n // Return the decrypted text\n return decrypted;\n}\n\nreturn [\n {\n json: {\n email: decrypt(encryptedData, password),\n }\n }\n];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "561cb422-955b-445b-9690-aa439dcd2455",
+      "name": "Encrypt email",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        680,
+        -840
+      ],
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\nconst password = 'a random password';\nconst email = 'james@brown.com';\n\n\nfunction encrypt(text, password) {\n // Generate a secure random initialization vector\n const iv = crypto.randomBytes(16);\n\n // Create a key from the password\n const key = crypto.scryptSync(password, 'salt', 32);\n\n // Create a cipher\n const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);\n\n // Encrypt the text\n let encrypted = cipher.update(text, 'utf8', 'hex');\n encrypted += cipher.final('hex');\n\n // Return the IV and the encrypted text\n return `${iv.toString('hex')}:${encrypted}`;\n}\n\nreturn [\n {\n json: {\n email: encrypt(email, password),\n }\n }\n];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "eba004cb-4a40-432b-8fe2-d8526913c585",
+      "name": "Example encrypted email",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        680,
+        -580
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa8d71d3-8e60-44b0-8ef0-e0bfc6feaf0e",
+              "name": "email",
+              "type": "string",
+              "value": "352b16c74f73265441c55c37c9c22b04:4a8e614143c9cd31cc7e2389380943f3"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "d2fe7948-2ce5-4faa-91da-ea76f02aaf84",
+      "name": "Decrypt email address",
+      "type": "n8n-nodes-base.code",
+      "disabled": true,
+      "position": [
+        -240,
+        -220
+      ],
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nconst crypto = require('crypto');\n\nconst password = 'a random password';\nconst incomingData = $input.first().json;\n\n\nfunction decrypt(encrypted, password) {\n // Extract the IV and the encrypted text\n const parts = encrypted.split(':');\n const iv = Buffer.from(parts.shift(), 'hex');\n\n // Create a key from the password\n const key = crypto.scryptSync(password, 'salt', 32);\n\n // Create a decipher\n const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);\n\n // Decrypt the text\n let decrypted = decipher.update(parts.join(':'), 'hex', 'utf8');\n decrypted += decipher.final('utf8');\n\n // Return the decrypted text\n return decrypted;\n}\n\nreturn [\n {\n json: {\n ...incomingData,\n metadata: {\n email: decrypt(incomingData.metadata.email, password), \n },\n }\n }\n];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "26cb468c-5edf-4674-bec2-39270262fc00",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        140,
+        -220
+      ],
+      "parameters": {
+        "options": {
+          "systemMessage": "=The Assistant is tailored to support customers of Best Shirts Ltd. with inquiries related to their orders. It adheres to the following principles for optimal customer service:\n\n1. **Customer-Focused Communication**: The Assistant maintains a friendly and helpful tone throughout the interaction. It remains focused on the topic at hand, ensuring all responses are relevant to the customer's inquiries about their orders.\n\n2. **Objective and Factual**: In cases where specific information is unavailable, the Assistant clearly communicates the lack of information and refrains from speculating or providing unverified details.\n\n3. **Efficient Interaction**: Recognizing the importance of the customer's time, the Assistant is designed to remember previous interactions within the same session. This minimizes the need for customers to repeat information, streamlining the support process.\n\n4. **Strict Privacy Adherence**: The Assistant automatically has access to the customer's email address as \"{{ $json.email }}\", using it to assist with order-related inquiries. Customers are informed that it is not possible to use or inquire about a different email address. If a customer attempts to provide an alternate email, they are gently reminded of this limitation.\n\n5. **Transparency in Order Status**: The Assistant provides accurate information about order processing and delivery timelines. Orders are typically dispatched 1-2 days post-purchase, with an expected delivery period of 1-2 days following dispatch. If an order hasn't been sent out within 2 days, the Assistant acknowledges an unplanned delay and offers assistance accordingly.\n\n6. **Non-assumptive Approach to Delivery Confirmation**: The Assistant never presumes an order has been delivered based solely on its dispatch. It relies on explicit delivery confirmations or tracking information to inform customers about their order status.\n\n7. **Responsive to Specific Inquiries**: If a customer requests the email address used for their inquiry, the Assistant provides it directly, ensuring privacy and accuracy in communications.\n\nThis approach ensures that customers receive comprehensive, respectful, and efficient support for their order-related queries."
+        }
+      },
+      "typeVersion": 1.4
+    },
+    {
+      "id": "1088d613-4321-40ec-baba-deb0f3aa1078",
+      "name": "Mock Data",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -40,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c591fa49-31b3-46e7-8108-2d3ad1fc895b",
+              "name": "metadata.email",
+              "type": "string",
+              "value": "james@brown.com"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      },
+      "typeVersion": 3.3
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "DHL": {
+      "main": [
+        [
+          {
+            "node": "Merge Tracking Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Error Information",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "DHL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Decrypt email address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Orders": {
+      "main": [
+        [
+          {
+            "node": "Merge Order and Tracking Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If user found": {
+      "main": [
+        [
+          {
+            "node": "WooCommerce Get Orders",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No customer found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If order found": {
+      "main": [
+        [
+          {
+            "node": "Extract Tracking Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Order and Tracking Data",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "No order found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WooCommerce_Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If email provided": {
+      "main": [
+        [
+          {
+            "node": "WooCommerce - Get User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No email provided",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Tracking Data": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If contains DHL data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Orders",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Webhook Example Page": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Error Information": {
+      "main": [
+        [
+          {
+            "node": "Merge Tracking Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Decrypt email address": {
+      "main": [
+        [
+          {
+            "node": "Mock Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Tracking Data": {
+      "main": [
+        [
+          {
+            "node": "If contains DHL data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WooCommerce - Get User": {
+      "main": [
+        [
+          {
+            "node": "If user found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WooCommerce Get Orders": {
+      "main": [
+        [
+          {
+            "node": "If order found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Example encrypted email": {
+      "main": [
+        [
+          {
+            "node": "Decrypt email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "If email provided",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Order and Tracking Data": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

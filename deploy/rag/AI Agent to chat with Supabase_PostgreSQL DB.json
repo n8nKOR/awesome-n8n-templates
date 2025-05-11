@@ -1,0 +1,261 @@
+{
+  "nodes": [
+    {
+      "id": "0a4e65b7-39be-44eb-8c66-913ebfe8a87a",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1140,
+        840
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 215,
+        "height": 80,
+        "content": "Supabase의 비밀번호와 사용자 이름 변경"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2cea21fc-f3fe-47b7-a7b6-12acb0bc03ac",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -160,
+        320
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 280.2462120317618,
+        "height": 545.9087885077763,
+        "content": "### 설정 단계\n\n#### 준비\n1. **계정 생성**:\n   - [N8N](https://n8n.partnerlinks.io/2hr10zpkki6a): 워크플로 자동화를 위해.\n   - [Supabase](https://supabase.com/): 데이터베이스 호스팅 및 관리를 위해.\n   - [OpenAI](https://openai.com/): 대화형 AI 에이전트 구축을 위해.\n2. **데이터베이스 연결 구성**:\n   - Supabase에서 PostgreSQL 데이터베이스를 설정합니다.\n   - 워크플로에서 적절한 자격 증명(`username`, `password`, `host`, 및 `database` 이름)을 사용합니다.\n\n#### N8N 워크플로\n\nAI 에이전트와 도구:\n\n1. **코드 도구**:\n   - 사용자 입력에 따라 SQL 쿼리를 실행합니다.\n2. **데이터베이스 스키마 도구**:\n   - 데이터베이스의 모든 테이블 목록을 검색합니다.\n   - 열 이름, 유형 및 참조를 포함한 테이블 정의를 가져오기 위해 미리 정의된 SQL 쿼리를 사용합니다.\n3. **테이블 정의**:\n   - 하나의 테이블에 대한 열 목록과 유형을 검색합니다.\n\n### 출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "eacc0c8c-11d5-44fb-8ff1-10533a233693",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -160,
+        -200
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 636.2128494576581,
+        "height": 497.1532689930921,
+        "content": "Supabase/PostgreSQL DB와 채팅하는 AI 에이전트  \n커뮤니티 5minAI의 Mark Shcherbakov이 제작했습니다.  \n\n데이터베이스 데이터를 접근하고 분석하는 데는 종종 SQL 전문 지식이나 전용 보고서가 필요하며, 이는 시간 소모적일 수 있습니다. 이 워크플로는 AI 기반 에이전트를 통해 사용자가 데이터베이스를 대화식으로 상호작용할 수 있게 합니다. 이는 사용자 요청에 따라 동적으로 SQL 쿼리를 생성하여 데이터 검색 및 분석을 간소화합니다.  \n\n이 워크플로는 OpenAI를 Supabase 데이터베이스와 통합하여 사용자가 AI 에이전트를 통해 데이터를 상호작용할 수 있게 합니다. 에이전트는 다음과 같은 작업을 수행할 수 있습니다:  \n- 데이터베이스에서 레코드를 검색합니다.  \n- 테이블에 저장된 JSON 데이터를 추출하고 분석합니다.  \n- 사용자 쿼리에 따라 요약, 집계 또는 특정 데이터 포인트를 제공합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "be1559ea-1f75-4e7c-9bdd-3add8d8be70b",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        140,
+        320
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 330.5152611046425,
+        "height": 239.5888196628349,
+        "content": "... 또는 설정 비디오 보기 [20분]  \n![유튜브 썸네일](https://res.cloudinary.com/de9jgixzm/image/upload/v1739773279/Youtube%20Thumbs/Chat%20With%20DB.png) (https://www.youtube.com/watch?v=-GgKzhCNxjk)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4ea87754-dead-49ea-848c-ed86c98e217b",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        720,
+        400
+      ],
+      "webhookId": "6e95bc27-99a6-417c-8bf7-2831d7f7a4be",
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "c20d6e57-eb41-4682-a7f5-5bb4323df476",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        760,
+        680
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "zJhr5piyEwVnWtaI",
+          "name": "OpenAi club"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8d3b1faf-643c-4070-996d-a59cb06e1827",
+      "name": "DB Schema",
+      "type": "n8n-nodes-base.postgresTool",
+      "position": [
+        1180,
+        660
+      ],
+      "parameters": {
+        "query": "SELECT table_schema, table_name\nFROM information_schema.tables\nWHERE table_type = 'BASE TABLE' AND table_schema = 'public';",
+        "options": {},
+        "operation": "executeQuery",
+        "descriptionType": "manual",
+        "toolDescription": "Get list of all tables in database"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "AO9cER6p8uX7V07T",
+          "name": "Postgres 5minai"
+        }
+      },
+      "typeVersion": 2.5
+    },
+    {
+      "id": "d9346ade-79d1-44c2-8fa6-b337ad8b0544",
+      "name": "Get table definition",
+      "type": "n8n-nodes-base.postgresTool",
+      "position": [
+        1340,
+        660
+      ],
+      "parameters": {
+        "query": "SELECT \n c.column_name,\n c.data_type,\n c.is_nullable,\n c.column_default,\n tc.constraint_type,\n ccu.table_name AS referenced_table,\n ccu.column_name AS referenced_column\nFROM \n information_schema.columns c\nLEFT JOIN \n information_schema.key_column_usage kcu \n ON c.table_name = kcu.table_name \n AND c.column_name = kcu.column_name\nLEFT JOIN \n information_schema.table_constraints tc \n ON kcu.constraint_name = tc.constraint_name\n AND tc.constraint_type = 'FOREIGN KEY'\nLEFT JOIN\n information_schema.constraint_column_usage ccu\n ON tc.constraint_name = ccu.constraint_name\nWHERE \n c.table_name = '{{ $fromAI(\"table_name\") }}' -- Your table name\n AND c.table_schema = 'public' -- Ensure it's in the right schema\nORDER BY \n c.ordinal_position;\n",
+        "options": {},
+        "operation": "executeQuery",
+        "descriptionType": "manual",
+        "toolDescription": "Get table definition to find all columns and types."
+      },
+      "credentials": {
+        "postgres": {
+          "id": "AO9cER6p8uX7V07T",
+          "name": "Postgres 5minai"
+        }
+      },
+      "typeVersion": 2.5
+    },
+    {
+      "id": "b88a21e0-d2ff-4431-bd84-dfd43edeb5c4",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        280
+      ],
+      "parameters": {
+        "width": 215,
+        "height": 80,
+        "content": "어시스턴트의 프롬프트를 파인튜닝"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "fbe9eb68-5990-485c-820f-08234ea33194",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        940,
+        400
+      ],
+      "parameters": {
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "agent": "openAiFunctionsAgent",
+        "options": {
+          "systemMessage": "You are DB assistant. You need to run queries in DB aligned with user requests.\n\nRun custom SQL query to aggregate data and response to user.\n\nFetch all data to analyse it for response if needed.\n"
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.6
+    },
+    {
+      "id": "7f82d6d9-d7d6-4443-bbaa-c9b276a376e3",
+      "name": "Run SQL Query",
+      "type": "n8n-nodes-base.postgresTool",
+      "position": [
+        1040,
+        660
+      ],
+      "parameters": {
+        "query": "{{ $fromAI(\"query\",\"SQL query for PostgreSQL DB in Supabase\") }}",
+        "options": {},
+        "operation": "executeQuery",
+        "descriptionType": "manual",
+        "toolDescription": "Run custom SQL queries using knowledge about Output structure to provide needed response for user request.\nUse ->> operator to extract JSON data."
+      },
+      "credentials": {
+        "postgres": {
+          "id": "AO9cER6p8uX7V07T",
+          "name": "Postgres 5minai"
+        }
+      },
+      "typeVersion": 2.5
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "DB Schema": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run SQL Query": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get table definition": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

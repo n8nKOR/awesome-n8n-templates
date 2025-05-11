@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "instanceId": "205b3bc06c96f2dc835b4f00e1cbf9a937a74eeb3b47c99d0c30b0586dbf85aa",
+    "templateId": "2436"
+  },
+  "nodes": [
+    {
+      "id": "b24c6e28-3c9e-4069-9e87-49b2efd47257",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1200,
+        660
+      ],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "AzPPV759YPBxJj3o",
+          "name": "Max's DevRel OpenAI account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c71a3e22-f0fd-4377-9be2-32438b282430",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        200,
+        240
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 636.2128494576581,
+        "height": 494.9629292914819,
+        "content": "![Siri 템플릿 썸네일](https://uploads.n8n.io/devrel/wf-siri-header.png#full-width)  \n## \"Hey Siri, Ask Agent\" 워크플로우  \n** [Max Tkacz](https://www.linkedin.com/in/maxtkacz) 가 [30 Day AI Sprint](https://30dayaisprint.notion.site/) 동안 만든 것 **  \n\n이 템플릿은 Apple Shortcuts와 통합되어 \"Hey Siri\" 명령을 통해 n8n AI 에이전트를 트리거합니다. 숏컷은 음성 입력을 유도하여 전사한 후, 이를 워크플로의 `When Called by Apple Shortcut` Webhook 트리거로 보냅니다. AI 에이전트가 입력을 처리하고 Siri가 응답을 음성으로 전달합니다.  \n\n워크플로우는 현재 날짜와 시간을 `AI Agent`에 전달하며, App 노드 등의 추가 컨텍스트를 통해 더 맞춤형 응답을 위해 확장할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a4ec93c3-eefa-4006-b02c-f995fb7bc410",
+      "name": "Respond to Apple Shortcut",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        1640,
+        460
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "942b284e-e26a-4534-8f33-eb92b0a88fdb",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        200,
+        760
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 280.2462120317618,
+        "height": 438.5821431288714,
+        "content": "### 설정 단계\n\n1. `OpenAI Chat Model` 노드에 OpenAI API 자격 증명을 추가하거나 다른 모델로 교체하세요. 무료 대안으로 `Groq`를 시도해보세요 (무료 Groq 계정으로 사용할 수 있음, CC 없음).\n2. `When called by Apple Shortcut` 노드에서 \"Production URL\"을 복사하세요. 숏컷 설정 시 이 URL이 필요합니다.\n3. 이 n8n 워크플로를 저장하고 활성화하세요.\n4. [Apple Shortcut를 여기에서 다운로드](https://uploads.n8n.io/devrel/ask-agent.shortcut)하세요, macOS 또는 iOS에서 열어주세요. 이로 인해 숏컷이 기기에 추가됩니다.\n5. 숏컷을 열고 `Get contents of` 단계에서 URL을 `When called by Apple Shortcut`에서 복사한 \"Production URL\"로 교체하세요.\n6. 테스트하려면 'Hey Siri, AI Agent'라고 말한 후 질문을 하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ebb9e886-546a-429c-b4b5-35c0a7b6370e",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        503.6292958565226,
+        760
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 330.5152611046425,
+        "height": 240.6839895136402,
+        "content": "... 또는 설정 비디오 보기 [5분]  \n[![Siri 템플릿 썸네일](https://uploads.n8n.io/devrel/thumb-siri.png#full-width)](https://youtu.be/dewsB-4iGA8)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5a842fa9-be8c-4ba8-996b-a26a53273b3f",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1240,
+        460
+      ],
+      "parameters": {
+        "text": "=Here is my request: {{ $json.body.input }}\n",
+        "agent": "conversationalAgent",
+        "options": {
+          "systemMessage": "=## Task\nYou are a helpful assistant. Provide concise replies as the user receives them via voice on their mobile phone. Avoid using symbols like \"\\n\" to prevent them from being narrated.\n\n## Context\n- Today is {{ $now.format('dd LLL yy') }}.\n- Current time: {{ $now.format('h:mm a') }} in Berlin, Germany.\n- When asked, you are an AI Agent running as an n8n workflow.\n\n## Output\nKeep responses short and clear, optimized for voice delivery. Don't hallucinate, if you don't know the answer, say you don't know. "
+        },
+        "promptType": "define",
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.6
+    },
+    {
+      "id": "598d22d5-7472-44c5-ab2e-69c8bbb23ddd",
+      "name": "When called by Apple Shortcut",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        980,
+        460
+      ],
+      "webhookId": "f0224b4b-1644-4d3d-9f12-01a9c04879e4",
+      "parameters": {
+        "path": "assistant",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "typeVersion": 2
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Apple Shortcut",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When called by Apple Shortcut": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "meta": {
+    "instanceId": "84ba6d895254e080ac2b4916d987aa66b000f88d4d919a6b9c76848f9b8a7616",
+    "templateId": "2370"
+  },
+  "nodes": [
+    {
+      "id": "2ce91ec6-0a8c-438a-8a18-216001c9ee07",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {
+        "width": 407.6388140161723,
+        "height": 490.24769122000794,
+        "content": "## 이것은 POST Webhook 엔드포인트입니다\n\n이 웹훅을 https:// 래퍼를 사용하여 구성하세요. 기본 http://localhost:5678을 사용하지 마세요. 왜냐하면 그것이 당신의 슬랙 웹훅에 의해 인식되지 않을 것이기 때문입니다.\n\n데이터가 당신의 웹훅으로 보내지면, 다음 단계는 AI 에이전트를 통해 그것을 전달하여 우리 에이전트에게 전달된 쿼리에 기반한 데이터를 처리하는 것입니다.\n\n일종의 메모리를 갖기 위해, 슬랙 토큰을 메모리 노드에 설정하세요. 이 방법으로 당신은 역사에서 다른 채팅을 참조할 수 있습니다.\n\n최종 메시지는 슬랙으로 새로운 메시지로 전달됩니다. 슬랙 응답을 3000ms 이상 기다릴 수 없기 때문에, 우리는 전달한 입력에 대한 참조와 함께 새로운 메시지를 생성할 것입니다.\n\n우리는 도구나 데이터 소스를 사용하여 이것을 더 회사에 맞게 맞춤형으로 발전시킬 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7a0c84a8-90ef-4de8-b120-700c94c35a51",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1180,
+        560
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 221.73584905660368,
+        "height": 233,
+        "content": "대화 기록은 메모리에 body token을 chatsession id로 사용하여 저장됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9b843e0e-42a6-4125-8c59-a7d5620a15f7",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        942.5229110512129,
+        560
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 217.47708894878716,
+        "height": 233,
+        "content": "프롬프트를 처리하기 위한 채팅 LLM. 여기에서 어떤 AI 모델도 사용하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4efa968f-ebf5-42ec-80d3-907ef2622c61",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1020,
+        640
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-1.5-flash-latest"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "fd1efd7c-7cd0-4edf-960e-19bd4567293e",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1260,
+        660
+      ],
+      "parameters": {
+        "sessionKey": "={{ $('Webhook to receive message').item.json.body.token }}",
+        "sessionIdType": "customKey",
+        "contextWindowLength": 10
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "60d1eb77-492d-4a18-8cec-fa3f6ef8d707",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1467.5148247978436,
+        260
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 223.7196765498655,
+        "height": 236.66152029520293,
+        "content": "AI의 응답을 Slack 채널로 다시 보내세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "186069c0-5c79-4738-9924-de33998658bc",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        840,
+        180
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 561.423180592992,
+        "height": 340.09703504043114,
+        "content": "## POST 웹훅을 수신하여 데이터를 처리하고 응답을 반환"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2bfce117-a769-46e1-a028-ed0c7ba62653",
+      "name": "Send response back to slack channel",
+      "type": "n8n-nodes-base.slack",
+      "position": [
+        1540,
+        320
+      ],
+      "parameters": {
+        "text": "={{ $('Webhook to receive message').item.json.body.user_name }}: {{ $('Webhook to receive message').item.json.body.text }}\n\nEffibotics Bot: {{ $json.output.removeMarkdown() }} ",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Webhook to receive message').item.json.body.channel_id }}"
+        },
+        "otherOptions": {
+          "mrkdwn": true,
+          "sendAsUser": "Effibotics Bot",
+          "includeLinkToWorkflow": false
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "cfcf2bbc-8ed5-4a9f-8f35-cf2715686ebe",
+      "name": "Webhook to receive message",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        880,
+        320
+      ],
+      "webhookId": "28b84545-96aa-42f5-990b-aa8783a320ca",
+      "parameters": {
+        "path": "slack-bot",
+        "options": {
+          "responseData": ""
+        },
+        "httpMethod": "POST"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "dc93e588-fc0b-4561-88a5-e1cccd48323f",
+      "name": "Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1100,
+        320
+      ],
+      "parameters": {
+        "text": "={{ $json.body.text }}",
+        "options": {
+          "systemMessage": "You are Effibotics AI personal assistant. Your task will be to provide helpful assistance and advice related to automation and such tasks. "
+        }
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Agent": {
+      "main": [
+        [
+          {
+            "node": "Send response back to slack channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook to receive message": {
+      "main": [
+        [
+          {
+            "node": "Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

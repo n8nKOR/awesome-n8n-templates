@@ -1,0 +1,283 @@
+{
+  "meta": {
+    "instanceId": "f4f5d195bb2162a0972f737368404b18be694648d365d6c6771d7b4909d28167"
+  },
+  "nodes": [
+    {
+      "id": "b6cd232e-e82e-457b-9f03-c010b3eba148",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -40,
+        0
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "2b734806-e3c0-4552-a491-54ca846ed3ac",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        620,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "binaryToPropery"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2c199499-cc4f-405c-8560-765500b7acba",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        420,
+        0
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "18Ac2xorxirIBm9FNFDDB5aVUSPBCCg1U",
+          "cachedResultUrl": "https://drive.google.com/file/d/18Ac2xorxirIBm9FNFDDB5aVUSPBCCg1U/view?usp=drivesdk",
+          "cachedResultName": "Invoice-798FE2FA-0004.pdf"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "AUEpxwlqBJghNMtb",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "e3031c0c-f059-4f30-9684-10014a277d55",
+      "name": "Call Gemini 2.0 Flash with PDF Capabilities",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        880,
+        220
+      ],
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"contents\": [\n {\n \"parts\": [\n {\n \"inline_data\": {\n \"mime_type\": \"application/pdf\",\n \"data\": \"{{ $json.data }}\"\n }\n },\n {\n \"text\": \"{{ $('Define Prompt').item.json.prompt }}\"\n }\n ]\n }\n ]\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi"
+      },
+      "credentials": {
+        "anthropicApi": {
+          "id": "eOt6Ois0jSizRFMJ",
+          "name": "Anthropic Mira Account"
+        },
+        "googlePalmApi": {
+          "id": "IQrjvfoUd5LUft3b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "135df716-32a1-47e8-9ed8-30c830b803d6",
+      "name": "Call Claude 3.5 Sonnet with PDF Capabilities",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        880,
+        -140
+      ],
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"model\": \"claude-3-5-sonnet-20241022\",\n \"max_tokens\": 1024,\n \"messages\": [{\n \"role\": \"user\",\n \"content\": [{\n \"type\": \"document\",\n \"source\": {\n \"type\": \"base64\",\n \"media_type\": \"application/pdf\",\n \"data\": \"{{$json.data}}\"\n }\n },\n {\n \"type\": \"text\",\n \"text\": \"{{ $('Define Prompt').item.json.prompt }}\"\n }]\n }]\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "nodeCredentialType": "anthropicApi"
+      },
+      "credentials": {
+        "anthropicApi": {
+          "id": "eOt6Ois0jSizRFMJ",
+          "name": "Anthropic Mira Account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "5b8994d1-4bfd-4776-84ac-b3141aca6378",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -700,
+        -280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 601,
+        "height": 585,
+        "content": "## 워크플로우: Claude 3.5 Sonnet 또는 Gemini 2.0 Flash를 사용하여 PDF에서 데이터 추출\n\n**개요**  \n- 이 워크플로우는 PDF에서 데이터를 추출할 때 Claude 3.5 Sonnet과 Gemini 2.0 Flash를 비교하는 데 도움이 됩니다.  \n- 이 워크플로우는 PDF 내 데이터를 **한 번의 단일 단계**에서 추출하고 처리합니다. **OCR을 호출한 후 LLM을 호출하는 대신**입니다.\n\n**작동 원리**  \n- 초기 2단계에서 PDF를 다운로드하고 base64로 변환합니다.  \n- 이 base64 문자열을 Claude 3.5 Sonnet과 Gemini 2.0 Flash 모두에 보내 정보를 추출합니다.  \n- 이 워크플로우는 결과를 비교하고, 지연 시간, 비용을 전용 대시보드에서 확인할 수 있도록 설계되었습니다.\n\n**사용 방법**  \n- Google Drive를 아직 설정하지 않았다면 설정합니다.  \n- Google Drive에서 문서를 선택합니다.  \n- \"Define Prompt\"의 프롬프트를 수정하여 필요한 정보를 추출하고 원하는 대로 변환합니다.  \n- [Claude API 키](https://console.anthropic.com/settings/keys)를 얻거나 [Gemini API 키](https://aistudio.google.com/app/apikey)를 얻습니다.  \n- 둘 중 하나의 API 호출을 비활성화하여 둘 다 시도하지 않을 수 있습니다.  \n- 워크플로우를 테스트합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "616241a9-6199-406b-88dc-0afc7d974250",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        820,
+        60
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 320,
+        "height": 360,
+        "content": "다음을 추가하여 결과를 JSON으로 출력할 수 있습니다:\n```\n\"generationConfig\": {\n \"responseMimeType\": \"application/json\"\n}\n```\n또는 구조화된 출력을 사용할 수도 있습니다.\n[문서를 확인하세요](https://ai.google.dev/gemini-api/docs/structured-output?lang=rest)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "bbac8d3d-d68f-4aa2-a41a-b06f7de2317b",
+      "name": "Define Prompt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        180,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dba23ef5-95df-496a-8e24-c7c1544533d2",
+              "name": "prompt",
+              "type": "string",
+              "value": "Extract the VAT numbers for each country"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "3c2e7265-76e5-4911-a950-7e6b0c89ec5a",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        820,
+        -200
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 320,
+        "height": 240,
+        "content": "Claude를 JSON 출력으로 강제할 수 있는 [Prefill response format](https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/increase-consistency#prefill-claudes-response)입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f2b46305-5200-486e-ad4d-ecc0d2a14314",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        -120
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 380,
+        "height": 280,
+        "content": "이 두 단계는 먼저 PDF 파일을 다운로드한 다음 base64로 변환합니다. 이는 두 API가 파일을 처리하기 위해 필요합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e5dff70f-b55a-4c23-9025-765a7cf19c4a",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        -120
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 220,
+        "height": 280,
+        "content": "이 프롬프트는 Gemini와 Claude의 호출에서 정보를 추출하고 처리해야 할 내용을 정의하는 데 사용됩니다."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Prompt": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Call Claude 3.5 Sonnet with PDF Capabilities",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call Gemini 2.0 Flash with PDF Capabilities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Define Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

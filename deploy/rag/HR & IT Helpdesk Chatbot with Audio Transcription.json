@@ -1,0 +1,760 @@
+{
+  "id": "zmgSshZ5xESr3ozl",
+  "meta": {
+    "instanceId": "1fedaf0aa3a5d200ffa1bbc98554b56cac895dd5d001907cb6f1c7a3c0a78215",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "HR & IT Helpdesk Chatbot with Audio Transcription",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "c6cb921e-97ac-48f6-9d79-133993dd6ef7",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -300,
+        -280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 780,
+        "height": 460,
+        "content": "## 1. 내부 정책 문서 다운로드 및 추출\n\n[HTTP Request 도구에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest)\n\n먼저 내부 정책과 FAQ가 포함된 PDF 문서를 가져오세요. 이 문서들은 Internal Helpdesk Assistant의 지식 기반이 됩니다. 예를 들어, 회사 핸드북이나 IT/HR 정책 PDF를 공유 드라이브나 클라우드 스토리지에 저장하고 여기에 직접 다운로드 링크를 참조할 수 있습니다.\n\n이 데모에서 **HTTP Request 노드**를 사용하여 주어진 URL에서 PDF 파일을 가져온 다음 **Extract from File 노드**를 사용하여 텍스트 내용을 구문 분석합니다. 추출된 후, 이 텍스트 청크는 헬프데스크 챗봇의 응답을 뒷받침하는 벡터 스토어를 구축하는 데 사용됩니다.\n\n[예시 직원 핸드북과 정책](https://s3.amazonaws.com/scschoolfiles/656/employee_handbook_print_1.pdf)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "450a254c-eec3-41ea-a11d-eb87b62ee4f4",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -80,
+        20
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "0972f31c-1f62-430c-8beb-bef8976cd0eb",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        100,
+        20
+      ],
+      "parameters": {
+        "url": "https://s3.amazonaws.com/scschoolfiles/656/employee_handbook_print_1.pdf",
+        "options": {}
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "bf523255-39f5-410a-beb7-6331139c5f9b",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        280,
+        20
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "pdf"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "88901c7c-e747-44c7-87d9-e14ac99a93db",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        540,
+        -280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 780,
+        "height": 1020,
+        "content": "## 2. 내부 정책 벡터 저장소 생성\n\n[In-Memory Vector Store에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.vectorstoreinmemory/)\n\n벡터 저장소는 사용자의 자연어 질문을 관련 텍스트 청크에 매칭하여 검색 과정을 강화합니다. 추출된 내부 정책 텍스트를 벡터 임베딩으로 변환하여 데이터베이스와 유사한 구조에 저장할 것입니다.\n\n우리는 프로덕션 준비가 된 벡터 지원을 갖춘 PostgreSQL을 사용할 것입니다.\n\n**작동 원리**  \n1. 1단계에서 추출된 텍스트는 관리 가능한 세그먼트(청크)로 분할됩니다.  \n2. 임베딩 모델이 이러한 세그먼트를 숫자 벡터로 변환합니다.  \n3. 이러한 벡터와 함께 메타데이터가 PostgreSQL에 저장됩니다.  \n4. 사용자가 질문을 할 때, 그 쿼리가 임베딩되어 가장 관련성 있는 벡터와 매칭되며, 채팅봇의 응답 정확도를 향상시킵니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8d6472ab-dcff-4d24-a320-109787bce52a",
+      "name": "Create HR Policies",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "position": [
+        620,
+        100
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "wQK6JXyS5y1icHw3",
+          "name": "Postgres account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e669b3fb-aaf1-4df8-855b-d3142215b308",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        600,
+        320
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "J2D6m1evHLUJOMhO",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "e25418af-65bb-4628-9b26-ec59cae7b2b4",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        760,
+        340
+      ],
+      "parameters": {
+        "options": {},
+        "jsonData": "={{ $('Extract from File').item.json.text }}",
+        "jsonMode": "expressionData"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a4538deb-8406-4a5b-9b1e-4e2f859943c8",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        860,
+        560
+      ],
+      "parameters": {
+        "options": {},
+        "chunkSize": 2000
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7ee0e861-1576-4b0c-b2ef-3fc023371907",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        1420,
+        240
+      ],
+      "webhookId": "65f501de-3c14-4089-9b9d-8956676bebf3",
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "jSdrxiRKb8yfG6Ty",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "bcf1e82e-0e83-4783-a59f-857a6d1528b6",
+      "name": "Verify Message Type",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        1620,
+        240
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "Text",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    },
+                    "leftValue": "={{ $json.message.keys()}}",
+                    "rightValue": "text"
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "Audio",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "d16eb899-cccb-41b6-921e-172c525ff92c",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    },
+                    "leftValue": "={{ $json.message.keys()}}",
+                    "rightValue": "voice"
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "typeVersion": 3.2,
+      "alwaysOutputData": false
+    },
+    {
+      "id": "d403f864-c781-48fc-a62b-de0c8bfedf06",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2340,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=data"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "J2D6m1evHLUJOMhO",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.8
+    },
+    {
+      "id": "5b17c8f1-4bee-4f2a-abcb-74fe72d4cdfd",
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2120,
+        380
+      ],
+      "parameters": {
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "resource": "file"
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "jSdrxiRKb8yfG6Ty",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "cc6862cb-acfc-465b-b142-dd5fdc12fb13",
+      "name": "Unsupported Message Type",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2200,
+        560
+      ],
+      "parameters": {
+        "text": "I'm not able to process this message type.",
+        "chatId": "={{ $json.message.chat.id }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "jSdrxiRKb8yfG6Ty",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "8b97aaa1-ea0d-4b11-89c9-9ac6376c0760",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2860,
+        400
+      ],
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant for HR and employee policies"
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "e0d5416e-a799-46a2-83e3-fa6919ec0e36",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2800,
+        840
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "J2D6m1evHLUJOMhO",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "9149f41d-692e-49bc-ad70-848492d2c345",
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "position": [
+        3060,
+        840
+      ],
+      "parameters": {
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "sessionIdType": "customKey"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "wQK6JXyS5y1icHw3",
+          "name": "Postgres account"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "a1f68887-da44-4bff-86fc-f607a5bd0ab6",
+      "name": "Answer questions with a vector store",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "position": [
+        3360,
+        580
+      ],
+      "parameters": {
+        "name": "hr_employee_policies",
+        "description": "data for HR and employee policies"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "76220fe4-2448-4b32-92d8-68c564cc702d",
+      "name": "Postgres PGVector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "position": [
+        3220,
+        780
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "wQK6JXyS5y1icHw3",
+          "name": "Postgres account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "055fd294-7483-45ce-b58a-c90075199f5f",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        3640,
+        780
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "J2D6m1evHLUJOMhO",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "cc13eac7-8163-45bf-8d8a-9cf72659e357",
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        3300,
+        920
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "J2D6m1evHLUJOMhO",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "d46e415e-75ff-46b8-b382-cdcda216b1ed",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        4200,
+        420
+      ],
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "jSdrxiRKb8yfG6Ty",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "ddf623a1-0a5e-48c9-b897-6a339895a891",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2120,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "403b336f-87ce-4bef-a5f2-1640425f8198",
+              "name": "text",
+              "type": "string",
+              "value": "={{ $json.message.text }}"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "4ae84e17-cfc1-425c-930d-949da7308b78",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1340,
+        -280
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 1300,
+        "height": 1020,
+        "content": "## 3. 대체 지원을 갖춘 메시지 처리\n\n이 워크플로는 텔레그램 메시지를 처리하여 **텍스트** 및 **보이스** 입력을 다루며, 지원되지 않는 메시지 유형에 대한 대체 기능을 제공합니다. 작동 방식은 다음과 같습니다:\n\n1. **트리거 노드**:\n - 워크플로는 수신 메시지를 감지하는 텔레그램 트리거로 시작합니다.\n\n2. **메시지 유형 확인**:\n - 워크플로는 수신된 메시지의 유형을 확인합니다:\n   - **텍스트 메시지**: 메시지에 `$json.message.text`가 포함되어 있으면, 이를 에이전트에게 직접 보냅니다.\n   - **보이스 메시지**: 메시지에 `$json.message.voice`가 포함되어 있으면, 오디오를 전사 서비스를 사용하여 텍스트로 변환한 후, 결과를 에이전트에게 보냅니다.\n\n3. **대체 경로**:\n - 메시지가 텍스트나 보이스가 아니면, 대체 응답을 반환합니다:\n   `\"죄송합니다, 메시지를 처리할 수 없습니다. 다시 시도해 주세요.\"`\n\n4. **통합 출력**:\n - 텍스트 메시지와 전사된 보이스 메시지는 에이전트에게 보내기 전에 동일한 형식으로 변환되어, 처리의 일관성을 보장합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "86ad4e08-ef2d-405e-8861-bff38e1db651",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        220,
+        220
+      ],
+      "parameters": {
+        "width": 260,
+        "height": 80,
+        "content": "설정이 시작 시 또는 데이터가 변경될 때 실행되어야 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b05c4437-00fb-40f6-87fa-8dc564b16005",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2680,
+        -280
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 1180,
+        "height": 1420,
+        "content": "## 4. HR & IT AI 에이전트가 헬프데스크 지원을 제공합니다\n\nn8n의 AI 에이전트는 지능형 및 상호작용적인 워크플로를 생성하여 내부 지식베이스에서 데이터를 액세스하고 검색할 수 있습니다. 이 워크플로에서 AI 에이전트는 내부 문서에 대한 Retrieval-Augmented Generation (RAG)을 수행하여 HR 및 IT 쿼리에 대한 답변을 제공하도록 구성되어 있습니다.\n\n### How It Works:\n- **내부 지식베이스 액세스**: **Vector store tool**을 사용하여 에이전트를 워크플로에서 이전에 구축된 HR & IT 지식베이스에 연결합니다. 이는 에이전트가 직원 쿼리에 대해 정확하고 구체적인 답변을 가져올 수 있게 합니다.\n- **채팅 메모리**: **Chat memory subnode**가 대화를 추적하여 에이전트가 동일한 사용자로부터 여러 쿼리에 걸쳐 맥락을 유지하도록 하며, 개인화되고 일관된 경험을 제공합니다.\n- **동적 쿼리 응답**: 직원이 정책, 휴가 잔고, 또는 기술 문제 해결에 대해 묻든, 에이전트는 벡터 스토어에서 관련 데이터를 검색하여 자연스러운 언어 응답을 작성합니다.\n\nAI 에이전트를 벡터 스토어와 채팅 메모리와 통합하여 이 워크플로는 HR & IT 헬프데스크 챗봇이 직원에게 빠르고 정확하며 대화적인 지원을 제공할 수 있도록 합니다.\n\nPostgrSQL이 모든 단계에서 사용되어 프로덕션 개발을 간소화합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b266ca42-de62-4341-9aff-33ee0ac68045",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3900,
+        300
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 540,
+        "height": 280,
+        "content": "## 5. 메시지 보내기\n\n가장 간단하고 가장 중요한 부분 :)"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7b1d11ca-9b56-4c5f-9189-26d536c24b76",
+  "connections": {
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Verify Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Create HR Policies",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Create HR Policies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Create HR Policies",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Message Type": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

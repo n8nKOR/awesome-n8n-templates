@@ -1,0 +1,885 @@
+{
+  "id": "xM8Z5vZVNTNjCySL",
+  "meta": {
+    "instanceId": "b8ef33547995f2a520f12118ac1f7819ea58faa7a1096148cac519fa08be8e99"
+  },
+  "name": "News Extraction",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "97711d12-20de-40aa-b994-d2b10f20a5e5",
+      "name": "Extract the HTML with the right css class",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        -500,
+        0
+      ],
+      "parameters": {
+        "options": {
+          "trimValues": true
+        },
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "data",
+              "attribute": "href",
+              "cssSelector": "=div:nth-child(9) > div:nth-child(3) > a:nth-child(2)",
+              "returnArray": true,
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b874b570-daae-4878-b525-07ac30756eb1",
+      "name": "Summary",
+      "type": "n8n-nodes-base.openAi",
+      "position": [
+        -880,
+        440
+      ],
+      "parameters": {
+        "model": "gpt-4-1106-preview",
+        "prompt": {
+          "messages": [
+            {
+              "content": "=Create a summary in less than 70 words {{ $json[\"content\"] }}"
+            }
+          ]
+        },
+        "options": {},
+        "resource": "chat"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "0Vdk5RlVe7AoUdAM",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "72696278-2d44-4073-936a-6fe9df1bc7d8",
+      "name": "Keywords",
+      "type": "n8n-nodes-base.openAi",
+      "position": [
+        -880,
+        620
+      ],
+      "parameters": {
+        "model": "gpt-4-1106-preview",
+        "prompt": {
+          "messages": [
+            {
+              "content": "=name the 3 most important technical keywords in {{ $json[\"content\"] }} ? just name them without any explanations or other sentences"
+            }
+          ]
+        },
+        "options": {},
+        "resource": "chat"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "0Vdk5RlVe7AoUdAM",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0bfdb3be-76ef-4bb3-902f-f0869342b83c",
+      "name": "Rename keywords",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -700,
+        620
+      ],
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "keywords",
+              "stringValue": "={{ $json[\"message\"][\"content\"] }}"
+            }
+          ]
+        },
+        "include": "none",
+        "options": {}
+      },
+      "typeVersion": 3.1
+    },
+    {
+      "id": "0387cf34-41c9-4729-8570-1db7b17c42f4",
+      "name": "Rename Summary",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -700,
+        440
+      ],
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "=summary",
+              "stringValue": "={{ $json[\"message\"][\"content\"] }}"
+            }
+          ]
+        },
+        "include": "none",
+        "options": {}
+      },
+      "typeVersion": 3.1
+    },
+    {
+      "id": "5fa1702c-f0bf-4524-bc8f-6f550dd83f1e",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        -480,
+        560
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "25128a71-b0d5-49a4-adb8-c3fbe03c0a85",
+      "name": "Extract date",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        -500,
+        -160
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "data",
+              "cssSelector": "div:nth-child(9) > div:nth-child(2) > span:nth-child(1)",
+              "returnArray": true
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "138b3bd6-494a-49b9-b5b8-c9febcfef9fb",
+      "name": "Select posts of last 7 days",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        120,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const currentDate = new Date();\nconst sevenDaysAgo = new Date(currentDate.setDate(currentDate.getDate() - 70)); // Change the number of days going back to your liking (e.g. from -7 to -1) -> BUT sync with the cron job (first node)\n\nconst filteredItems = items.filter(item => {\n const postDate = new Date(item.json[\"Date\"]); // Assuming \"Date\" is the field name in the extracted html\n return postDate >= sevenDaysAgo;\n});\n\nreturn filteredItems;\n"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "1ace953b-e298-4fc2-8970-327f736889ec",
+      "name": "Merge date & links",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        -100,
+        0
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "bba692fc-c225-41be-a969-179d8b99c071",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        320,
+        0
+      ],
+      "parameters": {
+        "url": "={{ $json[\"Link\"] }}",
+        "options": {}
+      },
+      "typeVersion": 4.1
+    },
+    {
+      "id": "26671065-631f-4684-9ee1-15f26b4cf1e4",
+      "name": "Merge Content with Date & Link",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        500,
+        260
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "79beb744-97b8-4072-824a-6736b0a080ef",
+      "name": "Extract individual posts",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        500,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "h1.fl-heading > span:nth-child(1)"
+            },
+            {
+              "key": "content",
+              "cssSelector": ".fl-node-5c7574ae7d5c6 > div:nth-child(1)"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e89d9de5-875b-453e-825a-26f2bebcc8df",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        80,
+        -107
+      ],
+      "parameters": {
+        "width": 180.9747474601832,
+        "height": 276.31054308676767,
+        "content": "가장 최신 뉴스만 선택: 오늘의 날짜에서 xy일 전으로"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8a603f2f-4208-48c7-b169-e5613f13fa7d",
+      "name": "Merge ChatGPT output with Date & Link",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        -180,
+        560
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "e1036421-9ce1-4121-a692-602410ec7c95",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "disabled": true,
+      "position": [
+        -539.7802584556148,
+        -4.722020203185366
+      ],
+      "parameters": {
+        "width": 182.2748213508401,
+        "height": 304.2550759710132,
+        "content": "보도 자료 페이지의 개별 링크를 추출하여 해당 **URL** 상에 있는 개별 게시물을 검색합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3655ab22-6a17-429a-9d9b-d96bbcc78fee",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -538.404803912782,
+        -304
+      ],
+      "parameters": {
+        "width": 178.75185894039254,
+        "height": 289.463147786618,
+        "content": "보도 자료 페이지의 게시물 날짜를 추출합니다.  \n올바른 CSS 선택자를 선택해야 합니다.  \n[datagrab.io에 대한 추가 정보](https://datagrab.io/blog/guide-to-css-selectors-for-web-scraping/)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2e27fb4c-426a-41e1-b5fb-9b2d78acd2a7",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1300,
+        -299.82161760751774
+      ],
+      "parameters": {
+        "width": 334.4404040637068,
+        "height": 1127.2017245821128,
+        "content": "# RSS 피드를 제공하지 않는 뉴스 사이트의 게시물 스크래핑\n\nColt라는 통신 회사의 [뉴스 사이트](https://www.colt.net/resources/type/news/)는 RSS 피드를 제공하지 않으므로, 뉴스를 추출하고 처리하기 위해 웹 스크래핑이 선택됩니다.\n\n목표는 가장 최신의 게시물만 가져오고, 각 게시물의 요약과 해당 (기술) 키워드를 얻는 것입니다.\n\n뉴스 사이트는 각 뉴스 게시물의 링크를 제공하지만 개별 뉴스는 제공하지 않습니다. 먼저 각 게시물의 링크와 날짜를 수집한 후 최신의 것을 추출합니다.\n\n결과는 SQL 데이터베이스, 이 경우 NocoDB 데이터베이스로 전송됩니다.\n\n이 프로세스는 매주 cron 작업을 통해 발생합니다.\n\n**요구사항**:\n- CSS 선택자와 이를 브라우저를 통해 얻는 방법에 대한 기본 이해 (보통: 오른쪽 클릭 → 검사)\n- ChatGPT API 계정 - 일반 계정으로는 충분하지 않음\n- NocoDB 데이터베이스 - 물론 다른 유형의 출력 대상을 선택할 수 있습니다\n\n**가정**:\n- CSS 선택자가 뉴스 사이트에서 작동함\n- 게시물에 날짜가 있으며 자체 CSS 선택자가 있음 - 날짜가 뉴스 내용의 일부가 아님을 의미\n\n**\"경고\"**\n- 모든 사이트가 스크래핑을 좋아하는 것은 아니며, 특히 높은 빈도로는 더더욱\n- 각 웹사이트는 다르게 구성되어 있으므로, 워크플로는 여러 적응이 필요할 수 있습니다.\n\n개선 제안을 환영합니다. **Mastodon**에서 저에게 연락할 수 있습니다: https://bonn.social/@askans"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d43bd5b7-2aff-4a07-8aca-ca4747ec6c4d",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -927.8447474890202,
+        -80
+      ],
+      "parameters": {
+        "width": 153.90180146729315,
+        "height": 237.91333335255808,
+        "content": "주간 크론 작업"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e732d136-fcf1-4fc3-8bb6-bdcea3c78d9e",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -760,
+        -80
+      ],
+      "parameters": {
+        "width": 185.41515152389002,
+        "height": 241.454848504947,
+        "content": "뉴스 사이트의 HTML이 가져오고 있습니다: https://www.colt.net/resources/type/news/"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d5e29ec3-5ef2-42f3-b316-9350644dbba4",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -340,
+        -306
+      ],
+      "parameters": {
+        "width": 187.3613302133812,
+        "height": 469.2923233086395,
+        "content": "추출물이 배열로 반환되므로, 이를 개별 JSON 항목으로 변환하여 다른 노드와의 루핑을 가능하게 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1af15c45-32c0-4abf-a35d-be7206823569",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -120,
+        -103.54151515238902
+      ],
+      "parameters": {
+        "width": 150,
+        "height": 274.50898992724416,
+        "content": "개별 게시물의 링크와 게시물의 날짜"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f7c42748-f227-42d0-a9e2-fcb16dbd0f75",
+      "name": "Retrieve the web page for further processsing",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -720,
+        0
+      ],
+      "parameters": {
+        "url": "https://www.colt.net/resources/type/news/",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "typeVersion": 4.1
+    },
+    {
+      "id": "b2c36f26-8221-478f-a4b0-22758b1e5e58",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        292,
+        -100
+      ],
+      "parameters": {
+        "width": 155.0036363426638,
+        "height": 272.1479798256519,
+        "content": "각 개별 최신 게시물의 HTML을 가져오세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6ae05c31-c09a-4b4e-a013-41571937bc39",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        -100
+      ],
+      "parameters": {
+        "width": 184.07417896879767,
+        "height": 269.2504410842093,
+        "content": "각 개별 뉴스 게시물의 제목과 내용(텍스트)을 올바른 CSS 선택자로 추출하는 것"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e2da76d4-0c8c-4c61-924f-50aa9387e9ab",
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        180
+      ],
+      "parameters": {
+        "width": 191.87778190338406,
+        "height": 234.13422787857044,
+        "content": "링크를 URL에, 날짜를 내용(텍스트)과 각 뉴스 게시물의 제목과 합치세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c124aaac-dce6-4658-9027-bdfe5c0c81e6",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -907.2264215202996,
+        331.0681740778203
+      ],
+      "parameters": {
+        "width": 150,
+        "height": 256.2444361932317,
+        "content": "ChatGPT를 사용하여 각 뉴스 게시물의 요약을 생성하세요. 이를 위해 ChatGPT API 계정이 필요합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c9037e74-007b-4e44-b7f9-90e78b853eb5",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -909.595196087218,
+        610.7495589157902
+      ],
+      "parameters": {
+        "width": 152.85976723045226,
+        "height": 218.52702200939785,
+        "content": "각 뉴스 게시물의 3개 키워드를 가져오세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "756397d9-de80-4114-9dee-b4f4b9593333",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -740,
+        340
+      ],
+      "parameters": {
+        "width": 182.7735784797001,
+        "height": 489.05192374172555,
+        "content": "데이터 필드의 이름 변경과 불필요한 것들의 제거"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a0dcb254-f064-45ed-8e22-30a6d079085b",
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -520,
+        480
+      ],
+      "parameters": {
+        "width": 169.7675735887227,
+        "height": 254.94383570413422,
+        "content": "각 뉴스 게시물의 요약과 키워드를 병합하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "82993166-b273-4b82-a954-554c6892f825",
+      "name": "Schedule Trigger each week",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -900,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                3
+              ],
+              "triggerAtHour": 4,
+              "triggerAtMinute": 32
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "3d670eb9-5a36-4cd9-8d2c-40adf848485e",
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        477.5081090810816
+      ],
+      "parameters": {
+        "width": 180.1723775015045,
+        "height": 260.5279202647822,
+        "content": "각 뉴스 게시물의 요약과 키워드에 제목, 링크, 및 날짜를 추가하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "62021393-e988-4834-9fa2-75a957b42890",
+      "name": "NocoDB news database",
+      "type": "n8n-nodes-base.nocoDb",
+      "position": [
+        60,
+        560
+      ],
+      "parameters": {
+        "table": "mhbalmu9aaqcun6",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "=News_Source",
+              "fieldValue": "=Colt"
+            },
+            {
+              "fieldName": "Title",
+              "fieldValue": "={{ $json[\"title\"] }}"
+            },
+            {
+              "fieldName": "Date",
+              "fieldValue": "={{ $json[\"Date\"] }}"
+            },
+            {
+              "fieldName": "Link",
+              "fieldValue": "={{ $json[\"Link\"] }}"
+            },
+            {
+              "fieldName": "Summary",
+              "fieldValue": "={{ $json[\"summary\"] }}"
+            },
+            {
+              "fieldName": "Keywords",
+              "fieldValue": "={{ $json[\"keywords\"] }}"
+            }
+          ]
+        },
+        "operation": "create",
+        "projectId": "prqu4e8bjj4bv1j",
+        "authentication": "nocoDbApiToken"
+      },
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "gjNns0VJMS3P2RQ3",
+          "name": "NocoDB Token account"
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "e59e9fab-10a7-470b-afa6-e1d4b4e57723",
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        280,
+        480
+      ],
+      "parameters": {
+        "width": 483.95825869942666,
+        "height": 268.5678114630957,
+        "content": "## 뉴스 요약 및 키워드 → 데이터베이스\n\n[NocoDB](https://nocodb.com/)은 SQL 데이터베이스입니다. 여기에서 뉴스 요약과 키워드를 추가 처리를 위해 저장합니다. 다른 출력 대상을 여기에서 선택할 수 있습니다. 예: 이메일, Excel 등.\n\n뉴스 요약과 추가 필드를 추가하기 전에 해당 데이터베이스를 구조화해야 합니다. 그런 다음 이 노드를 형성할 수 있습니다.\n\n일부 필드는 데이터베이스 자체에서 편집될 수 있습니다(예: 뉴스의 당신에 대한 관련성). 따라서 기본값으로 채워지거나 전혀 채워지지 않을 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "253b414b-9a5b-4a25-892b-9aa011d55d28",
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        480
+      ],
+      "parameters": {
+        "width": 262.99083066277313,
+        "height": 268.56781146309544,
+        "content": "### Output 여전히 비어 있음. 이는 시스템 프롬프트에 따라 번역된 결과를 반환해야 하며, 입력 텍스트가 없으므로 빈 응답입니다. 그러나 실제로 AI로서, 이 메시지는 오류일 수 있으므로 확인해 주세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "438e8dde-ce0a-4e5e-8d62-d735d19ec189",
+      "name": "Create single link items",
+      "type": "n8n-nodes-base.itemLists",
+      "position": [
+        -300,
+        0
+      ],
+      "parameters": {
+        "options": {
+          "destinationFieldName": "Link"
+        },
+        "fieldToSplitOut": "data"
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "d721776b-fefc-4e72-91ef-6710f10b0393",
+      "name": "Create single date items",
+      "type": "n8n-nodes-base.itemLists",
+      "position": [
+        -300,
+        -160
+      ],
+      "parameters": {
+        "options": {
+          "destinationFieldName": "Date"
+        },
+        "fieldToSplitOut": "data"
+      },
+      "typeVersion": 3
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ff89d802-3bcf-4b34-9cd9-776b1f3b5eab",
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge ChatGPT output with Date & Link",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Summary": {
+      "main": [
+        [
+          {
+            "node": "Rename Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keywords": {
+      "main": [
+        [
+          {
+            "node": "Rename keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract date": {
+      "main": [
+        [
+          {
+            "node": "Create single date items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Extract individual posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename Summary": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge date & links": {
+      "main": [
+        [
+          {
+            "node": "Select posts of last 7 days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create single date items": {
+      "main": [
+        [
+          {
+            "node": "Merge date & links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create single link items": {
+      "main": [
+        [
+          {
+            "node": "Merge date & links",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Extract individual posts": {
+      "main": [
+        [
+          {
+            "node": "Merge Content with Date & Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger each week": {
+      "main": [
+        [
+          {
+            "node": "Retrieve the web page for further processsing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select posts of last 7 days": {
+      "main": [
+        [
+          {
+            "node": "Merge Content with Date & Link",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Content with Date & Link": {
+      "main": [
+        [
+          {
+            "node": "Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Keywords",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge ChatGPT output with Date & Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge ChatGPT output with Date & Link": {
+      "main": [
+        [
+          {
+            "node": "NocoDB news database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract the HTML with the right css class": {
+      "main": [
+        [
+          {
+            "node": "Create single link items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve the web page for further processsing": {
+      "main": [
+        [
+          {
+            "node": "Extract the HTML with the right css class",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

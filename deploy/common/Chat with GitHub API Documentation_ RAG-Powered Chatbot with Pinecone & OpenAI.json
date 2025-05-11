@@ -1,0 +1,426 @@
+{
+  "id": "FD0bHNaehP3LzCNN",
+  "meta": {
+    "instanceId": "69133932b9ba8e1ef14816d0b63297bb44feb97c19f759b5d153ff6b0c59e18d"
+  },
+  "name": "Chat with GitHub OpenAPI Specification using RAG (Pinecone and OpenAI)",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "362cb773-7540-4753-a401-e585cdf4af8a",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "45470036-cae6-48d0-ac66-addc8999e776",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        300,
+        0
+      ],
+      "parameters": {
+        "url": "https://raw.githubusercontent.com/github/rest-api-description/refs/heads/main/descriptions/api.github.com/api.github.com.json",
+        "options": {}
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "a9e65897-52c9-4941-bf49-e1a659e442ef",
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {},
+        "pineconeIndex": {
+          "__rl": true,
+          "mode": "list",
+          "value": "n8n-demo",
+          "cachedResultName": "n8n-demo"
+        }
+      },
+      "credentials": {
+        "pineconeApi": {
+          "id": "bQTNry52ypGLqt47",
+          "name": "PineconeApi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c2a2354b-5457-4ceb-abfc-9a58e8593b81",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        660,
+        180
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7338d9ea-ae8f-46eb-807f-a15dc7639fc9",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        740,
+        360
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "44fd7a59-f208-4d5d-a22d-e9f8ca9badf1",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -20,
+        760
+      ],
+      "webhookId": "089e38ab-4eee-4c34-aa5d-54cf4a8f53b7",
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "51d819d6-70ff-428d-aa56-1d7e06490dee",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        320,
+        760
+      ],
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant providing information about the GitHub API and how to use it based on the OpenAPI V3 specifications."
+        }
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "aed548bf-7083-44ad-a3e0-163dee7423ef",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        220,
+        980
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "tQLWnWRzD8aebYvp",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "dfe9f356-2225-4f4b-86c7-e56a230b4193",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        420,
+        1020
+      ],
+      "parameters": {},
+      "typeVersion": 1.3
+    },
+    {
+      "id": "4cf672ee-13b8-4355-b8e0-c2e7381671bc",
+      "name": "Vector Store Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "position": [
+        580,
+        980
+      ],
+      "parameters": {
+        "name": "GitHub_OpenAPI_Specification",
+        "description": "Use this tool to get information about the GitHub API. This database contains OpenAPI v3 specifications."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1df7fb85-9d4a-4db5-9bed-41d28e2e4643",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        840,
+        1160
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "tQLWnWRzD8aebYvp",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "7b52ef7a-5935-451e-8747-efe16ce288af",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -40,
+        -260
+      ],
+      "parameters": {
+        "width": 640,
+        "height": 200,
+        "content": "## 벡터 데이터베이스에 콘텐츠 인덱싱\n이 워크플로의 이 부분은 콘텐츠를 추출하고, 임베딩을 생성하며, 이를 Pinecone 벡터 저장소로 보내는 역할을 합니다.\n\n이것은 HTTP 요청을 사용하여 GitHub에서 OpenAPI 사양을 요청합니다. 그런 다음, 파일을 청크로 나누고, 각 청크에 대해 OpenAI를 사용하여 임베딩을 생성하며, Pinecone 벡터 DB에 저장합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3508d602-56d4-4818-84eb-ca75cdeec1d0",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -20,
+        560
+      ],
+      "parameters": {
+        "width": 580,
+        "content": "## 쿼리 및 응답 생성\n\n워크플로의 이 부분은 채팅 인터페이스, 벡터 스토어를 쿼리하고 관련 응답을 생성하는 것을 담당합니다.\n\n이는 응답을 생성하기 위해 OpenAI GPT 4o-mini를 사용합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5a9808ef-4edd-4ec9-ba01-2fe50b2dbf4b",
+      "name": "Generate User Query Embedding",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        480,
+        1400
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "tQLWnWRzD8aebYvp",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "f703dc8e-9d4b-45e3-8994-789b3dfe8631",
+      "name": "Pinecone Vector Store (Querying)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        440,
+        1220
+      ],
+      "parameters": {
+        "options": {},
+        "pineconeIndex": {
+          "__rl": true,
+          "mode": "list",
+          "value": "n8n-demo",
+          "cachedResultName": "n8n-demo"
+        }
+      },
+      "credentials": {
+        "pineconeApi": {
+          "id": "bQTNry52ypGLqt47",
+          "name": "PineconeApi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ea64a7a5-1fa5-4938-83a9-271929733a8e",
+      "name": "Generate Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        480,
+        220
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "tQLWnWRzD8aebYvp",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "65cbd4e3-91f6-441a-9ef1-528c3019e238",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -820,
+        -260
+      ],
+      "parameters": {
+        "width": 620,
+        "height": 320,
+        "content": "## n8n에서의 RAG 워크플로우\n\nn8n을 사용하여 RAG 기술을 적용해 채팅봇을 만드는 예입니다. 이는 GitHub API에 대한 질문을 답할 수 있는 API 문서 채팅봇입니다. 임베딩 생성에 OpenAI를 사용하며, 응답 생성에 gpt-4o-mini LLM을 사용하고, 벡터 데이터베이스로 Pinecone을 사용합니다.\n\n### 이 템플릿을 사용하기 전에\n* OpenAI와 Pinecone 계정을 생성하세요\n* OpenAI와 Pinecone의 API 키를 얻으세요\n* 둘 다 n8n에서 자격 증명을 구성하세요\n* Pinecone 인덱스에 \"n8n-demo\"라는 이름이 있는지 확인하거나 워크플로를 그에 따라 조정하세요.\n\n### 출력"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2908105f-c20c-4183-bb9d-26e3559b9911",
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate User Query Embedding": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store (Querying)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store (Querying)": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

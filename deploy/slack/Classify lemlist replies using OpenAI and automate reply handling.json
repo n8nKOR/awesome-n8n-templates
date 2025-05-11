@@ -1,0 +1,472 @@
+{
+  "meta": {
+    "instanceId": "2b1cc1a8b0a2fb9caab11ab2d5eb3712f9973066051b2e898cf4041a1f2a7757",
+    "templateCredsSetupCompleted": true
+  },
+  "nodes": [
+    {
+      "id": "7786165e-5e74-4614-b065-86db19482b72",
+      "name": "Format text with Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "position": [
+        -1200,
+        980
+      ],
+      "parameters": {
+        "html": "={{ $json.text }}",
+        "options": {},
+        "destinationKey": "textClean"
+      },
+      "typeVersion": 1,
+      "continueOnFail": true
+    },
+    {
+      "id": "8f73d4d6-2473-4fdf-8797-c049d6df6967",
+      "name": "Lemlist Trigger - On new reply",
+      "type": "n8n-nodes-base.lemlistTrigger",
+      "position": [
+        -1600,
+        980
+      ],
+      "webhookId": "039bb443-8d2a-4eb3-9c16-772943a46db7",
+      "parameters": {
+        "event": "emailsReplied",
+        "options": {
+          "isFirst": true
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1f94d672-0a70-45ad-bf96-72c4aecabcd0",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1700,
+        680
+      ],
+      "parameters": {
+        "width": 304.92548549441915,
+        "height": 504.9663351162785,
+        "content": "### lemlist API 키 가져오기\n\n1. lemlist 계정으로 이동하거나 새로 만들기 [여기](https://app.lemlist.com/create-account)\n\n2. 설정 -> 통합\n\n3. API 키를 생성하고 복사하기\n\n4. 이 노드에서 새 자격 증명 생성을 클릭하고 API 키를 붙여넣기"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3032b04c-76a2-4f7c-a790-ede26b102254",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2040,
+        680
+      ],
+      "parameters": {
+        "width": 319.6621253622332,
+        "height": 507.1074887209538,
+        "content": "# 읽기\n\n이 워크플로는 귀하의 lemlist 캠페인에 대한 이메일 답변을 귀하가 선택한 Slack 채널로 보냅니다.\n\nOpenAI 노드가 답변 상태를 분류할 것입니다.\n\nSlack 알림은 사용자가 쉽게 읽을 수 있도록 구조화되어 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "df142fcb-f5ec-475d-8f90-c0bd064d390c",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -760,
+        1320
+      ],
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1fa6d12c-2555-42c6-8f80-b24dc3608ed7",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -600,
+        1320
+      ],
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"category\": {\n\t\t\t\"type\": \"string\"\n }\n\t}\n}"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "734013f9-d058-4f08-9026-a41cd5877a3b",
+      "name": "Send alert to Slack",
+      "type": "n8n-nodes-base.slack",
+      "position": [
+        320,
+        700
+      ],
+      "parameters": {
+        "text": "=",
+        "select": "channel",
+        "blocksUi": "={\n\t\"blocks\": [\n\t\t{\n\t\t\t\"type\": \"section\",\n\t\t\t\"text\": {\n\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\"text\": \":raised_hands: New reply in lemlist!\\n\"\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"type\": \"section\",\n\t\t\t\"fields\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\t\"text\": \"*Categorized as:*\\n{{ $json[\"output\"][\"category\"] }}\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\t\"text\": \"*Campaign:*\\n<https://app.lemlist.com/teams/{{ $json[\"teamId\"] }}/reports/campaigns/{{ $json[\"campaignId\"] }}|{{ $json[\"campaignName\"] }}>\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\t\"text\": \"*Sender Email:*\\n{{ $json[\"sendUserEmail\"] }}\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\t\"text\": \"*Lead Email:*\\n{{ $json[\"leadEmail\"] }}\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\t\"text\": \"*Linkedin URL:*\\n{{ $json[\"linkedinUrl\"] }}\"\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\"type\": \"section\",\n\t\t\t\"text\": {\n\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\"text\": \"*Reply preview*:\\n{{ JSON.stringify($json[\"textClean\"]).replace(/^\"(.+(?=\"$))\"$/, '$1').substring(0, 100) }}\"\n\t\t\t}\n\t\t}\n\t]\n}",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "automated_outbound_replies"
+        },
+        "messageType": "block",
+        "otherOptions": {
+          "botProfile": {
+            "imageValues": {
+              "icon_emoji": ":fire:",
+              "profilePhotoType": "emoji"
+            }
+          },
+          "unfurl_links": false,
+          "includeLinkToWorkflow": false
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "0558c166-16d7-4c26-a09c-fb46c2b6b687",
+      "name": "Lemlist - Unsubscribe",
+      "type": "n8n-nodes-base.lemlist",
+      "position": [
+        300,
+        1000
+      ],
+      "parameters": {
+        "email": "={{ $json[\"leadEmail\"] }}",
+        "resource": "lead",
+        "operation": "unsubscribe",
+        "campaignId": "={{$json[\"campaignId\"]}}"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "79d17d20-a60a-4b5a-a83c-821cac265b17",
+      "name": "lemlist - Mark as interested",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        300,
+        1260
+      ],
+      "parameters": {
+        "url": "=https://api.lemlist.com/api/campaigns/{{$json[\"campaignId\"]}}/leads/{{$json[\"leadEmail\"]}}/interested",
+        "options": {},
+        "requestMethod": "POST",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "lemlistApi"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "04f74337-903c-481a-95ca-a1d4a5985b9e",
+      "name": "Categorize lemlist reply",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        -780,
+        1120
+      ],
+      "parameters": {
+        "text": "=Classify the [email_content] in one only of the following categories: \n\nCategories=[\"Interested\", \"Out of office\", \"Unsubscribe\", \"Not interested\", \"Other\"] \n\n- Interested is when the reply is positive, and the person want more information or a meeting \n\nDon't output quotes like in the next example: \nemail_content_example:Hey I would like to know more \ncategory:Interested\n\nemail_content:\"{{ $json.textClean }}\" \n\nOnly answer with JSON in the following format:\n{\"replyStatus\":category}\n\nJSON:",
+        "promptType": "define",
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.4
+    },
+    {
+      "id": "c1d66785-e096-4fd7-90de-51c7b9117413",
+      "name": "Merge data",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        -280,
+        1000
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "bf21f5b9-6978-4657-a0a2-847265cff31e",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        260,
+        520
+      ],
+      "parameters": {
+        "width": 480.38008828116847,
+        "height": 341.5885389153657,
+        "content": "### 각 새로운 답글에 대한 Slack 알림 생성\n\n1. 자격 증명을 추가하는 버튼을 클릭하여 Slack 계정을 연결하세요\n\n2. Slack 알림을 보내고 싶은 채널의 이름을 작성하세요"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "024b4399-8e20-4974-986d-6c1ee4103fa0",
+      "name": "Route reply to the right branch",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -100,
+        1000
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "Send all replies to Slack",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "Unsubscribe",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "9ad6f5cd-8c50-4710-8eaf-085e8f11f202",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "Unsubscribe"
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "Interested",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "cb410bcc-a70c-4430-aec1-b71f3f615c4d",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "Interested"
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "f9f23daa-f7a9-49f9-8ffb-16798656af73",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        260,
+        900
+      ],
+      "parameters": {
+        "width": 480.38008828116847,
+        "height": 256.5682017131378,
+        "content": "시간을 절약하세요: 이메일을 받기 원하지 않는 리드를 자동으로 구독 취소하여."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "63c536bd-e624-4118-b0c8-38c07f2d1955",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        260,
+        1200
+      ],
+      "parameters": {
+        "width": 480.38008828116847,
+        "height": 256.5682017131378,
+        "content": "lemlist에서 관심 있는 리드를 관심 있음으로 표시하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8ed8b714-8196-4593-87b8-18c6a7318fbe",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -880,
+        875.46282303881
+      ],
+      "parameters": {
+        "width": 480.38008828116847,
+        "height": 608.2279357257166,
+        "content": "답변을 OpenAI로 분류"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6b1846df-0214-4383-87cf-55232093ae2a",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1320,
+        880
+      ],
+      "parameters": {
+        "width": 336.62085535637357,
+        "height": 311.3046602455328,
+        "content": "이 노드가 텍스트를 정리하고 Slack에서 예쁘게 보이도록 할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f7378ecd-e8d2-4204-a883-3161be601ffc",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        880
+      ],
+      "parameters": {
+        "width": 336.62085535637357,
+        "height": 311.3046602455328,
+        "content": "회신의 카테고리에 따라 다른 시나리오를 트리거하세요."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge data": {
+      "main": [
+        [
+          {
+            "node": "Route reply to the right branch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Categorize lemlist reply",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize lemlist reply": {
+      "main": [
+        [
+          {
+            "node": "Merge data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Categorize lemlist reply",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format text with Markdown": {
+      "main": [
+        [
+          {
+            "node": "Merge data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Categorize lemlist reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lemlist Trigger - On new reply": {
+      "main": [
+        [
+          {
+            "node": "Format text with Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route reply to the right branch": {
+      "main": [
+        [
+          {
+            "node": "Send alert to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lemlist - Unsubscribe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "lemlist - Mark as interested",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

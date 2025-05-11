@@ -1,0 +1,431 @@
+{
+  "meta": {
+    "instanceId": "84ba6d895254e080ac2b4916d987aa66b000f88d4d919a6b9c76848f9b8a7616",
+    "templateId": "2234"
+  },
+  "nodes": [
+    {
+      "id": "e0f68f60-f036-4103-a9fc-d6cb80b6f8a2",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1980,
+        1100
+      ],
+      "parameters": {
+        "model": "gpt-4-turbo",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "23779dea-c21d-42da-b493-09394bc64436",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2420,
+        660
+      ],
+      "parameters": {
+        "model": "gpt-4-turbo",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "af59863e-12c5-414c-bf64-dd6712e3aa7b",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        1680,
+        960
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "bc2ad02b-72c9-4132-96e8-b64487f589f7",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        2160,
+        1140
+      ],
+      "parameters": {
+        "options": {},
+        "chunkSize": 500,
+        "chunkOverlap": 300
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "cb11a8bb-bdca-43cb-a586-7f93471d58f7",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2420,
+        1300
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9d02b910-a467-4d4d-a2fa-32d1d3361d21",
+      "name": "Create a Prompt for DALL-E",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        2400,
+        1080
+      ],
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "prompt": "Summarize the characters in this story based on their appearance and describe them if they are humans or animals and how they look like and what kind of are they, the prompt should be no-text in the picture.\n\n\n\n\n\"{text}\"\n\n\nCONCISE SUMMARY:",
+              "summarizationMethod": "stuff"
+            }
+          }
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "4723dd65-96f5-41c1-9ff6-f1a344d96241",
+      "name": "Generate an Image for the Story",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2860,
+        1080
+      ],
+      "parameters": {
+        "prompt": "=Produce an image ensuring that no text is generated within the visual content. {{ $json.response.text }}",
+        "options": {},
+        "resource": "image"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "70b7f55a-31c4-456b-8273-8250bac74409",
+      "name": "Generate Audio for the Story",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2640,
+        820
+      ],
+      "parameters": {
+        "input": "={{ $json.response.text }}",
+        "options": {},
+        "resource": "audio"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "executeOnce": true,
+      "typeVersion": 1.3
+    },
+    {
+      "id": "c381dbe4-6112-441c-b213-8a2d218f4cc2",
+      "name": "Send the Story To Channel",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3160,
+        480
+      ],
+      "parameters": {
+        "text": "={{ $json.response.text }}",
+        "chatId": "=-4170994782",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "78289bfa-54b4-4acb-b513-7a0134a010f3",
+      "name": "Send Image to the Channel",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3180,
+        1080
+      ],
+      "parameters": {
+        "chatId": "=-4170994782",
+        "operation": "sendPhoto",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "f779047b-6dec-4e4e-ae09-4dd91f961d08",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {
+        "width": 1224.7156767468991,
+        "height": 1282.378312060854,
+        "content": "# 아라비아어로 된 어린이 이야기 템플릿\n\nn8n 템플릿은 아라비아어로 어린이 이야기를 만드는 데 사용되며, 이야기꾼들이 교육적이고 상호작용적인 이야기를 통해 어린 청중을 매료시킬 수 있는 다재다능한 플랫폼을 제공합니다. 이 템플릿의 핵심 기능 외에도 다양한 용도에 맞게 커스터마이징할 수 있으며, 쉽게 설정할 수 있습니다.\n\n이 예시를 확인하세요: [https://t.me/st0ries95](https://t.me/st0ries95)\n\n\n## 노드 기능\n\n\n## 자동화된 스토리텔링 프로세스\n\n\n## 용도 사례\n1. **교육 플랫폼**:\n   교육 플랫폼은 이 템플릿을 사용하여 아라비아어로 된 교육적 이야기를 자동으로 생성하고 배포할 수 있습니다. 시각적 및 청각적 요소를 스토리텔링 프로세스에 통합하여 학습 경험을 강화하고 어린 학습자를 효과적으로 참여시킬 수 있습니다.\n\n2. **어린이 도서관**:\n   어린이 도서관은 이 템플릿을 활용하여 다양한 아라비아어 이야기를 어린 독자들과 공유할 수 있습니다. 시각 콘텐츠와 오디오 파일의 자동 생성을 통해 스토리텔링 경험을 향상시키며, 어린이들이 매력적인 서사로 새로운 세계와 캐릭터에 몰입할 수 있도록 장려합니다.\n\n3. **언어 학습 앱**:\n   아라비아어에 초점을 맞춘 언어 학습 앱은 이 템플릿을 통합하여 어린이들에게 문화적으로 풍부한 스토리텔링 경험을 제공할 수 있습니다. 이야기를 아라비아어로 번역하고 시각적 및 청각적 구성 요소를 추가하여 즐겁고 상호작용적인 방식으로 언어 습득을 촉진합니다.\n\n## 노드 구성 가이드\n\n### OpenAI 채팅 모델 노드:\n- **자격 증명**: OpenAI GPT-4 Turbo 모델의 필요한 API 자격 증명을 제공합니다.\n- **옵션**: 채팅 모델에 필요한 특정 옵션을 구성합니다.\n\n### DALL-E 노드를 위한 프롬프트 생성:\n- **프롬프트 커스터마이징**: 이야기를 위한 관련 시각 콘텐츠를 생성하도록 프롬프트를 커스터마이징합니다.\n- **요약 방법 및 프롬프트**: 텍스트 없이 시각 콘텐츠를 생성하기 위한 요약 방법 및 프롬프트를 정의합니다.\n\n### 이야기 노드를 위한 이미지 생성:\n- **리소스**: 리소스 유형(이미지)을 지정합니다.\n- **프롬프트**: 시각 콘텐츠 내 텍스트 없이 이미지를 생성하기 위한 프롬프트를 설정합니다.\n\n### 이야기 노드를 위한 오디오 생성:\n- **리소스**: 리소스 유형(오디오)을 선택합니다.\n- **입력**: 오디오 파일을 생성하기 위한 입력 텍스트를 정의합니다.\n\n### 이야기를 아라비아어로 번역하는 노드:\n- **청크링 모드**: 청크링 모드(고급)를 선택합니다.\n- **요약 방법 및 프롬프트**: 이야기를 아라비아어로 번역하기 위한 요약 방법 및 프롬프트를 설정합니다.\n\n### 채널에 이야기를 보내는 노드:\n- **채팅 ID**: 이야기 텍스트가 보내질 채팅 ID를 제공합니다.\n- **텍스트**: 채널에 보낼 텍스트를 구성합니다.\n\n위 가이드에 따라 각 노드를 구성하면, 사용자는 n8n 템플릿을 효과적으로 설정하고 커스터마이징하여 특정 용도에 맞게 조정할 수 있으며, 어린 청중에게 원활하고 매력적인 스토리텔링 경험을 제공할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5ef92ebc-e4e4-4165-a7df-9f94802f8e27",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1620,
+        240
+      ],
+      "parameters": {
+        "width": 1811.9647367735226,
+        "height": 1280.7253282813103,
+        "content": "아래는 영어 텍스트의 한국어 번역입니다. 추가 설명 없이 번역 결과만 반환하겠습니다.\n\n입력 텍스트가 비어 있으므로, 번역 결과도 비어 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "76d2b256-8083-42d9-8465-63b2f9c73a67",
+      "name": "Translate the Story to Arabic",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        2400,
+        480
+      ],
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "prompt": "Translate this story texts to \"Arabic\" and make it easy to understands for kids with easy words and moral lesson :\n\n\n\"{text}\"\n\n\n",
+              "summarizationMethod": "stuff"
+            }
+          }
+        },
+        "chunkingMode": "advanced"
+      },
+      "executeOnce": true,
+      "typeVersion": 2
+    },
+    {
+      "id": "126e463e-f1e8-4cd2-856d-aaaebc279797",
+      "name": "Send Audio to the Channel",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3180,
+        820
+      ],
+      "parameters": {
+        "chatId": "-4170994782",
+        "operation": "sendAudio",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "نهاية القصة ... "
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "162049a0-620a-4044-966a-27b665827b60",
+      "name": "Create a Story for Kids",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        1980,
+        960
+      ],
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "prompt": "Create a captivating short tale for kids, whisking them away to magical lands brimming with wisdom. Explore diverse themes in a fun and simple way, weaving in valuable messages. Dive into cultural adventures with lively language that sparks curiosity. Let your story inspire young minds through enchanting narratives that linger long after the last word. Begin crafting your imaginative tale now! (Approximately 900 characters)\n\n\n\"{text}\"\n\nCONCISE SUMMARY:",
+              "summarizationMethod": "stuff"
+            }
+          }
+        },
+        "chunkingMode": "advanced"
+      },
+      "executeOnce": true,
+      "typeVersion": 2
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create a Story for Kids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create a Story for Kids",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Translate the Story to Arabic",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create a Prompt for DALL-E",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a Story for Kids": {
+      "main": [
+        [
+          {
+            "node": "Translate the Story to Arabic",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a Prompt for DALL-E",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a Prompt for DALL-E": {
+      "main": [
+        [
+          {
+            "node": "Generate an Image for the Story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Audio for the Story": {
+      "main": [
+        [
+          {
+            "node": "Send Audio to the Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate the Story to Arabic": {
+      "main": [
+        [
+          {
+            "node": "Send the Story To Channel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Audio for the Story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an Image for the Story": {
+      "main": [
+        [
+          {
+            "node": "Send Image to the Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Create a Story for Kids",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,526 @@
+{
+  "meta": {
+    "instanceId": "26ba763460b97c249b82942b23b6384876dfeb9327513332e743c5f6219c2b8e"
+  },
+  "nodes": [
+    {
+      "id": "141638a4-b340-473f-a800-be7dbdcff131",
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        695,
+        380
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "6ccdaca5-f620-4afa-bed6-92f3a450687d",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        875,
+        380
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "0B43u2YYOTJR2cC1BRkptZ3N4QTk4NEtxRko5cjhKUUFyemw0",
+          "cachedResultUrl": "https://drive.google.com/file/d/0B43u2YYOTJR2cC1BRkptZ3N4QTk4NEtxRko5cjhKUUFyemw0/view?usp=drivesdk&resourcekey=0-UJ8EfTMMBRNVyBb6KhN2Tg",
+          "cachedResultName": "0B0A0255.jpeg"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "b0c2f7a4-a336-4705-aeda-411f2518aaef",
+      "name": "Get Color Information",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        1200,
+        200
+      ],
+      "parameters": {
+        "operation": "information"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3e42b3f1-6900-4622-8c0d-2d9a27a7e1c9",
+      "name": "Resize Image",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        1200,
+        580
+      ],
+      "parameters": {
+        "width": 512,
+        "height": 512,
+        "options": {},
+        "operation": "resize",
+        "resizeOption": "onlyIfLarger"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "00425bb2-289e-4a09-8fcb-52319281483c",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        2300,
+        380
+      ],
+      "parameters": {
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ $('Document for Embedding').item.json.metadata.source }}"
+              },
+              {
+                "name": "format",
+                "value": "={{ $('Document for Embedding').item.json.metadata.format }}"
+              },
+              {
+                "name": "backgroundColor",
+                "value": "={{ $('Document for Embedding').item.json.metadata.backgroundColor }}"
+              }
+            ]
+          }
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "06dbdf39-9d72-460e-a29c-1ae4e9f3552a",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        2300,
+        500
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "139cac42-c006-4c9d-8298-ade845e137a7",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1140,
+        100
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 372,
+        "height": 288,
+        "content": "### 색상 채널 가져오기  \n[출처: https://www.pinecone.io/learn/series/image-search/color-histograms/](https://www.pinecone.io/learn/series/image-search/color-histograms/)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9b8584ae-067c-4515-b194-32986ba3bf8b",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1140,
+        418
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 376.4067897296865,
+        "height": 335.30166772984643,
+        "content": "### 이미지 키워드 생성\n[출처: https://www.pinecone.io/learn/series/image-search/bag-of-visual-words/](https://www.pinecone.io/learn/series/image-search/bag-of-visual-words/)\n\n참고, OpenAI 이미지 모델은 이미지가 512x512로 크기 조정될 때 가장 잘 작동합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7f2c27d7-9947-42fa-aafb-78f4f95ac433",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        540
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 359.1981770749933,
+        "height": 98.40143173756314,
+        "content": "⚠️ **멀티모달 임베딩은 의료 이미지를 진단 기능이나 질병 패턴을 분석하도록 설계되지 않았습니다.** 멀티모달 임베딩을 의료 목적으로 사용하지 마십시오."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "cb6b4a82-db5f-41f0-94dc-6cfabe0905eb",
+      "name": "Combine Image Analysis",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1700,
+        260
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "1ba33665-3ebb-4b23-989d-eec53dfd225a",
+      "name": "Document for Embedding",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1860,
+        257
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8204b731-24e2-4993-9e6d-4cea80393580",
+              "name": "data",
+              "type": "string",
+              "value": "=## keywords\\n\n{{ $json.content }}\\n\n## color information:\\n\n{{ JSON.stringify($json[\"Channel Statistics\"]) }}"
+            },
+            {
+              "id": "ca49cccf-ea4e-4362-bf49-ac836c8758d3",
+              "name": "metadata",
+              "type": "object",
+              "value": "={ \"format\": \"{{ $json.format }}\", \"backgroundColor\": \"{{ $json[\"Background Color\"] }}\", \"source\": \"{{ $binary.data.fileName }}\" } "
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "5d01a2fd-0190-48fc-b588-d5872c5cd793",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        250.0169327052916
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 418.6907913057789,
+        "height": 316.7698949693208,
+        "content": "## 1. 소스 이미지 가져오기  \n이 데모에서, 우리는 단지 이미지 파일 하나만 필요합니다. Google Drive에서 이미지를 가져올 것입니다만, 당신이 선호하는 모든 입력 트리거나 소스를 사용할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4c9825f3-6a2b-4fd2-bdb1-e49f8d947e7a",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1098.439755647174,
+        -145.1609149026466
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 462.52060804115854,
+        "height": 938.3723985625845,
+        "content": "## 2. 이미지 임베딩 방법\n\n[n8n에서 이미지 작업에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.editimage)\n\n이미지 임베딩 기술에는 [무수히 많은](https://www.pinecone.io/learn/series/image-search/) 어떤 것은 특화된 모델을 포함하고, 어떤 것은 간단한 이미지-텍스트 표현을 합니다.\n\n이 데모에서, 우리는 간단한 텍스트 표현 방법을 사용할 것입니다: 색상 채널 정보를 수집하고, Multimodal LLMs를 사용하여 이미지에 대한 키워드를 생성합니다. 이 요소들이 함께 이미지를 검색을 위해 임베딩할 문서를 형성할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e4035987-16c0-4d03-9e20-5f2042a6a020",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1600,
+        120
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 418.6907913057789,
+        "height": 343.6004071339855,
+        "content": "## 3. 임베딩 문서 생성  \n메타데이터를 나중에 필터링 및 검색 목적으로 정의하는 것이 중요합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "91fe4c5c-c063-48e2-b248-801c11880c69",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2060,
+        -11.068945113406585
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 532.5269726975372,
+        "height": 665.9365418117011,
+        "content": "## 3. 벡터 스토어에 저장\n\n[벡터 스토어에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.vectorstoreinmemory)\n\n문서가 준비되면, 어떤 벡터 스토어에든 삽입하여 검색할 수 있게 할 수 있습니다. 검색할 때, 여기에서 사용된 동일한 벡터 스토어 인덱스를 정의해야 합니다!\n\n노트: 메타데이터는 문서 로더에서 정의되며, 수동으로 매핑해야 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6e8ffa06-ddec-463a-b8d6-581ad7095398",
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        2680,
+        547
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3dea73b2-6aa1-4158-945e-a5d6bea65244",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2620,
+        200
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 400.96585774172854,
+        "height": 512.739000439197,
+        "content": "## 4. 시도해 보세요!\n\n[벡터 스토어에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.vectorstoreinmemory)\n\n여기 간단한 테스트가 있습니다. 간단한 텍스트 프롬프트를 사용하여 이미지를 검색합니다. 다음 단계는 \"Embedding Doc\"을 사용하여 벡터 데이터베이스에 저장하는 대신 검색하기 위해 이미지-대-이미지 검색을 구현하는 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f6a543d4-df3b-456c-8f85-4dca29029b55",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        140
+      ],
+      "parameters": {
+        "width": 359.6648027457353,
+        "height": 384.6280362222034,
+        "content": "## 시도해 보세요!\n### 이 워크플로우는 다음을 수행합니다:\n* Google Drive에서 선택된 이미지를 다운로드합니다.\n* 이미지에서 색상 채널 정보를 추출합니다.\n* OpenAI 비전 모델을 사용하여 이미지의 의미적 키워드를 생성합니다.\n* 추출된 데이터와 생성된 데이터를 결합하여 이미지에 대한 임베딩 문서를 생성합니다.\n* 이 문서를 벡터 저장소에 삽입하여 원본 이미지에 대한 벡터 검색을 가능하게 합니다. \n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 가입하거나 [Forum](https://community.n8n.io/)에서 물어보세요!\n\n즐거운 해킹!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1b1e8568-3779-4ee1-b520-517246d9bf86",
+      "name": "Get Image Keywords",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1360,
+        580
+      ],
+      "parameters": {
+        "text": "Extract all possible semantic keywords which describe the image. Be comprehensive and be sure to identify subjects (if applicable) such as biological and non-biological objects, lightning, mood, tone, color, special effects, camera and/or techniques used if known. Respond with a comma-separated list.",
+        "options": {
+          "detail": "high"
+        },
+        "resource": "image",
+        "inputType": "base64",
+        "operation": "analyze"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "724acae9-75d2-4421-b5a3-b920f7bda825",
+      "name": "In-Memory Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "position": [
+        2180,
+        200
+      ],
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": "image_embeddings"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "52afd512-0d55-4ae3-9377-4cb324c571a8",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        2180,
+        420
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c769f279-22ef-4cb1-aef3-9089bb92a0a4",
+      "name": "Search for Image",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "position": [
+        2680,
+        387
+      ],
+      "parameters": {
+        "mode": "load",
+        "prompt": "student having fun",
+        "memoryKey": "image_embeddings"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Get Color Information",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Resize Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Image": {
+      "main": [
+        [
+          {
+            "node": "Get Image Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "In-Memory Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Search for Image",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image Keywords": {
+      "main": [
+        [
+          {
+            "node": "Combine Image Analysis",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "In-Memory Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Color Information": {
+      "main": [
+        [
+          {
+            "node": "Combine Image Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Image Analysis": {
+      "main": [
+        [
+          {
+            "node": "Document for Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document for Embedding": {
+      "main": [
+        [
+          {
+            "node": "In-Memory Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Test workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

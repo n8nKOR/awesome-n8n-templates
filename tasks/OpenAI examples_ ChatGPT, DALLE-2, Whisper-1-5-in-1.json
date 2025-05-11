@@ -272,7 +272,7 @@
       "parameters": {
         "width": 746.6347949130579,
         "height": 295.50954755505853,
-        "content": "## The old way of using text completion and text edit\n### Davinci model is 10 times more expensive then ChatGPT, consider switching to the new API:\nhttps://openai.com/blog/introducing-chatgpt-and-whisper-apis\n"
+        "content": "## 텍스트 완성 및 텍스트 편집을 사용하는 오래된 방법\n\nDavinci 모델은 ChatGPT보다 10배 더 비싸요, 새로운 API로 전환을 고려하세요:\nhttps://openai.com/blog/introducing-chatgpt-and-whisper-apis"
       },
       "typeVersion": 1
     },
@@ -287,7 +287,7 @@
       "parameters": {
         "width": 428.4578974150008,
         "height": 316.6202633391793,
-        "content": "## Whisper-1 example\n### Prepare your audio file and send it to whisper-1 transcription model"
+        "content": "## Whisper-1 예시\n### 오디오 파일을 준비하고 whisper-1 전사 모델에 보내세요"
       },
       "typeVersion": 1
     },
@@ -302,7 +302,7 @@
       "parameters": {
         "width": 421.9002034748082,
         "height": 302.4086532331564,
-        "content": "## An example of transcribed text\n### Please pause this node when using real audio files"
+        "content": "## 전사된 텍스트의 예시\n\n### 실제 오디오 파일을 사용할 때 이 노드를 일시 중지하세요"
       },
       "typeVersion": 1
     },
@@ -317,7 +317,7 @@
       "parameters": {
         "width": 747.8556016477869,
         "height": 288.18470714667706,
-        "content": "## ChatGPT example 1.1 and 1.2 \n### Write a Tl;dr of the text input\n### Translate it to German\n### only user content provided"
+        "content": "## ChatGPT 예시 1.1 및 1.2  \n### 텍스트 입력의 TL;DR 작성  \n### 이를 독일어로 번역  \n### 사용자 콘텐츠만 제공"
       },
       "typeVersion": 1
     },
@@ -332,7 +332,7 @@
       "parameters": {
         "width": 742.9723747088658,
         "height": 288.18470714667706,
-        "content": "## ChatGPT example 2 \n### Use system content to provide general instruction\n### Manual setup of system and user content"
+        "content": "## ChatGPT 예제 2  \n### 시스템 콘텐츠를 사용하여 일반 지시 제공  \n### 시스템 및 사용자 콘텐츠의 수동 설정  \n\n### 출력"
       },
       "typeVersion": 1
     },
@@ -347,7 +347,7 @@
       "parameters": {
         "width": 739.309954504675,
         "height": 288.18470714667706,
-        "content": "## ChatGPT example 3.1\n### When using ChatGPT programmatically, create an array of system / user / assistant contents and append them one after another\n### Call ChatGPT API via HTTP Request node to provide all messages at once"
+        "content": "## ChatGPT 예제 3.1\n### ChatGPT를 프로그래밍 방식으로 사용할 때, system / user / assistant 내용의 배열을 생성하여 하나씩 추가하세요\n### HTTP Request 노드를 통해 ChatGPT API를 호출하여 모든 메시지를 한 번에 제공하세요"
       },
       "typeVersion": 1
     },
@@ -386,7 +386,7 @@
       "parameters": {
         "width": 611.1252473579985,
         "height": 284.52228694248623,
-        "content": "## ChatGPT example 3.2 & DALLE-2 example 3.3\n### Use ChatGPT to create a prompt for a cover image of the Tl;dr message\n### Use OpenAI node to generate 4 images using the auto-generated prompt"
+        "content": "## ChatGPT 예제 3.2 & DALLE-2 예제 3.3  \n### ChatGPT를 사용하여 Tl;dr 메시지의 커버 이미지를 위한 프롬프트를 생성하세요  \n### 자동 생성된 프롬프트를 사용하여 OpenAI 노드로 4개의 이미지를 생성하세요"
       },
       "typeVersion": 1
     },
@@ -475,7 +475,7 @@
       "parameters": {
         "width": 739.309954504675,
         "height": 288.18470714667706,
-        "content": "## ChatGPT example 4\n### Generate HTML code that contains SVG image"
+        "content": "## 챗GPT 예제 4 ### SVG 이미지를 포함하는 HTML 코드를 생성"
       },
       "typeVersion": 1
     },
@@ -490,7 +490,7 @@
       "parameters": {
         "width": 739.309954504675,
         "height": 288.18470714667706,
-        "content": "## ChatGPT example 5\n### Provide several outputs. Useful for quick replies (i.e. in Gmail / Outlook)"
+        "content": "## ChatGPT 예시 5\n### 여러 출력을 제공하세요. 빠른 응답에 유용합니다 (i.e. Gmail / Outlook에서)\n\n### 출력"
       },
       "typeVersion": 1
     },
@@ -594,7 +594,7 @@
       "parameters": {
         "width": 596.9600747621192,
         "height": 320.63203364295396,
-        "content": "## Do not run the whole workflow, it's rather slow\n### Better execute the last node of each branch or simply disconnect branches that are not needed"
+        "content": "## 전체 워크플로를 실행하지 마세요, 꽤 느립니다  \n### 각 브랜치의 마지막 노드를 실행하는 것이 좋습니다. 또는 필요하지 않은 브랜치를 단순히 연결 해제하세요"
       },
       "typeVersion": 1
     }

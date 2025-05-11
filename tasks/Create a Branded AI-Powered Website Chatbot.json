@@ -425,7 +425,7 @@
       "parameters": {
         "width": 311.6936390497898,
         "height": 205.34013605442183,
-        "content": "Ensure these referance this workflow, replace placeholders"
+        "content": "이것들이 이 워크플로를 참조하도록 하세요, 플레이스홀더를 대체하세요."
       },
       "typeVersion": 1
     },
@@ -440,7 +440,7 @@
       "parameters": {
         "width": 468,
         "height": 238,
-        "content": "modify business hours\nmodify timezones"
+        "content": "영업 시간을 수정  \n시간대를 수정"
       },
       "typeVersion": 1
     },
@@ -522,7 +522,7 @@
         "color": 6,
         "width": 668,
         "height": 111,
-        "content": "# Custom Branded n8n Chatbot\nBuilt by [Wayne Simpson](https://www.linkedin.com/in/simpsonwayne/) at [nocodecreative.io](https://nocodecreative.io)\n☕ If you find this useful, feel free to [buy me a coffee](https://ko-fi.com/waynesimpson)"
+        "content": "# 맞춤 브랜딩된 n8n 챗봇\n\n[Wayne Simpson](https://www.linkedin.com/in/simpsonwayne/)이 [nocodecreative.io](https://nocodecreative.io)에서 제작됨\n\n☕ 이가 유용하다면, 자유롭게 [커피 사주기](https://ko-fi.com/waynesimpson) 해주세요"
       },
       "typeVersion": 1
     },
@@ -538,7 +538,7 @@
         "color": 7,
         "width": 667,
         "height": 497,
-        "content": "# Watch the Setup Video 📺\n### Watch Set Up Video 👇\n[![Auto Categorise Outlook Emails with AI](https://cdn.jsdelivr.net/gh/WayneSimpson/n8n-chatbot-template/custom-branded-chatbot.png)](https://youtu.be/xQ1tCQZhLaI)\n\n"
+        "content": "# 설정 비디오를 시청하세요 📺  \n### 설정 비디오를 시청하세요 👇  \n[![AI를 사용한 Outlook 이메일 자동 분류](https://cdn.jsdelivr.net/gh/WayneSimpson/n8n-chatbot-template/custom-branded-chatbot.png)](https://youtu.be/xQ1tCQZhLaI)"
       },
       "typeVersion": 1
     },
@@ -554,7 +554,7 @@
         "color": 7,
         "width": 600,
         "height": 500,
-        "content": "## Read to blog post to get started 📝\n**Follow along to add a custom branded chat widget to your webiste**\n\n[![Custom Branded n8n Chatbot](https://cdn.jsdelivr.net/gh/WayneSimpson/n8n-chatbot-template/chat%20widget.png)](https://blog.nocodecreative.io/create-a-branded-ai-powered-website-chatbot-with-n8n/)"
+        "content": "## 블로그 게시물을 읽어 시작하세요 📝  \n**커스텀 브랜디드 채팅 위젯을 귀하의 웹사이트에 추가하기 위해 따라하세요**  \n\n[![커스텀 브랜디드 n8n 챗봇](https://cdn.jsdelivr.net/gh/WayneSimpson/n8n-chatbot-template/chat%20widget.png)](https://blog.nocodecreative.io/create-a-branded-ai-powered-website-chatbot-with-n8n/)"
       },
       "typeVersion": 1
     },
@@ -570,7 +570,7 @@
         "color": 4,
         "width": 260,
         "height": 240,
-        "content": "Customise the email template"
+        "content": "이메일 템플릿을 사용자 정의"
       },
       "typeVersion": 1
     },
@@ -586,7 +586,7 @@
         "color": 6,
         "width": 208,
         "height": 238,
-        "content": "modify timezones"
+        "content": "시간대 수정"
       },
       "typeVersion": 1
     }

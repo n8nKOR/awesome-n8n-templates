@@ -58,7 +58,7 @@
         "color": 7,
         "width": 1118.3459011229047,
         "height": 775.3931210698682,
-        "content": "### Sub-workflow: Custom tool\nThe agent above can call this workflow. It checks if the user has supplied an email address. If they haven't it prompts them to provide one. If they have, it messages a customer support channel for help."
+        "content": "서브-워크플로우: 커스텀 도구  \n위의 에이전트가 이 워크플로우를 호출할 수 있습니다. 사용자가 이메일 주소를 제공했는지 확인합니다. 제공하지 않았다면, 사용자가 하나를 제공하도록 유도합니다. 제공했다면, 고객 지원 채널에 도움을 요청하는 메시지를 보냅니다."
       },
       "typeVersion": 1
     },
@@ -74,7 +74,7 @@
         "color": 7,
         "width": 927.5,
         "height": 486.5625,
-        "content": "### Main workflow: AI agent using custom tool"
+        "content": "주요 워크플로: AI 에이전트가 커스텀 도구를 사용"
       },
       "typeVersion": 1
     },
@@ -90,7 +90,7 @@
         "color": 5,
         "width": 197.45572294791873,
         "height": 179.21380662202682,
-        "content": "**This tool calls the sub-workflow below**"
+        "content": "이 도구는 아래 서브 워크플로를 호출합니다."
       },
       "typeVersion": 1
     },
@@ -106,7 +106,7 @@
         "color": 2,
         "width": 150,
         "height": 213.44323866265472,
-        "content": "**Set your credentials**"
+        "content": "자격 증명을 설정하세요."
       },
       "typeVersion": 1
     },
@@ -122,7 +122,7 @@
         "color": 2,
         "width": 178.0499248677781,
         "height": 250.57252651663197,
-        "content": "**Set your credentials and Slack details**"
+        "content": "자격 증명과 Slack 세부 사항을 설정하세요."
       },
       "typeVersion": 1
     },
@@ -138,7 +138,7 @@
         "color": 4,
         "width": 185.9375,
         "height": 214.8397420554627,
-        "content": "## Try it out\n\nSelect **Chat** at the bottom and enter:\n\n_Hi! Please respond to this as if you don't know the answer to my query._"
+        "content": "## 이를 시도해 보세요\n\n맨 아래에 **Chat**을 선택하고 입력하세요:\n\n_안녕! 내 쿼리에 대한 답을 모르는 것처럼 응답해 주세요._"
       },
       "typeVersion": 1
     },
@@ -152,7 +152,7 @@
       ],
       "parameters": {
         "height": 144.50520156238127,
-        "content": "## Next steps\n\nLearn more about [Advanced AI in n8n](https://docs.n8n.io/advanced-ai/)"
+        "content": "## 다음 단계\n\nn8n의 고급 AI에 대해 자세히 알아보기 [n8n의 고급 AI](https://docs.n8n.io/advanced-ai/)"
       },
       "typeVersion": 1
     },

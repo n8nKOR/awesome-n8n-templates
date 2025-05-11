@@ -93,7 +93,7 @@
         "color": 7,
         "width": 693.2572054941234,
         "height": 354.53098948245656,
-        "content": "Main Workflow"
+        "content": "## 주요 워크플로"
       },
       "typeVersion": 1
     },
@@ -337,7 +337,7 @@
         "color": 5,
         "width": 1607,
         "height": 520,
-        "content": "This part should be abstracted to another workflow and called inside the \"youtube_search\" tool of the main AI Agent."
+        "content": "이 부분은 다른 워크플로로 추상화되어야 하며, 주 AI 에이전트의 \"youtube_search\" 도구 내부에서 호출되어야 합니다."
       },
       "typeVersion": 1
     }

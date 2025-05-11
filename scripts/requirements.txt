@@ -1,0 +1,5 @@
+fire
+orjson
+requests
+python-dotenv
+tqdm

@@ -32,7 +32,7 @@
         "color": 6,
         "width": 478.38709677419376,
         "height": 347.82258064516134,
-        "content": "## 🧠Text Analysis\n### Readability Score Ranges:\nWhen testing model responses, readability scores can range across different levels. Here’s a breakdown:\n\n- **90–100**: Very easy to read (5th grade or below)\n- **80–89**: Easy to read (6th grade)\n- **70–79**: Fairly easy to read (7th grade)\n- **60–69**: Standard (8th to 9th grade)\n- **50–59**: Fairly difficult (10th to 12th grade)\n- **30–49**: Difficult (College)\n- **0–29**: Very difficult (College graduate)\n- **Below 0**: Extremely difficult (Post-graduate level)\n"
+        "content": "## 🧠텍스트 분석\n### 가독성 점수 범위:\n모델 응답을 테스트할 때, 가독성 점수는 다양한 수준으로 분포할 수 있습니다. 다음은 세부 사항입니다:\n\n- **90–100**: 매우 쉽게 읽을 수 있음 (5학년 이하)\n- **80–89**: 쉽게 읽을 수 있음 (6학년)\n- **70–79**: 상당히 쉽게 읽을 수 있음 (7학년)\n- **60–69**: 표준 (8학년에서 9학년)\n- **50–59**: 상당히 어렵게 읽을 수 있음 (10학년에서 12학년)\n- **30–49**: 어렵게 읽을 수 있음 (대학)\n- **0–29**: 매우 어렵게 읽을 수 있음 (대학 졸업생)\n- **Below 0**: 극도로 어렵게 읽을 수 있음 (대학원 수준)"
       },
       "typeVersion": 1
     },
@@ -65,7 +65,7 @@
       "parameters": {
         "width": 377.6129032258063,
         "height": 264.22580645161304,
-        "content": "## ⚙️ 2. Update Local IP\nUpdate the **'Base URL'** `http://192.168.1.1:1234/v1/models` in the workflow to match the IP of your LM Studio server. (Running LM Server)[https://lmstudio.ai/docs/basics/server]\n\nThis node will query the LM Studio server to retrieve a list of all loaded model IDs at the time of the query. If you change or add models to LM Studio, you’ll need to rerun this node to get an updated list of active LLMs.\n"
+        "content": "## ⚙️ 2. 로컬 IP 업데이트\n워크플로우에서 **'Base URL'** `http://192.168.1.1:1234/v1/models`을 귀하의 LM Studio 서버 IP와 일치하도록 업데이트하세요. (LM 서버 실행)[https://lmstudio.ai/docs/basics/server]\n\n이 노드는 쿼리 시점에 로드된 모든 모델 ID 목록을 검색하기 위해 LM Studio 서버에 쿼리를 보낼 것입니다. LM Studio에 모델을 변경하거나 추가하면, 업데이트된 활성 LLM 목록을 얻기 위해 이 노드를 다시 실행해야 합니다."
       },
       "typeVersion": 1
     },
@@ -94,7 +94,7 @@
       "parameters": {
         "width": 378.75806451612857,
         "height": 216.12903225806457,
-        "content": "## 🛠️1. Setup - LM Studio\nFirst, download and install [LM Studio](https://lmstudio.ai/). Identify which LLM models you want to use for testing.\n\nNext, the selected models are loaded into the server capabilities to prepare them for testing. For a detailed guide on how to set up multiple models, refer to the [LM Studio Basics](https://lmstudio.ai/docs/basics) documentation.\n"
+        "content": "## 🛠️1. 설정 - LM Studio\n먼저, [LM Studio](https://lmstudio.ai/)를 다운로드하고 설치하세요. 테스트를 위해 사용할 LLM 모델을 식별하세요.\n\n다음으로, 선택된 모델들을 서버 기능에 로드하여 테스트를 위해 준비합니다. 여러 모델을 설정하는 방법에 대한 자세한 가이드의 경우, [LM Studio Basics](https://lmstudio.ai/docs/basics) 문서를 참조하세요."
       },
       "typeVersion": 1
     },
@@ -109,7 +109,7 @@
       "parameters": {
         "width": 570.0000000000002,
         "height": 326.0645161290325,
-        "content": "## 3. 💡Update the LM Settings\n\nFrom here, you can modify the following\n parameters to fine-tune model behavior:\n\n- **Temperature**: Controls randomness. Higher values (e.g., 1.0) produce more diverse results, while lower values (e.g., 0.2) make responses more focused and deterministic.\n- **Top P**: Adjusts nucleus sampling, where the model considers only a subset of probable tokens. A lower value (e.g., 0.5) narrows the response range.\n- **Presence Penalty**: Penalizes new tokens based on their presence in the input, encouraging the model to generate more varied responses.\n"
+        "content": "## 3. 💡LM 설정 업데이트\n\n여기에서 다음 매개변수를 수정하여 모델 동작을 미세 조정할 수 있습니다:\n\n- **Temperature**: 무작위성을 제어합니다. 더 높은 값(예: 1.0)은 더 다양한 결과를 생성하며, 더 낮은 값(예: 0.2)은 응답을 더 집중적이고 결정적으로 만듭니다.\n- **Top P**: nucleus sampling을 조정하며, 모델이 가능한 토큰의 하위 집합만 고려합니다. 더 낮은 값(예: 0.5)은 응답 범위를 좁힙니다.\n- **Presence Penalty**: 입력에 존재하는 토큰에 기반하여 새로운 토큰에 페널티를 부과하여 모델이 더 다양한 응답을 생성하도록 장려합니다."
       },
       "typeVersion": 1
     },
@@ -140,7 +140,7 @@
       "parameters": {
         "width": 304.3225806451618,
         "height": 599.7580645161281,
-        "content": "## 📊4. Create Google Sheet (Optional)\n1. First, create a Google Sheet with the following headers:\n - Prompt\n - Time Sent\n - Time Received\n - Total Time Spent\n - Model\n - Response\n - Readability Score\n - Average Word Length\n - Word Count\n - Sentence Count\n - Average Sentence Length\n2. After creating the sheet, update the corresponding Google Sheets node in the workflow to map the data fields correctly.\n"
+        "content": "## 📊4. Google Sheet 만들기 (선택사항)\n\n1. 먼저, 다음 헤더를 가진 Google Sheet를 만드세요:\n   - Prompt\n   - Time Sent\n   - Time Received\n   - Total Time Spent\n   - Model\n   - Response\n   - Readability Score\n   - Average Word Length\n   - Word Count\n   - Sentence Count\n   - Average Sentence Length\n\n2. 시트를 만든 후, 워크플로의 해당 Google Sheets 노드를 업데이트하여 데이터 필드를 올바르게 매핑하세요."
       },
       "typeVersion": 1
     },
@@ -156,7 +156,7 @@
         "color": 5,
         "width": 359.2903225806448,
         "height": 316.9032258064518,
-        "content": "## 🏗️Setup Steps\n1. **Download and Install LM Studio**: Ensure LM Studio is correctly installed on your machine.\n2. **Update the Base URL**: Replace the base URL with the IP address of your LLM instance. Ensure the connection is established.\n3. **Configure LLM Settings**: Verify that your LLM models are properly set up and configured in LM Studio.\n4. **Create a Google Sheet**: Set up a Google Sheet with the necessary headers (Prompt, Time Sent, Time Received, etc.) to track your testing results.\n"
+        "content": "## 🏗️설정 단계\n\n1. **LM Studio 다운로드 및 설치**: LM Studio가 컴퓨터에 올바르게 설치되었는지 확인하세요.\n2. **기본 URL 업데이트**: LLM 인스턴스의 IP 주소로 기본 URL을 교체하세요. 연결이 제대로 설정되었는지 확인하세요.\n3. **LLM 설정 구성**: LM Studio에서 LLM 모델이 제대로 설정되고 구성되었는지 확인하세요.\n4. **Google 시트 생성**: 테스트 결과를 추적하기 위해 필요한 헤더(Prompt, Time Sent, Time Received 등)를 가진 Google 시트를 설정하세요."
       },
       "typeVersion": 1
     },
@@ -171,7 +171,7 @@
       "parameters": {
         "width": 615.8064516129025,
         "height": 272.241935483871,
-        "content": "## 📖Prompting Multiple LLMs\n\nWhen testing for specific outcomes (such as conciseness or readability), you can add a **System Prompt** in the LLM Chain to guide the models' responses.\n\n**System Prompt Suggestion**:\n- Focus on ensuring that responses are concise, clear, and easily understandable by a 5th-grade reading level. \n- This prompt will help you compare models based on how well they meet readability standards and stay on point.\n \nAdjust the prompt to fit your desired testing criteria.\n"
+        "content": "## 📖여러 LLM 프롬프팅\n\n특정 결과를 테스트할 때 (예: 간결성 또는 가독성과 같은 경우), LLM 체인에 **System Prompt**를 추가하여 모델의 응답을 안내할 수 있습니다.\n\n**System Prompt Suggestion**:\n- 응답이 간결하고, 명확하며, 5학년 수준으로 쉽게 이해할 수 있도록 하는 데 중점을 두세요. \n- 이 프롬프트는 모델이 가독성 기준을 얼마나 잘 충족하고 본론에 충실한지 비교하는 데 도움이 될 것입니다.\n \n프롬프트를 원하는 테스트 기준에 맞게 조정하세요."
       },
       "typeVersion": 1
     },
@@ -477,7 +477,7 @@
       "parameters": {
         "width": 330.4677419354838,
         "height": 182.9032258064516,
-        "content": "### Optional\nYou can just delete the google sheet node, and review the results by hand. \n\nUtilizing the google sheet, allows you to provide mulitple prompts and review the analysis against all of those runs."
+        "content": "구글 시트 노드를 그냥 삭제하고, 결과를 수동으로 검토할 수 있습니다. \n\n구글 시트를 이용하면, 여러 프롬프트를 제공하고 모든 실행에 대한 분석을 검토할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -538,7 +538,7 @@
         "color": 3,
         "width": 570.0000000000002,
         "height": 182.91935483870984,
-        "content": "## 🚀Pro Tip \n\nIf you are getting strange results, ensure that you are Deleting the previous chat (next to the Chat Button) to ensure you aren't bleeding responses into the next chat. "
+        "content": "## 🚀프로 팁\n\n이상한 결과를 얻고 있다면, 채팅 버튼 옆에 있는 이전 채팅을 삭제하여 다음 채팅으로 응답이 유출되지 않도록 하세요."
       },
       "typeVersion": 1
     }

@@ -260,7 +260,7 @@
       "parameters": {
         "width": 860,
         "height": 600,
-        "content": "## Build a summary\n\nThis is useful to run it in an agentic workflow. You may remove the summary part and return the raw array with the found issues."
+        "content": "## 요약 빌드\n\n이것은 에이전트 워크플로에서 실행하는 데 유용합니다. 요약 부분을 제거하고 발견된 문제와 함께 원시 배열을 반환할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -275,7 +275,7 @@
       "parameters": {
         "width": 760,
         "height": 600,
-        "content": "## Split into sentences"
+        "content": "## 문장으로 분할"
       },
       "typeVersion": 1
     },
@@ -290,7 +290,7 @@
       "parameters": {
         "width": 920,
         "height": 600,
-        "content": "## Fact checking\n\nThis use a small ollama model that is specialized on that task: https://ollama.com/library/bespoke-minicheck\n\nYou have to install it before use with `ollama pull bespoke-minicheck`."
+        "content": "## 사실 확인\n\n이것은 그 작업에 특화된 작은 ollama 모델을 사용합니다: https://ollama.com/library/bespoke-minicheck\n\n사용 전에 `ollama pull bespoke-minicheck`으로 이를 설치해야 합니다."
       },
       "typeVersion": 1
     },
@@ -305,7 +305,7 @@
       "parameters": {
         "width": 600,
         "height": 300,
-        "content": "## Test workflow\n"
+        "content": "테스트 워크플로"
       },
       "typeVersion": 1
     },
@@ -320,7 +320,7 @@
       "parameters": {
         "width": 600,
         "height": 280,
-        "content": "## Entrypoint to use in other workflows\n"
+        "content": "## 다른 워크플로에서 사용하기 위한 진입점"
       },
       "typeVersion": 1
     }

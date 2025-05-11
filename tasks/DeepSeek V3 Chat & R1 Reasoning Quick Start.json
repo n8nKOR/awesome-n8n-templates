@@ -101,7 +101,7 @@
         "color": 5,
         "width": 420,
         "height": 340,
-        "content": "## DeepSeek using HTTP Request\n### DeepSeek Reasoner R1\nhttps://api-docs.deepseek.com/\nRaw Body"
+        "content": "## DeepSeek을 사용한 HTTP 요청  \n### DeepSeek Reasoner R1  \nhttps://api-docs.deepseek.com/  \n원시 본문  \n\n### Output"
       },
       "typeVersion": 1
     },
@@ -117,7 +117,7 @@
         "color": 4,
         "width": 580,
         "height": 400,
-        "content": "## DeepSeek with Ollama Local Model"
+        "content": "## DeepSeek과 Ollama 로컬 모델"
       },
       "typeVersion": 1
     },
@@ -157,7 +157,7 @@
         "color": 3,
         "width": 600,
         "height": 460,
-        "content": "## DeepSeek Conversational Agent w/Memory\n"
+        "content": "## DeepSeek 대화형 에이전트 메모리 포함"
       },
       "typeVersion": 1
     },
@@ -173,7 +173,7 @@
         "color": 6,
         "width": 420,
         "height": 340,
-        "content": "## DeepSeek using HTTP Request\n### DeepSeek Chat V3\nhttps://api-docs.deepseek.com/\nJSON Body"
+        "content": "## DeepSeek을 HTTP 요청으로 사용하기\n### DeepSeek Chat V3\nhttps://api-docs.deepseek.com/\nJSON 본문"
       },
       "typeVersion": 1
     },
@@ -242,7 +242,7 @@
         "color": 7,
         "width": 580,
         "height": 840,
-        "content": "# Your First DeepSeek API Call\n\nThe DeepSeek API uses an API format compatible with OpenAI. By modifying the configuration, you can use the OpenAI SDK or softwares compatible with the OpenAI API to access the DeepSeek API.\n\nhttps://api-docs.deepseek.com/\n\n## Configuration Parameters\n\n| Parameter | Value |\n|-----------|--------|\n| base_url | https://api.deepseek.com |\n| api_key | https://platform.deepseek.com/api_keys |\n\n\n\n## Important Notes\n\n- To be compatible with OpenAI, you can also use `https://api.deepseek.com/v1` as the base_url. Note that the v1 here has NO relationship with the model's version.\n\n- The deepseek-chat model has been upgraded to DeepSeek-V3. The API remains unchanged. You can invoke DeepSeek-V3 by specifying `model='deepseek-chat'`.\n\n- deepseek-reasoner is the latest reasoning model, DeepSeek-R1, released by DeepSeek. You can invoke DeepSeek-R1 by specifying `model='deepseek-reasoner'`."
+        "content": "# 당신의 첫 DeepSeek API 호출\n\nDeepSeek API는 OpenAI와 호환되는 API 형식을 사용합니다. 구성을 수정하여 OpenAI SDK 또는 OpenAI API와 호환되는 소프트웨어를 사용하여 DeepSeek API에 접근할 수 있습니다.\n\nhttps://api-docs.deepseek.com/\n\n## 구성 매개변수\n\n| Parameter | Value |\n|-----------|--------|\n| base_url | https://api.deepseek.com |\n| api_key | https://platform.deepseek.com/api_keys |\n\n\n\n## 중요한 주의사항\n\n- OpenAI와 호환되도록 `https://api.deepseek.com/v1`을 base_url로 사용할 수 있습니다. 여기서 v1은 모델의 버전과 아무런 관련이 없습니다.\n\n- deepseek-chat 모델이 DeepSeek-V3로 업그레이드되었습니다. API는 변경되지 않았습니다. `model='deepseek-chat'`을 지정하여 DeepSeek-V3를 호출할 수 있습니다.\n\n- deepseek-reasoner는 DeepSeek이 출시한 최신 추론 모델인 DeepSeek-R1입니다. `model='deepseek-reasoner'`을 지정하여 DeepSeek-R1을 호출할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -258,7 +258,7 @@
         "color": 2,
         "width": 580,
         "height": 400,
-        "content": "## Four Examples for Connecting to DeepSeek\nhttps://api-docs.deepseek.com/\nhttps://platform.deepseek.com/api_keys"
+        "content": "## DeepSeek에 연결하는 네 가지 예제\n\nhttps://api-docs.deepseek.com/\n\nhttps://platform.deepseek.com/api_keys"
       },
       "typeVersion": 1
     },
@@ -274,7 +274,7 @@
         "color": 7,
         "width": 300,
         "height": 120,
-        "content": "### Ollama Local\nhttps://ollama.com/\nhttps://ollama.com/library/deepseek-r1"
+        "content": "Ollama 로컬  \nhttps://ollama.com/  \nhttps://ollama.com/library/deepseek-r1"
       },
       "typeVersion": 1
     }

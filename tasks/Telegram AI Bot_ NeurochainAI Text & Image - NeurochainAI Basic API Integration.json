@@ -381,7 +381,7 @@
         "color": 3,
         "width": 460.4333621829785,
         "height": 347.9769162173868,
-        "content": "## ERROR"
+        "content": "## 에러"
       },
       "typeVersion": 1
     },
@@ -457,7 +457,7 @@
         "color": 4,
         "width": 459.0810102677459,
         "height": 350.68162004785273,
-        "content": "## SUCCESS\nThis node will send the AI ​​response directly to the Telegram chat."
+        "content": "## 성공\n\n이 노드는 AI 응답을 Telegram 채팅으로 직접 보낼 것입니다."
       },
       "typeVersion": 1
     },
@@ -473,7 +473,7 @@
         "color": 5,
         "width": 411.78262099325127,
         "height": 705.0354263931183,
-        "content": "## HTTP REQUEST\n\nReplace **MODEL** with the desired AI model from the NeurochainAI dashboard.\n\nReplace YOUR-API-KEY-HERE with your actual NeurochainAI API key.\n\n**Models:**\nMeta-Llama-3.1-8B-Instruct-Q8_0.gguf\nMeta-Llama-3.1-8B-Instruct-Q6_K.gguf\nMistral-7B-Instruct-v0.2-GPTQ-Neurochain-custom-io\nMistral-7B-Instruct-v0.2-GPTQ-Neurochain-custom\nMistral-7B-OpenOrca-GPTQ\nMistral-7B-Instruct-v0.1-gguf-q8_0.gguf\nMistral-7B-Instruct-v0.2-GPTQ\ningredient-extractor-mistral-7b-instruct-v0.1-gguf-q8_0.gguf"
+        "content": "## HTTP 요청\n\nNeurochainAI 대시보드에서 원하는 AI 모델로 **MODEL**을 대체하세요.\n\nYOUR-API-KEY-HERE를 실제 NeurochainAI API 키로 대체하세요.\n\n**모델들:**\nMeta-Llama-3.1-8B-Instruct-Q8_0.gguf\nMeta-Llama-3.1-8B-Instruct-Q6_K.gguf\nMistral-7B-Instruct-v0.2-GPTQ-Neurochain-custom-io\nMistral-7B-Instruct-v0.2-GPTQ-Neurochain-custom\nMistral-7B-OpenOrca-GPTQ\nMistral-7B-Instruct-v0.1-gguf-q8_0.gguf\nMistral-7B-Instruct-v0.2-GPTQ\ningredient-extractor-mistral-7b-instruct-v0.1-gguf-q8_0.gguf"
       },
       "typeVersion": 1
     },
@@ -489,7 +489,7 @@
         "color": 6,
         "width": 236.80242230495116,
         "height": 535.7153791682382,
-        "content": "## This node removes the /flux prefix."
+        "content": "## 이 노드가 /flux 접두사를 제거합니다."
       },
       "typeVersion": 1
     },
@@ -505,7 +505,7 @@
         "color": 3,
         "width": 593.1328365275054,
         "height": 403.9345258807414,
-        "content": "## ERROR"
+        "content": "## 오류"
       },
       "typeVersion": 1
     },
@@ -521,7 +521,7 @@
         "color": 5,
         "width": 384.60321058533617,
         "height": 538.7613862505775,
-        "content": "## HTTP REQUEST\n\nReplace **MODEL** with the desired AI model from the NeurochainAI dashboard.\n\nReplace YOUR-API-KEY-HERE with your actual NeurochainAI API key.\n\n**Models:**\nsuper-flux1-schnell-gguf\nflux1-schnell-gguf"
+        "content": "## HTTP 요청\n\n**MODEL**을 NeurochainAI 대시보드에서 원하는 AI 모델로 바꾸세요.\n\nYOUR-API-KEY-HERE를 실제 NeurochainAI API 키로 바꾸세요.\n\n**모델들:**  \nsuper-flux1-schnell-gguf  \nflux1-schnell-gguf"
       },
       "typeVersion": 1
     },
@@ -548,7 +548,7 @@
       ],
       "parameters": {
         "height": 535.7153791682384,
-        "content": "## This node sends an emoji to indicate that the prompt is being processed."
+        "content": "## 이 노드는 프롬프트가 처리되고 있음을 나타내기 위해 이모지를 보냅니다."
       },
       "typeVersion": 1
     },
@@ -564,7 +564,7 @@
         "color": 4,
         "width": 596.5768511548468,
         "height": 350.68162004785273,
-        "content": "## SUCCESS\nThis node will send the AI ​​response directly to the Telegram chat."
+        "content": "## 성공  \n이 노드는 AI 응답을 Telegram 채팅에 직접 보낼 것입니다."
       },
       "typeVersion": 1
     },
@@ -672,7 +672,7 @@
       "parameters": {
         "width": 623.6530631885605,
         "height": 648.96526541807,
-        "content": "## Instructions for Using the Template\nFollow these steps to set up and use this template:\n\n**Create a Telegram Bot**:\n- Open Telegram and search for BotFather.\n- Use the ``/newbot`` command to create your bot.\n- Follow the prompts and copy the Token provided at the end.\n-------------\n**Obtain a NeurochainAI API Key:**\n\n- Log in to the NeurochainAI Dashboard.\n- Generate an **API Key** under the Inference As Service section.\n- Ensure your account has sufficient credits for usage.\n-------------\n **Configure Telegram Nodes:**\n- Locate all Telegram nodes in the workflow and add your Telegram Bot Token to each node's credentials.\n-------------\n**Configure HTTP Request Nodes:**\n\n- Identify the NeurochainAI - Rest API and NeurochainAI - Flux nodes in the workflow.\nIn each node:\n- Enter your desired model in the Model field.\n- Replace ``YOUR-API-KEY-HERE`` with your API Key in the headers or configuration section.\n-------------\n**Save and Test:**\n- Save the workflow in N8N.\n- Test the workflow by interacting with your Telegram bot to trigger text and image generation tasks."
+        "content": "## 템플릿 사용 지침\n다음 단계를 따르세요. 이 템플릿을 설정하고 사용하는 방법입니다:\n\n**Telegram 봇 만들기**:\n- Telegram을 열고 BotFather를 검색하세요.\n- ``/newbot`` 명령어를 사용하여 봇을 만드세요.\n- 지시를 따르고 끝에 제공되는 Token을 복사하세요.\n-------------\n**NeurochainAI API 키 얻기:**\n\n- NeurochainAI 대시보드에 로그인하세요.\n- Inference As Service 섹션에서 **API 키**를 생성하세요.\n- 계정에 사용을 위한 충분한 크레딧이 있는지 확인하세요.\n-------------\n**Telegram 노드 구성:**\n- 워크플로우에서 모든 Telegram 노드를 찾아 각 노드의 자격 증명에 Telegram 봇 Token을 추가하세요.\n-------------\n**HTTP 요청 노드 구성:**\n\n- 워크플로우에서 NeurochainAI - Rest API 및 NeurochainAI - Flux 노드를 식별하세요.\n각 노드에서:\n- Model 필드에 원하는 모델을 입력하세요.\n- headers 또는 구성 섹션에서 ``YOUR-API-KEY-HERE``를 실제 API 키로 교체하세요.\n-------------\n**저장 및 테스트:**\n- N8N에서 워크플로우를 저장하세요.\n- Telegram 봇과 상호작용하여 텍스트 및 이미지 생성 작업을 트리거하여 워크플로우를 테스트하세요."
       },
       "typeVersion": 1
     },

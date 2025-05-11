@@ -208,7 +208,7 @@
       "parameters": {
         "width": 452.37174177689576,
         "height": 462.1804790107177,
-        "content": "## About the workflow\nThe workflow reads every reply that is received from a cold email campaign and qualifies if the lead is interested in a meeting. If the lead is interested, a deal is made in pipedrive. You can add as many email inboxes as you need!\n\n## Setup:\n- Add credentials to the Gmail, OpenAI and Pipedrive Nodes.\n- Add a in_campaign field in Pipedrive for persons. In Pipedrive click on your credentials at the top right, go to company settings > Data fields > Person and click on add custom field. Single option [TRUE/FALSE].\n- If you have only one email inbox, you can delete one of the Gmail nodes.\n- If you have more than two email inboxes, you can duplicate a Gmail node as many times as you like. Just connect it to the Get email node, and you are good to go!\n- In the Gmail inbox nodes, select Inbox under label names and uncheck Simplify."
+        "content": "워크플로는 콜드 이메일 캠페인에서 받은 모든 답변을 읽고, 리드가 미팅에 관심이 있는지 자격을 확인합니다. 리드가 관심이 있으면, Pipedrive에서 딜을 생성합니다. 필요한 만큼 이메일 인박스를 추가할 수 있습니다!\n\n설정:\n- Gmail, OpenAI 및 Pipedrive 노드에 자격 증명을 추가하세요.\n- Pipedrive에서 persons에 in_campaign 필드를 추가하세요. Pipedrive에서 오른쪽 상단의 자격 증명을 클릭한 후, 회사 설정 > 데이터 필드 > Person으로 이동하여 새 커스텀 필드를 추가하세요. 단일 옵션 [TRUE/FALSE].\n- 이메일 인박스가 하나만 있으면, Gmail 노드 중 하나를 삭제할 수 있습니다.\n- 이메일 인박스가 두 개 이상 있으면, Gmail 노드를 원하는 만큼 복제할 수 있습니다. 그냥 Get email 노드에 연결하면 됩니다!\n- Gmail 인박스 노드에서, 레이블 이름 아래에 Inbox을 선택하고 Simplify를 체크 해제하세요."
       },
       "typeVersion": 1
     },

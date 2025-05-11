@@ -259,7 +259,7 @@
         "color": 7,
         "width": 541.1455500767354,
         "height": 381.6388867600897,
-        "content": "## 1. Get Source Image\n[Read more about setting variables for your workflow](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set)\n\nFor this demo, we'll manually define an image to process. In production however, this image can come from a variety of sources such as drives, webhooks and more."
+        "content": "## 1. 소스 이미지 가져오기\n\n[워크플로우에 대한 변수 설정에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set)\n\n이 데모의 경우, 처리할 이미지를 수동으로 정의하겠습니다. 그러나 프로덕션에서는 이 이미지가 드라이브, 웹훅 등 다양한 소스에서 올 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -275,7 +275,7 @@
         "color": 7,
         "width": 579.7748008857744,
         "height": 437.4680103498263,
-        "content": "## 2. Use Detr-Resnet-50 Object Classification\n[Learn more about Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)\n\nNot all AI workflows need an LLM! As in this example, we're using a non-LLM vision model to parse the source image and return what objects are contained within. The image search feature we're building will be based on the objects in the image making for a much more granular search via object association.\n\nWe'll use the Cloudflare Workers AI service which conveniently provides this model via API use."
+        "content": "## 2. Detr-Resnet-50 객체 분류 사용\n\n[Cloudflare Workers AI에 대해 더 알아보기](https://developers.cloudflare.com/workers-ai/)\n\n모든 AI 워크플로가 LLM을 필요로 하는 것은 아니다! 이 예제에서, 우리는 non-LLM 비전 모델을 사용하여 소스 이미지를 분석하고 그 안에 포함된 객체를 반환합니다. 우리가 구축 중인 이미지 검색 기능은 이미지 내의 객체를 기반으로 하며, 객체 연관을 통해 훨씬 더 세밀한 검색을 가능하게 합니다.\n\n우리는 Cloudflare Workers AI 서비스를 사용할 것입니다. 이 서비스는 이 모델을 API를 통해 편리하게 제공합니다."
       },
       "typeVersion": 1
     },
@@ -291,7 +291,7 @@
         "color": 7,
         "width": 466.35460775498495,
         "height": 371.9272151757119,
-        "content": "## 3. Crop Objects Out of Source Image\n[Read more about Editing Images in n8n](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.editimage)\n\nWith our objects identified by their bounding boxes, we can \"cut\" them out of the source image as separate images."
+        "content": "## 3. 소스 이미지에서 객체 자르기\n\n[n8n에서 이미지 편집에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.editimage)\n\n객체가 경계 상자로 식별되었으므로, 소스 이미지에서 별도의 이미지로 '잘라내기' 할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -307,7 +307,7 @@
         "color": 7,
         "width": 478.20345439832454,
         "height": 386.06196032653685,
-        "content": "## 4. Index Object Images In ElasticSearch\n[Read more about using ElasticSearch](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.elasticsearch)\n\nBy storing the newly created object images externally and indexing them in Elasticsearch, we now have a foundation for our Image Search service which queries by object association."
+        "content": "## 4. ElasticSearch에 객체 이미지 인덱스\n\n[ElasticSearch 사용에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.elasticsearch)\n\n새로 생성된 객체 이미지를 외부에 저장하고 Elasticsearch에 인덱싱하여, 이제 우리는 객체 연관성에 의해 쿼리하는 Image Search 서비스의 기반을 갖추었습니다."
       },
       "typeVersion": 1
     },
@@ -323,7 +323,7 @@
         "color": 7,
         "width": 328.419768654291,
         "height": 462.65463700396174,
-        "content": "Fig 1. Result of Classification\n![image of classification](https://res.cloudinary.com/daglih2g8/image/upload/f_auto,q_auto,w_300/v1/n8n-workflows/ywtzjcmqrypihci1npgh)"
+        "content": "그림 1. 분류 결과"
       },
       "typeVersion": 1
     },
@@ -352,7 +352,7 @@
       "parameters": {
         "width": 359.6648027457353,
         "height": 352.41026669883723,
-        "content": "## Try It Out!\n### This workflow does the following:\n* Downloads an image\n* Uses an object classification AI model to identify objects in the image.\n* Crops the objects out from the original image into new image files.\n* Indexes the image's object in an Elasticsearch Database to enable image search.\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!\n\nHappy Hacking!"
+        "content": "## 시도해 보세요!\n\n### 이 워크플로우는 다음과 같이 수행합니다:\n\n* 이미지를 다운로드합니다\n* 이미지에서 객체를 식별하기 위해 객체 분류 AI 모델을 사용합니다.\n* 원본 이미지에서 객체를 잘라내어 새로운 이미지 파일로 만듭니다.\n* 이미지의 객체를 Elasticsearch 데이터베이스에 인덱싱하여 이미지 검색을 활성화합니다.\n\n### 도움이 필요하신가요?\n\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 가입하거나 [Forum](https://community.n8n.io/)에서 질문하세요!\n\n즐거운 해킹!"
       },
       "typeVersion": 1
     },
@@ -367,7 +367,7 @@
       "parameters": {
         "width": 172.9365918827757,
         "height": 291.6881468483679,
-        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n🚨**Required**\n* Set your variables here first!"
+        "content": "🚨**필수**  \n* 변수를 먼저 여기에 설정하세요! *"
       },
       "typeVersion": 1
     }

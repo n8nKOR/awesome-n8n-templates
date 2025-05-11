@@ -386,7 +386,7 @@
       "parameters": {
         "width": 409.0131656322444,
         "height": 658.0614601225933,
-        "content": "## Read Me\n\nThis workflow allows you to do account research with the web using AI.\n\nThe advanced AI module has 2 capabilities: \n- Research Google using SerpAPI\n- Visit and get website content using a sub-workflow\n\n\nFrom an unstructured input like a domain or a company name. \n\nIt will return the following properties: \n- domain\n- company Linkedin Url\n- cheapest plan\n- has free trial\n- has entreprise plan\n- has API\n- market (B2B or B2C)\n\n\nThe strength of n8n here is that you can adapt this workflow to research whatever information you need.\n\nYou just have to precise it in the prompt and to precise the output format in the \"Strutured Output Parser\" module.\n\n[Click here to find more detailed instructions with video guide.](https://lempire.notion.site/AI-Web-research-with-n8n-a25aae3258d0423481a08bd102f16906)\n"
+        "content": "## 읽기 안내\n\n이 워크플로는 AI를 사용하여 웹으로 계정 조사를 할 수 있습니다.\n\n고급 AI 모듈에는 2가지 기능이 있습니다: \n- SerpAPI를 사용하여 Google 검색\n- 하위 워크플로를 사용하여 웹사이트 방문 및 내용 가져오기\n\n도메인이나 회사 이름과 같은 비구조화된 입력에서 다음 속성을 반환합니다: \n- 도메인\n- 회사 LinkedIn URL\n- 가장 저렴한 플랜\n- 무료 체험 있음\n- 엔터프라이즈 플랜 있음\n- API 있음\n- 시장 (B2B 또는 B2C)\n\nn8n의 강점은 이 워크플로를 원하는 정보 조사를 위해 조정할 수 있다는 점입니다.\n\n프롬프트에서 이를 지정하고, \"Strutured Output Parser\" 모듈에서 출력 형식을 지정하기만 하면 됩니다.\n\n[여기를 클릭하여 더 자세한 지침과 비디오 가이드를 찾으세요.](https://lempire.notion.site/AI-Web-research-with-n8n-a25aae3258d0423481a08bd102f16906)"
       },
       "typeVersion": 1
     },
@@ -443,7 +443,7 @@
       "parameters": {
         "width": 300.49399096535876,
         "height": 333.8263184006576,
-        "content": "### Process rows 1 by 1\nThis module will allow us to process rows 1 by 1"
+        "content": "### 행을 하나씩 처리\n\n이 모듈은 행을 하나씩 처리할 수 있게 해줄 것입니다."
       },
       "typeVersion": 1
     },
@@ -458,7 +458,7 @@
       "parameters": {
         "width": 300.49399096535876,
         "height": 236.01118609685022,
-        "content": "Precise here the format in which you need the data to be "
+        "content": "여기에 데이터를 원하는 형식을 지정하세요."
       },
       "typeVersion": 1
     },
@@ -473,7 +473,7 @@
       "parameters": {
         "width": 300.49399096535876,
         "height": 279.8787004666023,
-        "content": "### Ask AI what are the information you are looking for about the company"
+        "content": "AI에게 회사에 대해 어떤 정보를 찾고 있는지 물어보세요."
       },
       "typeVersion": 1
     },
@@ -487,7 +487,7 @@
       ],
       "parameters": {
         "height": 248.91749449109562,
-        "content": "Get your free API key here https://serpapi.com/"
+        "content": "여기에서 무료 API 키를 받으세요 https://serpapi.com/"
       },
       "typeVersion": 1
     },
@@ -522,7 +522,7 @@
       "parameters": {
         "width": 266.12865147126786,
         "height": 627.5654650079845,
-        "content": "Run the workflow manually or activate it to run it every 2 hours"
+        "content": "워크플로를 수동으로 실행하거나 활성화하여 2시간마다 실행하세요."
       },
       "typeVersion": 1
     },
@@ -572,7 +572,7 @@
       ],
       "parameters": {
         "height": 340.14969579315925,
-        "content": "Instead of SERP API module, you can also use this custom module for ScrapingBee. It is more cost-efficient.\n\nGet your free API key here https://www.scrapingbee.com/"
+        "content": "SERP API 모듈 대신, ScrapingBee용 이 커스텀 모듈을 사용할 수도 있습니다. 이것은 더 비용 효율적입니다.\n\n여기에서 무료 API 키를 받으세요 https://www.scrapingbee.com/"
       },
       "typeVersion": 1
     },
@@ -587,7 +587,7 @@
       "parameters": {
         "width": 194.6864335083109,
         "height": 525.6560478822986,
-        "content": "In this workflow, I use Google Sheets to store the results. \n\nYou can use my template to get started faster:\n\n1. [Click on this link to get the template](https://docs.google.com/spreadsheets/d/1vR6s2nlTwu01v3GP7wvSRWS5W49FJIh20ZF7AUkmMDo/edit?usp=sharing)\n2. Make a copy of the Sheets\n3. Add the URL to this node and the node **\"Google Sheets - Update Row with data\"**\n\n\n"
+        "content": "이 워크플로우에서, 결과를 저장하기 위해 Google Sheets를 사용합니다.\n\n더 빠르게 시작하기 위해 내 템플릿을 사용할 수 있습니다:\n\n1. [템플릿을 받기 위해 이 링크를 클릭하세요](https://docs.google.com/spreadsheets/d/1vR6s2nlTwu01v3GP7wvSRWS5W49FJIh20ZF7AUkmMDo/edit?usp=sharing)\n2. Sheets의 복사본을 만드세요\n3. 이 노드와 **Google Sheets - 데이터로 행 업데이트** 노드에 URL을 추가하세요"
       },
       "typeVersion": 1
     }

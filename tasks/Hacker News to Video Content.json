@@ -330,7 +330,7 @@
         "color": 5,
         "width": 341,
         "height": 951,
-        "content": "# Choose your data source \n## This can be swapped for any other data source of your choosing."
+        "content": "# 데이터 소스를 선택하세요  \n## 이것은 원하는 다른 데이터 소스로 교체할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -862,7 +862,7 @@
         "color": 6,
         "width": 882,
         "height": 372,
-        "content": "# Upload Assets\nYou can extend this workflow further by uploading the generated assets to your storage option of choice."
+        "content": "# 에셋 업로드  \n생성된 에셋을 원하는 저장 옵션으로 업로드하여 이 워크플로를 더 확장할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -878,7 +878,7 @@
         "color": 6,
         "width": 882,
         "height": 372,
-        "content": "# Post to Social Media\nYou can extend this workflow further by posting the generated assets to social media."
+        "content": "# 소셜 미디어에 게시  \n생성된 자산을 소셜 미디어에 게시하여 이 워크플로를 더 확장할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -894,7 +894,7 @@
         "color": 4,
         "width": 1114,
         "height": 943,
-        "content": "# Generate Images and Videos"
+        "content": "# 이미지와 비디오 생성"
       },
       "typeVersion": 1
     },
@@ -910,7 +910,7 @@
         "color": 5,
         "width": 1114,
         "height": 372,
-        "content": "# Stitch it all together"
+        "content": "# 모두 연결하세요"
       },
       "typeVersion": 1
     },
@@ -986,7 +986,7 @@
         "color": 3,
         "width": 1033,
         "height": 951,
-        "content": "# Article Analysis - Is it the right topic?"
+        "content": "# 기사 분석 - 올바른 주제인가?"
       },
       "typeVersion": 1
     },
@@ -1002,7 +1002,7 @@
         "color": 3,
         "width": 630,
         "height": 947,
-        "content": "# Prepare the article for content generation"
+        "content": "# 기사를 콘텐츠 생성을 위해 준비하세요"
       },
       "typeVersion": 1
     },
@@ -1055,7 +1055,7 @@
         "color": 6,
         "width": 252,
         "height": 946,
-        "content": "# AlexK1919 \n![Alex Kim](https://media.licdn.com/dms/image/v2/D5603AQFOYMkqCPl6Sw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1718309808352?e=1736985600&v=beta&t=pQKm7lQfUU1ytuC2Gq1PRxNY-XmROFWbo-BjzUPxWOs)\n\n#### I’m Alex Kim, an AI-Native Workflow Automation Architect Building Solutions to Optimize your Personal and Professional Life.\n\n### Workflow Overview Video\nhttps://youtu.be/XaKybLDUlLk\n\n### About Me\nhttps://beacons.ai/alexk1919\n\n### Product Used \n[Leonardo.ai](https://leonardo.ai)\n[RunwayML](https://runwayml.com/)\n[Creatomate](https://creatomate.com/)\n"
+        "content": "# AlexK1919  \n![알렉스 김](https://media.licdn.com/dms/image/v2/D5603AQFOYMkqCPl6Sw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1718309808352?e=1736985600&v=beta&t=pQKm7lQfUU1ytuC2Gq1PRxNY-XmROFWbo-BjzUPxWOs)  \n\n#### 저는 Alex Kim입니다. AI-네이티브 워크플로 자동화 아키텍트로서, 개인 및 직업 생활을 최적화하는 솔루션을 구축합니다.  \n\n### 워크플로 개요 비디오  \nhttps://youtu.be/XaKybLDUlLk  \n\n### 나에 대해  \nhttps://beacons.ai/alexk1919  \n\n### 사용된 제품   \n[Leonardo.ai](https://leonardo.ai)  \n[RunwayML](https://runwayml.com/)  \n[Creatomate](https://creatomate.com/)"
       },
       "typeVersion": 1
     },
@@ -1071,7 +1071,7 @@
         "color": 7,
         "width": 180,
         "height": 100,
-        "content": "Don't forget to connect this last node to the loop to process additional items"
+        "content": "이 마지막 노드를 루프에 연결하는 것을 잊지 마세요. 추가 항목을 처리하기 위해."
       },
       "typeVersion": 1
     }

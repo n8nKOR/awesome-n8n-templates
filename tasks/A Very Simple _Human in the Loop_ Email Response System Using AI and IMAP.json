@@ -140,7 +140,7 @@
       "parameters": {
         "width": 320,
         "height": 240,
-        "content": "Chain that summarizes the received email"
+        "content": "받은 이메일을 요약하는 체인"
       },
       "typeVersion": 1
     },
@@ -155,7 +155,7 @@
       "parameters": {
         "width": 340,
         "height": 240,
-        "content": "Agent that retrieves business information from a vector database and processes the response"
+        "content": "벡터 데이터베이스에서 비즈니스 정보를 검색하고 응답을 처리하는 에이전트"
       },
       "typeVersion": 1
     },
@@ -169,7 +169,7 @@
       ],
       "parameters": {
         "height": 240,
-        "content": "Convert email to Markdown format for better understanding of LLM models"
+        "content": "이메일을 Markdown 형식으로 변환하여 LLM 모델들의 더 나은 이해를 돕기 위해"
       },
       "typeVersion": 1
     },
@@ -183,7 +183,7 @@
       ],
       "parameters": {
         "height": 180,
-        "content": "If the feedback is OK send email"
+        "content": "피드백이 OK이면 이메일을 보내세요."
       },
       "typeVersion": 1
     },
@@ -270,7 +270,7 @@
       ],
       "parameters": {
         "height": 180,
-        "content": "Human in the loop"
+        "content": "인간이 루프에"
       },
       "typeVersion": 1
     },
@@ -286,7 +286,7 @@
         "color": 3,
         "width": 540,
         "height": 260,
-        "content": "# How it works\nThis workflow automates the handling of incoming emails, summarizes their content, generates appropriate responses and validate it through send IMAP email with \"Human in the loop\" system. \n\nYou can quickly integrate Gmail and Outlook via the appropriate nodes"
+        "content": "# 작동 원리\n이 워크플로우는 수신 이메일의 처리를 자동화하여, 그 내용을 요약하고, 적절한 응답을 생성하며, \"Human in the loop\" 시스템을 통해 IMAP 이메일 보내기로 이를 검증합니다. \n\nGmail과 Outlook을 적절한 노드를 통해 빠르게 통합할 수 있습니다."
       },
       "typeVersion": 1
     },

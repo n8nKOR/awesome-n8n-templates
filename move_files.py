@@ -82,7 +82,7 @@ def find_matching_files(item_name, tasks_dir):
 def move_files():
     """파일을 카테고리 폴더로 이동하고 넘버링합니다."""
     categories = read_readme()
-    tasks_dir = 'tasks'
+    tasks_dir = 'tasks_original'
     
     for category in categories:
         category_folder = category['name']

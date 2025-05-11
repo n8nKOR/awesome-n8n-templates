@@ -1,0 +1,446 @@
+{
+  "meta": {
+    "instanceId": "cb484ba7b742928a2048bf8829668bed5b5ad9787579adea888f05980292a4a7"
+  },
+  "nodes": [
+    {
+      "id": "d9bae984-2ce7-4f6b-ab53-527ac9dfea3d",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        680,
+        320
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "32ecf73c-b6e9-4bd6-9ecc-d82c4c50d7b5",
+      "name": "Reddit",
+      "type": "n8n-nodes-base.reddit",
+      "position": [
+        880,
+        320
+      ],
+      "parameters": {
+        "keyword": "n8n",
+        "location": "allReddit",
+        "operation": "search",
+        "additionalFields": {
+          "sort": "new"
+        }
+      },
+      "credentials": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "4b560620-a101-4566-b066-4ce3f44d8b0c",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        180
+      ],
+      "parameters": {
+        "width": 507.1052631578949,
+        "height": 210.99380804953552,
+        "content": "## 이 워크플로우가 하는 일\n✔︎ 1) n8n과 관련될 수 있는 Reddit 게시물을 가져옴\n - 가장 관련성 있는 게시물을 필터링 (지난 7일 이내에 게시되었고, 5회 이상 업보트되었으며, 원본 콘텐츠임)\n\n✔︎ 2) 게시물이 실제로 n8n에 관한지 확인\n\n✔︎ 3) 만약 그렇다면, OpenAI로 분류."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f3be9af5-b4ff-4f4e-a726-fc05fab94521",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1260,
+        320
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "upvotes",
+              "value": "={{ $json.ups }}"
+            },
+            {
+              "name": "subredditSize",
+              "value": "={{ $json.subreddit_subscribers }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "selftextTrimmed",
+              "value": "={{ $json.selftext.substring(0,500) }}"
+            },
+            {
+              "name": "subreddit",
+              "value": "={{ $json.subreddit }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ DateTime.fromSeconds($json.created).toLocaleString() }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b1dbf78f-c7c6-4ab7-a957-78d58c5e13e3",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1060,
+        320
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.ups }}",
+              "value2": "=5",
+              "operation": "largerEqual"
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{ $json.selftext }}",
+              "operation": "isNotEmpty"
+            }
+          ],
+          "dateTime": [
+            {
+              "value1": "={{ DateTime.fromSeconds($json.created).toISO() }}",
+              "value2": "={{ $today.minus({days: 7}).toISO() }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a3aa9e43-a824-4cc1-b4e6-d41a2e8e56cd",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        660
+      ],
+      "parameters": {
+        "width": 504.4736842105267,
+        "height": 116.77974205725066,
+        "content": "## 단점\n🤔 워크플로우는 각 Reddit 게시물의 처음 500자만 고려합니다. 그래서 n8n이 이 양 이후에 언급되면, n8n.io에 대한 게시물로 등록되지 않습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b3d566aa-1645-4c2c-9704-15aa2e42bb12",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1880,
+        340
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.choices[0].text }}",
+              "value2": "No",
+              "operation": "contains"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0ad54272-08b9-46d4-8e6a-1fb55a92d3e4",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1680,
+        520
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {
+          "fuzzyCompare": false,
+          "includeUnpaired": true
+        },
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "288f53cc-0e53-4683-ac0e-debe0a3691b8",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        2340,
+        540
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {
+          "fuzzyCompare": false,
+          "includeUnpaired": true
+        },
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "46280db5-e4b0-4108-958a-763b6410caa0",
+      "name": "SetFinal",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2560,
+        540
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "upvotes",
+              "value": "={{ $json.upvotes }}"
+            },
+            {
+              "name": "subredditSize",
+              "value": "={{ $json.subredditSize }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "subreddit",
+              "value": "={{ $json.subreddit }}"
+            },
+            {
+              "name": "bulletSummary",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ac8c4847-4d73-4dce-9543-a199e8b11b51",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        400
+      ],
+      "parameters": {
+        "width": 507.1052631578949,
+        "height": 247.53869969040255,
+        "content": "## 다음 단계\n* OpenAI 요약 노드 프롬프트를 개선하여 더 깨끗한 요약을 반환하도록 함.\n* **더 많은 플랫폼/소스**로 확장 - 예를 들어, 이렇게 더 큰 슬랙 커뮤니티를 모니터링하는 것은 정말 멋질 것입니다.\n* 사용자 유형에 대한 분류를 수행하여 우리 **ICP**에 속할 가능성이 있는 사용자를 강조합니다.\n* 데이터 소스 목록(reddit, twitter, slack, discord 등)을 분리하여 거기에서 메시지를 추출하고 **분류 및 요약을 위한 서브 워크플로**로 보내게 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "12ab5ba4-d24d-4fa1-a0d1-d1e81e2d5dee",
+      "name": "OpenAI Summary",
+      "type": "n8n-nodes-base.openAi",
+      "notes": "A one sentence summary of what the post is about.",
+      "disabled": true,
+      "position": [
+        2160,
+        160
+      ],
+      "parameters": {
+        "input": "={{ $json.selftextTrimmed }}",
+        "options": {
+          "temperature": 0.3
+        },
+        "operation": "edit",
+        "instruction": "Summarise what this is talking about in a meta way less than 20 words. Ignore punctuation in your summary and return a short, human readable summary."
+      },
+      "credentials": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "e303a1aa-ee93-4f8f-b834-19aa8da7fe95",
+      "name": "OpenAI Classify",
+      "type": "n8n-nodes-base.openAi",
+      "notes": "Is the post about n8n?",
+      "position": [
+        1460,
+        320
+      ],
+      "parameters": {
+        "prompt": "=Decide whether a reddit post is about n8n.io, a workflow automation low code tool that can be self-hosted, or not.\nReddit Post: {{ $json.selftextTrimmed }}\nAbout n8n?: Yes/No",
+        "options": {
+          "maxTokens": 32
+        },
+        "simplifyOutput": false
+      },
+      "credentials": {},
+      "notesInFlow": true,
+      "typeVersion": 1
+    },
+    {
+      "id": "f56cb8b6-4c28-448e-b259-8946ffc4c1f7",
+      "name": "OpenAI Summary Backup",
+      "type": "n8n-nodes-base.openAi",
+      "notes": "A one sentence summary of what the post is about.",
+      "position": [
+        2160,
+        340
+      ],
+      "parameters": {
+        "prompt": "=Summarise what this is talking about in a meta way in only 1 sentence.\n\n {{ $json.selftextTrimmed }}",
+        "options": {
+          "maxTokens": 128
+        }
+      },
+      "credentials": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "d1eacbf2-9cc8-482d-a7d2-34c351f20871",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        520
+      ],
+      "parameters": {
+        "width": 843.411496498402,
+        "height": 258.676790119369,
+        "content": "## 우리가 배운 것\n\n- 🪶 **프롬프트 작성**: 프롬프트 유형의 작은 변화가 결과에 큰 차이를 초래합니다. 예를 들어, 요약을 위해 OpenAI에 단 한 문장만 사용하라고 요청했음에도 불구하고 여러 문장을 사용합니다. OpenAI의 문서를 따르자 더 나은 결과를 얻었습니다.\n- 새 사용자들이 OpenAI 노드를 더 쉽게 사용할 수 있도록 노드 입력을 API에 파라미터를 보내는 데 초점을 맞추지 않고 [그들의 제안](https://platform.openai.com/docs/guides/completion/prompt-design)을 따르게 할 수 있습니다. 예를 들어, 프롬프트 필드 대신 예상 출력 형식 필드를 두는 것입니다.\n- ↕️ **max_tokens 매개변수 변경**은 결과를 크게 변화시킵니다 - 때로는 더 작게 설정하면 결과가 개선되기도 합니다 (예: OpenAI Classify 노드에서 yes/no 응답을 원할 때). 그들의 [문서](https://platform.openai.com/docs/guides/completion/inserting-text)에서 max_tokens>256을 추천하지만, [n8n의 기본 설정](https://community.n8n.io/t/openai-result-not-complete/21533)에서는 max_tokens=16을 사용합니다. 아마도 이를 업데이트해야 할 것입니다."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        null,
+        [
+          {
+            "node": "OpenAI Summary Backup",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Classify",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "SetFinal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Classify": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Summary Backup": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Reddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

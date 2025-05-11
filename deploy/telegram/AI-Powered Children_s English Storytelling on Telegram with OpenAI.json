@@ -1,0 +1,401 @@
+{
+  "meta": {
+    "instanceId": "84ba6d895254e080ac2b4916d987aa66b000f88d4d919a6b9c76848f9b8a7616",
+    "templateId": "2233"
+  },
+  "nodes": [
+    {
+      "id": "757a7e67-073a-4fa1-b571-2ddd147b35f6",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1000,
+        1240
+      ],
+      "parameters": {
+        "model": "gpt-3.5-turbo-16k-0613",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "761ed83a-2cfb-474a-b596-922e5a7e2717",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        660,
+        1060
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "41faf334-30d6-4cc0-9a94-9c486ec3fa6c",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1520,
+        1420
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d9ad0a3a-2ce6-4071-8262-8176b3eecf36",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1780,
+        220
+      ],
+      "parameters": {
+        "width": 1004.4263690337257,
+        "height": 811.7188223885136,
+        "content": "\"AI-Powered Children's English Storytelling on Telegram\"을 위한 워크플로우 설정\n\n이 가이드에서는 제공된 구성 파일을 사용하여 매력적인 어린이 이야기를 생성하고 공유하는 워크플로우를 설정하는 과정을 안내합니다. 이제 Telegram 채널에서 이러한 상상력 넘치는 이야기를 실현하기 위한 단계를 살펴보겠습니다.\n\n#### 워크플로우 설정 단계:\n1. **워크플로우 가져오기:**\n   - 제공된 워크플로우 JSON 구성을 복사합니다.\n   - n8n 인스턴스에서 Workflows로 이동하여 \"JSON에서 가져오기\"를 선택합니다.\n   - 구성을 붙여넣고 워크플로우를 가져옵니다.\n\n2. **노드 자격 증명 구성:**\n   - API 자격 증명(예: OpenAI 및 Telegram)이 필요한 노드의 경우, 적절한 API 키나 토큰으로 자격 증명을 생성합니다.\n\n3. **노드 매개변수 설정:**\n   - 채팅 ID, 프롬프트, 간격 등 필요한 노드 매개변수를 수정합니다.\n   - Config 노드의 chatId를 스토리가 게시될 채팅의 ID로 변경합니다.\n\n4. **데이터 흐름 확인:**\n   - 노드 간 연결을 확인하여 데이터와 작업의 원활한 흐름을 보장합니다.\n\n5. **한 번 실행 설정:**\n   - 설정 중에 작업을 한 번만 트리거하도록 필요한 노드에서 \"executeOnce\" 옵션을 활성화합니다.\n\n6. **워크플로우 테스트:**\n   - 워크플로우를 실행하여 각 노드가 올바르게 작동하고 데이터가 예상대로 처리되는지 확인합니다.\n\n7. **반복 트리거 활성화:**\n   - Schedule Trigger 노드가 원하는 간격(예: 12시간마다)으로 워크플로우를 트리거하도록 설정되었는지 확인합니다.\n\n8. **워크플로우 시작:**\n   - 모든 구성이 올바르게 완료되면 워크플로우를 활성화하여 Telegram에서 어린이 이야기를 생성하고 공유하기 시작합니다.\n\n이러한 단계를 세밀하게 따르면, 귀하의 청중을 위한 매력적인 어린이 이야기를 생성하도록 설계된 워크플로우를 원활하게 구축하고 운영할 수 있습니다. 자동화의 힘을 활용하여 어린이들의 마음을 자극하고, Telegram에서 공유되는 매력적인 이야기를 통해 스토리텔링에 대한 사랑을 키워보세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b550e4ff-167d-4b12-8dff-0511a435cd7c",
+      "name": "Create a Prompt for DALL-E",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        1500,
+        1280
+      ],
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "prompt": "Summarize the characters in this story based on their appearance and describe them if they are humans or animals and how they look like and what kind of are they, the prompt should be no-text in the picture, make sure the text is free from any prohibited or inappropriate content:\n\n\n\n\"{text}\"\n\n\nCONCISE SUMMARY:",
+              "summarizationMethod": "stuff"
+            }
+          }
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "024a3615-9e90-4e47-81e3-21febfc2f0c9",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {
+        "width": 611.6882702103559,
+        "height": 651.7145525871413,
+        "content": "어린이 이야기 워크플로우 설정 용도\n\n이 예를 확인하세요: [https://t.me/st0ries95](https://t.me/st0ries95)\n\n어린이 이야기 워크플로우는 콘텐츠 제작자, 교육자, 그리고 부모가 상상력과 교육적인 스토리텔링으로 아이들을 끌어들이기 위한 귀중한 도구로 작용합니다. 이 워크플로우의 주요 용도 몇 가지는 다음과 같습니다:\n\n1. **콘텐츠 제작:** 이 워크플로우는 구조화된 프레임워크와 스토리 생성, 오디오 제작, 이미지 제작을 위한 자동화를 제공하여 매력적인 어린이 이야기를 만드는 과정을 간소화합니다.\n\n2. **교육 자료:** 교사들은 스토리텔링을 통해 학습을 더 흥미롭고 상호작용적으로 만들 수 있는 교육 자료를 개발하기 위해 이 워크플로우를 사용할 수 있습니다.\n\n3. **부모 참여:** 부모들은 이 워크플로우를 활용하여 자녀와 개인화된 이야기를 공유하며, 읽기와 창의성을 사랑하게 하고, 공통의 스토리텔링 경험을 통해 유대감을 형성할 수 있습니다.\n\n4. **커뮤니티 구축:** 조직과 커뮤니티 그룹은 이 워크플로우를 활용하여 어린이 이야기를 만들어 공유하며, 청중과 연결하고 문해력과 창의성을 촉진할 수 있습니다.\n\n5. **젊은 마음 영감 주기:** 이 워크플로우는 매혹적인 어린이 이야기를 생성하고 공유하는 과정을 자동화하여 젊은 마음에 영감을 주고, 상상력을 자극하며, 아이들에게 스토리텔링에 대한 열정을 심어줍니다.\n\n전반적으로, 이 워크플로우의 용도는 스토리텔링이 아이들을 끌어들이고, 교육하며, 즐겁게 하는 다양한 환경으로 확장되며, 스토리텔링 경험을 향상시키는 다재다능한 도구입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "11bfff09-33c6-48ab-b9e6-2e5349a87ca5",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        1160,
+        1260
+      ],
+      "parameters": {
+        "options": {},
+        "chunkSize": 500,
+        "chunkOverlap": 300
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9da21054-961e-4b7a-973e-1c180571ce92",
+      "name": "Create a story",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        1080,
+        1060
+      ],
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "prompt": "Create a captivating short tale for kids, whisking them away to magical lands brimming with wisdom. Explore diverse themes in a fun and simple way, weaving in valuable messages. Dive into cultural adventures with lively language that sparks curiosity. Let your story inspire young minds through enchanting narratives that linger long after the last word. Begin crafting your imaginative tale now! (Approximately 900 characters)\n\n\n\"{text}\"\n\nCONCISE SUMMARY:",
+              "summarizationMethod": "stuff"
+            }
+          }
+        },
+        "chunkingMode": "advanced"
+      },
+      "executeOnce": true,
+      "typeVersion": 2
+    },
+    {
+      "id": "35579446-e11c-416b-b34a-b31e8461a1b3",
+      "name": "Generate Audio for the story",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1520,
+        1060
+      ],
+      "parameters": {
+        "input": "={{ $json.response.text }}",
+        "options": {},
+        "resource": "audio"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "executeOnce": true,
+      "typeVersion": 1.3
+    },
+    {
+      "id": "453d149f-a2a7-4fc9-ba3b-85b42df1c29b",
+      "name": "Generate a Picture for the story",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1840,
+        1280
+      ],
+      "parameters": {
+        "prompt": "=Produce an image ensuring that no text is generated within the visual content. {{ $json.response.text }}",
+        "options": {},
+        "resource": "image"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "8f324f12-b21e-4d0c-b7fa-5e2f93ba08aa",
+      "name": "Send Story Text",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1520,
+        840
+      ],
+      "parameters": {
+        "text": "={{ $json.response.text }}",
+        "chatId": "={{ $('Config').item.json.chatId }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "51a08f75-1c34-48a0-86de-b47e435ef618",
+      "name": "Send Audio for the story",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1720,
+        1060
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').item.json.chatId }}",
+        "operation": "sendAudio",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "End of the Story for today ....."
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "3f890a4d-26ea-452a-8ed5-917282e8b0d8",
+      "name": "Send Story Picture",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2020,
+        1280
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').item.json.chatId }}",
+        "operation": "sendPhoto",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "1cbec52c-b545-45df-885f-57c287f81017",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        880,
+        1060
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "327667cb-b5b0-4f6f-915c-544696ed8e5a",
+              "name": "chatId",
+              "type": "string",
+              "value": "-4170994782"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Create a story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a story": {
+      "main": [
+        [
+          {
+            "node": "Generate Audio for the story",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a Prompt for DALL-E",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Story Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create a story",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create a Prompt for DALL-E",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a Prompt for DALL-E": {
+      "main": [
+        [
+          {
+            "node": "Generate a Picture for the story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Audio for the story": {
+      "main": [
+        [
+          {
+            "node": "Send Audio for the story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate a Picture for the story": {
+      "main": [
+        [
+          {
+            "node": "Send Story Picture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Create a story",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

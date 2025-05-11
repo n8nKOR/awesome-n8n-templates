@@ -1,0 +1,1250 @@
+{
+  "id": "m9aACcHqydEbH4nR",
+  "meta": {
+    "instanceId": "205b3bc06c96f2dc835b4f00e1cbf9a937a74eeb3b47c99d0c30b0586dbf85aa"
+  },
+  "name": "[2/3] Set up medoids (2 types) for anomaly detection (crops dataset)",
+  "tags": [
+    {
+      "id": "spMntyrlE9ydvWFA",
+      "name": "anomaly-detection",
+      "createdAt": "2024-12-08T22:05:15.945Z",
+      "updatedAt": "2024-12-09T12:50:19.287Z"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "edaa871e-2b79-400e-8328-333d250bfdd2",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -660,
+        -220
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "ebd964de-faa4-4dc0-9245-cc9154b9ce02",
+      "name": "Total Points in Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        180,
+        -220
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').item.json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').item.json.collectionName }}/points/count",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"exact\": true\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "b51f6344-d090-4341-a908-581b78664b07",
+      "name": "Cluster Distance Matrix",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1200,
+        -360
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/search/matrix/offsets",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"sample\": $json.maxClusterSize,\n \"limit\": $json.maxClusterSize,\n \"using\": \"voyage\",\n \"filter\": {\n \"must\": {\n \"key\": \"crop_name\",\n \"match\": { \"value\": $json.cropName }\n }\n }\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "bebe5249-b138-4d7a-84b8-51eaed4331b8",
+      "name": "Scipy Sparse Matrix",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1460,
+        -360
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "from scipy.sparse import coo_array\n\ncluster = _input.item.json['result']\n\nscores = list(cluster['scores'])\noffsets_row = list(cluster['offsets_row'])\noffsets_col = list(cluster['offsets_col'])\n\ncluster_matrix = coo_array((scores, (offsets_row, offsets_col)))\nthe_most_similar_to_others = cluster_matrix.sum(axis=1).argmax()\n\nreturn {\n \"json\": {\n \"medoid_id\": cluster[\"ids\"][the_most_similar_to_others]\n }\n}\n"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "006c38bb-a271-40e1-9c5b-5a0a29ea96de",
+      "name": "Set medoid id",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2000,
+        -680
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/payload",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"payload\": {\"is_medoid\": true},\n \"points\": [$json.medoid_id]\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "aeeccfc5-67bf-4047-8a5a-8830e4fc87e8",
+      "name": "Get Medoid Vector",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2000,
+        -360
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"ids\": [$json.medoid_id],\n \"with_vector\": true,\n \"with_payload\": true\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "11fe54d5-9dc8-49ce-9e3f-1103ace0a3d5",
+      "name": "Prepare for Searching Threshold",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2240,
+        -360
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6faa5949-968c-42bf-8ce8-cf2403566eba",
+              "name": "oppositeOfCenterVector",
+              "type": "array",
+              "value": "={{ $json.result[0].vector.voyage.map(value => value * -1)}}"
+            },
+            {
+              "id": "84eb42be-2ea5-4a76-9c76-f21a962360a3",
+              "name": "cropName",
+              "type": "string",
+              "value": "={{ $json.result[0].payload.crop_name }}"
+            },
+            {
+              "id": "b68d2e42-0dde-4875-bb59-056f29b6ac0a",
+              "name": "centerId",
+              "type": "string",
+              "value": "={{ $json.result[0].id }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "4051b488-2e2e-4d33-9cc9-e1403c9173ed",
+      "name": "Searching Score",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2500,
+        -360
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/query",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"query\": $json.oppositeOfCenterVector,\n \"using\": \"voyage\",\n \"exact\": true,\n \"filter\": {\n \"must\": [\n {\n \"key\": \"crop_name\",\n \"match\": {\"value\": $json.cropName }\n }\n ]\n },\n \"limit\": $('Medoids Variables').first().json.furthestFromCenter,\n \"with_payload\": true\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "1c6cb6ee-ce3a-4d1a-b1b4-1e59e9a8f5b6",
+      "name": "Threshold Score",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2760,
+        -360
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "579a2ee4-0ab2-4fde-909a-01166624c9d8",
+              "name": "thresholdScore",
+              "type": "number",
+              "value": "={{ $json.result.points.last().score * -1 }}"
+            },
+            {
+              "id": "11eab775-f709-40a9-b0fe-d1059b67de05",
+              "name": "centerId",
+              "type": "string",
+              "value": "={{ $('Prepare for Searching Threshold').item.json.centerId }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "1bab1b9e-7b80-4ef3-8e3d-be4874792e58",
+      "name": "Set medoid threshold score",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2940,
+        -360
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/payload",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"payload\": {\"is_medoid_cluster_threshold\": $json.thresholdScore },\n \"points\": [$json.centerId]\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "cd5af197-4d79-49c2-aba6-a20571bd5c2e",
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        860,
+        80
+      ],
+      "parameters": {
+        "options": {
+          "destinationFieldName": ""
+        },
+        "fieldToSplitOut": "['text anchors']"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "956c126c-8bd6-4390-8704-3f0a5a2ce479",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1200,
+        -80
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "fieldsToMatchString": "cropName"
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "54a5d467-4985-49b5-9f13-e6563acf08b3",
+      "name": "Textual (visual) crop descriptions",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        380,
+        80
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "{\"text anchors\": [{\"cropName\": \"pearl_millet(bajra)\", \"cropDescription\": \"pearl_millet(bajra) - Tall stalks with cylindrical, spiked green grain heads.\"},\n{\"cropName\": \"tobacco-plant\", \"cropDescription\": \"tobacco-plant - Broad, oval leaves and small tubular flowers, typically pink or white.\"},\n{\"cropName\": \"cherry\", \"cropDescription\": \"cherry - Small, glossy red fruits on a medium-sized tree with slender branches and serrated leaves.\"},\n{\"cropName\": \"cotton\", \"cropDescription\": \"cotton - Bushy plant with fluffy white fiber-filled pods and lobed green leaves.\"},\n{\"cropName\": \"banana\", \"cropDescription\": \"banana - Tall herbaceous plant with broad, elongated green leaves and hanging bunches of yellow fruits.\"},\n{\"cropName\": \"cucumber\", \"cropDescription\": \"cucumber - Creeping vine with yellow flowers and elongated green cylindrical fruits.\"},\n{\"cropName\": \"maize\", \"cropDescription\": \"maize - Tall stalks with broad leaves, tassels at the top, and ears of corn sheathed in husks.\"},\n{\"cropName\": \"wheat\", \"cropDescription\": \"wheat - Slender, upright stalks with narrow green leaves and golden, spiky grain heads.\"},\n{\"cropName\": \"clove\", \"cropDescription\": \"clove - Small tree with oval green leaves and clusters of unopened reddish flower buds.\"},\n{\"cropName\": \"jowar\", \"cropDescription\": \"jowar - Tall grass-like plant with broad leaves and round, compact grain clusters at the top.\"},\n{\"cropName\": \"olive-tree\", \"cropDescription\": \"olive-tree - Medium-sized tree with silvery-green leaves and small oval green or black fruits.\"},\n{\"cropName\": \"soyabean\", \"cropDescription\": \"soyabean - Bushy plant with trifoliate green leaves and small pods containing rounded beans.\"},\n{\"cropName\": \"coffee-plant\", \"cropDescription\": \"coffee-plant - Shrub with shiny dark green leaves and clusters of small white flowers, followed by red berries.\"},\n{\"cropName\": \"rice\", \"cropDescription\": \"rice - Short, water-loving grass with narrow green leaves and drooping golden grain heads.\"},\n{\"cropName\": \"lemon\", \"cropDescription\": \"lemon - Small tree with glossy green leaves and oval yellow fruits.\"},\n{\"cropName\": \"mustard-oil\", \"cropDescription\": \"mustard-oil - Small herbaceous plant with yellow flowers and slender seed pods.\"},\n{\"cropName\": \"vigna-radiati(mung)\", \"cropDescription\": \"vigna-radiati(mung) - Low-growing plant with trifoliate leaves and small green pods containing mung beans.\"},\n{\"cropName\": \"coconut\", \"cropDescription\": \"coconut - Tall palm tree with feathery leaves and large round fibrous fruits.\"},\n{\"cropName\": \"gram\", \"cropDescription\": \"gram - Low bushy plant with feathery leaves and small pods containing round seeds.\"},\n{\"cropName\": \"pineapple\", \"cropDescription\": \"pineapple - Low plant with spiky, sword-shaped leaves and large, spiky golden fruits.\"},\n{\"cropName\": \"sugarcane\", \"cropDescription\": \"sugarcane - Tall, jointed stalks with long narrow leaves and a sweet interior.\"},\n{\"cropName\": \"sunflower\", \"cropDescription\": \"sunflower - Tall plant with rough green leaves and large bright yellow flower heads.\"},\n{\"cropName\": \"chilli\", \"cropDescription\": \"chilli - Small bushy plant with slender green or red elongated fruits.\"},\n{\"cropName\": \"fox_nut(makhana)\", \"cropDescription\": \"fox_nut(makhana) - Aquatic plant with floating round leaves and spiny white seeds.\"},\n{\"cropName\": \"jute\", \"cropDescription\": \"jute - Tall plant with long, straight stalks and narrow green leaves.\"},\n{\"cropName\": \"papaya\", \"cropDescription\": \"papaya - Medium-sized tree with hollow trunk, large lobed leaves, and yellow-orange pear-shaped fruits.\"},\n{\"cropName\": \"tea\", \"cropDescription\": \"tea - Small shrub with glossy dark green leaves and small white flowers.\"},\n{\"cropName\": \"cardamom\", \"cropDescription\": \"cardamom - Low tropical plant with broad leaves and clusters of small, light green pods.\"},\n{\"cropName\": \"almond\", \"cropDescription\": \"almond - Medium-sized tree with serrated leaves and oval green pods containing edible nuts.\"}]}\n"
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "14c25e76-8a2c-4df8-98ea-b2f31b15fd1f",
+      "name": "Embed text",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1460,
+        -80
+      ],
+      "parameters": {
+        "url": "https://api.voyageai.com/v1/multimodalembeddings",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"inputs\": [\n {\n \"content\": [\n {\n \"type\": \"text\",\n \"text\": $json.cropDescription\n }\n ]\n }\n ],\n \"model\": \"voyage-multimodal-3\",\n \"input_type\": \"query\"\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Vb0RNVDnIHmgnZOP",
+          "name": "Voyage API"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "8763db0a-9a92-4ffd-8a40-c7db614b735f",
+      "name": "Get Medoid by Text",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1640,
+        -80
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/query",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"query\": $json.data[0].embedding,\n \"using\": \"voyage\",\n \"exact\": true,\n \"filter\": {\n \"must\": [\n {\n \"key\": \"crop_name\",\n \"match\": {\"value\": $('Merge').item.json.cropName }\n }\n ]\n },\n \"limit\": 1,\n \"with_payload\": true,\n \"with_vector\": true\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "5c770ca2-6e1a-4c4b-80e0-dcbeeda43a0f",
+      "name": "Set text medoid id",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2000,
+        160
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/payload",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"payload\": {\"is_text_anchor_medoid\": true},\n \"points\": [$json.result.points[0].id]\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "c08ff472-51ab-4c3d-b9c0-2170fda2ccef",
+      "name": "Prepare for Searching Threshold1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2300,
+        80
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6faa5949-968c-42bf-8ce8-cf2403566eba",
+              "name": "oppositeOfCenterVector",
+              "type": "array",
+              "value": "={{ $json.result.points[0].vector.voyage.map(value => value * -1)}}"
+            },
+            {
+              "id": "84eb42be-2ea5-4a76-9c76-f21a962360a3",
+              "name": "cropName",
+              "type": "string",
+              "value": "={{ $json.result.points[0].payload.crop_name }}"
+            },
+            {
+              "id": "b68d2e42-0dde-4875-bb59-056f29b6ac0a",
+              "name": "centerId",
+              "type": "string",
+              "value": "={{ $json.result.points[0].id }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "84ba4de5-aa9b-43fb-89cb-70db0b3ca334",
+      "name": "Threshold Score1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2820,
+        80
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "579a2ee4-0ab2-4fde-909a-01166624c9d8",
+              "name": "thresholdScore",
+              "type": "number",
+              "value": "={{ $json.result.points.last().score * -1 }}"
+            },
+            {
+              "id": "11eab775-f709-40a9-b0fe-d1059b67de05",
+              "name": "centerId",
+              "type": "string",
+              "value": "={{ $('Prepare for Searching Threshold1').item.json.centerId }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "f490d224-38a8-4087-889d-1addb4472471",
+      "name": "Searching Text Medoid Score",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2560,
+        80
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/query",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"query\": $json.oppositeOfCenterVector,\n \"using\": \"voyage\",\n \"exact\": true,\n \"filter\": {\n \"must\": [\n {\n \"key\": \"crop_name\",\n \"match\": {\"value\": $json.cropName }\n }\n ]\n },\n \"limit\": $('Text Medoids Variables').first().json.furthestFromCenter,\n \"with_payload\": true\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "f5035aca-1706-4c8d-bd26-49b3451ae04b",
+      "name": "Medoids Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -140,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5eb23ad2-aacd-468f-9a27-ef2b63e6bd08",
+              "name": "furthestFromCenter",
+              "type": "number",
+              "value": 5
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "c9cad66d-4a76-4092-bfd6-4860493f942a",
+      "name": "Text Medoids Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -140,
+        80
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5eb23ad2-aacd-468f-9a27-ef2b63e6bd08",
+              "name": "furthestFromCenter",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "ecab63f7-7a72-425a-8f5a-0c707e7f77bc",
+      "name": "Qdrant cluster variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -420,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "58b7384d-fd0c-44aa-9f8e-0306a99be431",
+              "name": "qdrantCloudURL",
+              "type": "string",
+              "value": "=https://152bc6e2-832a-415c-a1aa-fb529f8baf8d.eu-central-1-0.aws.cloud.qdrant.io"
+            },
+            {
+              "id": "e34c4d88-b102-43cc-a09e-e0553f2da23a",
+              "name": "collectionName",
+              "type": "string",
+              "value": "=agricultural-crops"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "6e81f0b0-3843-467e-9c93-40026e57fa91",
+      "name": "Info About Crop Clusters",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        600,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5327b254-b703-4a34-a398-f82edb1d6d6b",
+              "name": "=cropsNumber",
+              "type": "number",
+              "value": "={{ $json.result.hits.length }}"
+            },
+            {
+              "id": "79168efa-11b8-4a7b-8851-da9c8cbd700b",
+              "name": "maxClusterSize",
+              "type": "number",
+              "value": "={{ Math.max(...$json.result.hits.map(item => item.count)) }}"
+            },
+            {
+              "id": "e1367cec-9629-4c69-a8d7-3eeae3ac94d3",
+              "name": "cropNames",
+              "type": "array",
+              "value": "={{ $json.result.hits.map(item => item.value)}}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "20191c0a-5310-48f2-8be4-1d160f237db2",
+      "name": "Crop Counts",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        380,
+        -220
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/facet",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"key\": \"crop_name\",\n \"limit\": $json.result.count,\n \"exact\": true\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "a81103bb-6522-49a2-8102-83c7e004b9b3",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1260,
+        -340
+      ],
+      "parameters": {
+        "width": 520,
+        "height": 240,
+        "content": "## 이상 탐지를 위한 Medoids 설정\n\n### 클러스터 센터와 클러스터 임계값 점수를 설정하기 위한 준비 작업, 이를 기반으로 이상을 탐지할 수 있도록\n\n여기서, 우리는 이러한 센터를 설정하기 위해 두 가지 접근 방식을 사용하고 있습니다: 상위 브랜치는 \"거리 행렬 접근법\"이고, 하위는 \"다중 모달 임베딩 모델 접근법\"입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "38fc8252-7e27-450d-b09e-59ceaebc5378",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -420,
+        -340
+      ],
+      "parameters": {
+        "height": 80,
+        "content": "다시 한 번, Qdrant의 변수: 클러스터 URL과 우리가 작업 중인 컬렉션"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2d0e3b52-d382-428c-9b37-870f4c53b8e7",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -140,
+        -360
+      ],
+      "parameters": {
+        "height": 100,
+        "content": "클러스터에서 임계값을 그리기 위해 사용하는 점은: 중심에서 가장 먼 점, 또는 2번째, ... X번째 가장 먼 점;"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b0b300f3-e2c9-4c36-8a1d-6705932c296c",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        -500
+      ],
+      "parameters": {
+        "width": 180,
+        "height": 240,
+        "content": "여기서 우리는 [facet counts](https://qdrant.tech/documentation/concepts/payload/?q=facet#facet-counts)를 가져오고 있습니다: \"crop_name\" 페이로드 뒤에 어떤 고유 값들이 있는지와, 이러한 값들을 가진 포인트가 각각 얼마나 많은지에 대한 정보(예를 들어, 31개의 \"cucumber\"와 29개의 \"cotton\"이 있습니다)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0d2584da-5fd0-4830-b329-c78b0debf584",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -140,
+        260
+      ],
+      "parameters": {
+        "height": 120,
+        "content": "클러스터에서 임계값을 그리는 데 사용하는 점은: 가운데에서 가장 먼 것, 또는 2번째, ... X번째 가장 먼 것;  \n<이것은 2번째 접근법입니다>"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f4c98469-d426-415c-916d-1bc442cf6a21",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        -400
+      ],
+      "parameters": {
+        "height": 140,
+        "content": "우리는 Qdrant 컬렉션에서 [포인트의 총량](https://qdrant.tech/documentation/concepts/points/?q=count#counting-points)을 가져와야 합니다. 이를 *\"Crop Counts\"* 노드의 `limit`으로 사용하기 위해, 그래서 정보를 잃지 않기 위해; <최선의 방법은 아님>"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "037af9df-34c4-488d-8c89-561ac25247c4",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        600,
+        -640
+      ],
+      "parameters": {
+        "width": 220,
+        "height": 380,
+        "content": "여기서 우리는 작물 클러스터에 대한 모든 정보를 추출하고 수집하고 있습니다. 이렇게 하면 각 클러스터에 대해 [Qdrant distance matrix API](https://qdrant.tech/documentation/concepts/explore/?q=distance+#distance-matrix)를 호출할 수 있습니다.  \n우리는 **가장 큰 클러스터 크기** (레이블된 데이터의, 우리 경우 모든 데이터가 레이블됨; 실제 사용 사례에서 레이블된 데이터가 수백 개 이상인 경우 거리 매트릭스 API를 호출하지 마세요), **고유 작물 값의 수** 및 **고유 작물 값** 자체를 전파하고 있습니다. 우리는 고유 작물 클러스터당 한 번 알고리즘을 실행할 것입니다 (그의 중심과 임계값을 찾기 위해)."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b4e635e3-233d-4358-ad11-250a2b14a2f7",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        260
+      ],
+      "parameters": {
+        "height": 200,
+        "content": "각 작물의 일반적인 외모에 대한 하드코딩된 설명; 그들은 ChatGPT로 생성되었으며, 작물 이름이나 작물 사진을 기반으로 n8n에서 직접 기술적으로 수행할 수 있습니다 (우리는 작물의 가장 정상적인 표본이 어떻게 생겼는지에 대한 좋은 설명이 필요합니다)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4fda1841-e7e3-4bd2-acf2-ee7338598184",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -800
+      ],
+      "parameters": {
+        "height": 400,
+        "content": "각 클러스터당 한 번 [거리 행렬 API](https://qdrant.tech/documentation/concepts/explore/?q=distance+#distance-matrix)를 호출합니다. \n\n`sample` - 샘플링할 포인트의 수 (여기서는 `crop_name` 필드로 필터링되므로, 각 클러스터 내에서 샘플링하며, `sample`에 가장 큰 클러스터 크기를 전달하므로 각 클러스터의 모든 포인트를 가져옵니다).\n\n`limit`은 계산할 이웃 거리의 수입니다. 클러스터 내 포인트 간의 모든 쌍별 거리를 원하므로, 여기에 다시 한 번 가장 큰 클러스터 크기와 같은 상한을 설정합니다;"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "19c4bb6d-abcb-423b-b883-48c779d0307d",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        860,
+        -220
+      ],
+      "parameters": {
+        "include": "allOtherFields",
+        "options": {
+          "destinationFieldName": "cropName"
+        },
+        "fieldToSplitOut": "cropNames"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f6d74ced-1998-4dbd-ab04-ca1b6ea409a5",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        840,
+        -60
+      ],
+      "parameters": {
+        "width": 150,
+        "height": 80,
+        "content": "각 고유 작물 클러스터로 분할"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b3adb2bc-61f5-42ff-bb5d-11faa12189b7",
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1460,
+        -640
+      ],
+      "parameters": {
+        "width": 180,
+        "height": 240,
+        "content": "Qdrant에서 생성된 거리 행렬과 scipy의 `coo_array`를 사용하여, 각 클러스터에 대한 대표자를 찾고 있습니다(클러스터 내의 다른 모든 점에 가장 유사한 점, 코사인 거리를 기반으로)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d9d3953e-8b69-4b6a-86f2-b2d2db28d4ad",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        100
+      ],
+      "parameters": {
+        "height": 280,
+        "content": "이 접근 방식을 통해 대표를 찾기 위해, 우리는:  \n1) 작물 설명을 이미지에 사용한 동일한 Voyage 모델로 임베드한다 (모델이 다중 모달이기 때문에 가능하다)  \n2) 각 (작물) 클러스터에 대해, 이 임베드된 설명에 Cosine 유사도 지표로 가장 가까운 이미지를 찾는다. 이를 클러스터의 완벽한 대표로 간주할 것이다"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8751efd4-d85e-4dc8-86ef-90073d49b6df",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1460,
+        100
+      ],
+      "parameters": {
+        "width": 160,
+        "height": 140,
+        "content": "설명 임베딩을 Voyage 모델로 수행하세요. [노트] `input_type`에 주의하세요, 그것은 \"query\"입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "652bc70a-4e6f-416a-977b-5d29ae9cb4f0",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1640,
+        100
+      ],
+      "parameters": {
+        "height": 260,
+        "content": "설명 임베딩에 가장 가까운 이미지를 클러스터별로 찾기  \n[Note] `exact` 매개변수에 주의하세요  \n[Note] `limit`은 1입니다. 왜냐하면 벡터 데이터베이스는 항상 가장 유사한 것부터 가장 덜 유사한 순으로 점을 반환하기 때문입니다.  \n[Note] `using` 매개변수가 여기에 있는 이유는 이전 파이프라인에서 업로드된 우리 벡터가 *\"voyage\"*로 명명되었기 때문입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a5836982-0de0-4692-883c-267602468ed2",
+      "name": "Set text medoid threshold score",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        3000,
+        80
+      ],
+      "parameters": {
+        "url": "={{ $('Qdrant cluster variables').first().json.qdrantCloudURL }}/collections/{{ $('Qdrant cluster variables').first().json.collectionName }}/points/payload",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"payload\": {\"is_text_anchor_medoid_cluster_threshold\": $json.thresholdScore },\n \"points\": [$json.centerId]\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "5354d197-be5e-4add-b721-9e5e3943e53d",
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1960,
+        -460
+      ],
+      "parameters": {
+        "width": 200,
+        "height": 80,
+        "content": "ID로 센터들의 벡터를 가져오기"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "93043602-92bc-40ac-b967-ddb7289e5d22",
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2000,
+        -820
+      ],
+      "parameters": {
+        "height": 100,
+        "content": "Qdrant에서 \"is_medoid\" 페이로드를 \"distance matrix approach\"에 의해 중심으로 정의된 포인트들에 대해 설정하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "cb1364ad-e21c-4336-9a5b-15e80c2ed2f2",
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2280,
+        260
+      ],
+      "parameters": {
+        "height": 180,
+        "content": "여기서, \"거리 행렬 접근법\"처럼 포인트 ID로 벡터를 가져올 필요가 없습니다. 왜냐하면 이전 노드의 API 호출이 Qdrant에 저장된 벡터를 응답으로 반환할 수 있기 때문입니다. 반면, 거리 행렬 API는 포인트 ID만 반환합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6d735a28-a93e-41f1-9889-2557a1dd7aec",
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1980,
+        320
+      ],
+      "parameters": {
+        "height": 140,
+        "content": "Qdrant에서 \"*is_text_anchor_medoid*\" [payloads](https://qdrant.tech/documentation/concepts/payload/)를 \"*multimodal embedding model approach*\"에 의해 중심으로 정의된 포인트에 설정하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7c6796a9-260b-41c0-9ac7-feb5d4d95c19",
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2240,
+        -500
+      ],
+      "parameters": {
+        "width": 440,
+        "height": 100,
+        "content": "여기부터, 이 노드와 다음 세 개의 노드는 두 방법에 대해 유사하며, 변수 이름만 다릅니다. 목표는 클래스(클러스터) 임계값 점수를 찾는 것이며, 이를 각 클래스에 대한 이상 탐지에 사용할 수 있도록 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5025936d-d49c-4cc1-a675-3bde71627c40",
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2280,
+        -180
+      ],
+      "parameters": {
+        "height": 220,
+        "content": "각 클래스 내에서 중심 벡터에 가장 유사하지 않은 점을 찾는 것은 중심 벡터의 반대(즉, 모든 좌표를 -1로 곱한 벡터)에 가장 유사한 점을 찾는 것과 동일하다. 이는 우리가 사용하는 코사인 벡터 유사성 측정법에서 항상 참이다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "fa9026e4-0c92-4755-92a0-5e400b5f04c9",
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2580,
+        -140
+      ],
+      "parameters": {
+        "width": 520,
+        "height": 140,
+        "content": "그래서 여기서, 우리는 crop class 내에서 class centre에 가장 dissimilar한 점을 찾았습니다(또는 이 파이프라인의 시작 부분에서 설정된 변수에 따라 X번째 dissimilar한 점). 우리의 임계값 점수는 이 점과 class centre 사이의 similarity score입니다. 이제 우리는 그것을 각 class centre point의 메타 정보로 저장하고 있습니다. 이상 탐지를 위한 모든 준비 작업이 완료되었습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8e172a7c-6865-4daf-9d9c-86e0dba2c0a2",
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -900,
+        -820
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 540,
+        "height": 300,
+        "content": "### 이상 탐지\n1. 첫 번째 파이프라인은 (작물) 데이터셋을 Qdrant의 컬렉션에 업로드하는 것입니다.\n2. **이것은 두 번째 파이프라인으로, 이 Qdrant 컬렉션에서 클러스터 (클래스) 중심을 설정하고 클러스터 (클래스) 임계값 점수를 설정하는 것입니다.**\n3. 세 번째는 이상 탐지 도구로, 입력으로 어떤 이미지든 받아 Qdrant (작물) 컬렉션에서 수행된 모든 준비 작업을 사용합니다.\n\n### 이를 재현하기 위해\n[crops](https://www.kaggle.com/datasets/mdwaquarazam/agricultural-crops-image-classification) 데이터셋을 Kaggle에서 자신의 Google Storage 버킷에 업로드해야 하며, [Qdrant Cloud](https://qdrant.tech/documentation/quickstart-cloud/)에 대한 API/연결을 재생성해야 합니다 (무료 티어 클러스터를 사용할 수 있음), Voyage AI API 및 Google Cloud Storage를 재생성하세요.\n\n**일반적으로, 파이프라인은 어떤 이미지 데이터셋에도 적용할 수 있습니다.**"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a23fc305-7ecd-4754-b208-2d964d9b1eda",
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Embed text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Cluster Distance Matrix",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embed text": {
+      "main": [
+        [
+          {
+            "node": "Get Medoid by Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Crop Counts": {
+      "main": [
+        [
+          {
+            "node": "Info About Crop Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set medoid id": {
+      "main": [
+        []
+      ]
+    },
+    "Searching Score": {
+      "main": [
+        [
+          {
+            "node": "Threshold Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threshold Score": {
+      "main": [
+        [
+          {
+            "node": "Set medoid threshold score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threshold Score1": {
+      "main": [
+        [
+          {
+            "node": "Set text medoid threshold score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Medoid Vector": {
+      "main": [
+        [
+          {
+            "node": "Prepare for Searching Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Medoids Variables": {
+      "main": [
+        [
+          {
+            "node": "Total Points in Collection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Medoid by Text": {
+      "main": [
+        [
+          {
+            "node": "Set text medoid id",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare for Searching Threshold1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scipy Sparse Matrix": {
+      "main": [
+        [
+          {
+            "node": "Set medoid id",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Medoid Vector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Medoids Variables": {
+      "main": [
+        [
+          {
+            "node": "Textual (visual) crop descriptions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cluster Distance Matrix": {
+      "main": [
+        [
+          {
+            "node": "Scipy Sparse Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info About Crop Clusters": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant cluster variables": {
+      "main": [
+        [
+          {
+            "node": "Medoids Variables",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Text Medoids Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total Points in Collection": {
+      "main": [
+        [
+          {
+            "node": "Crop Counts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Searching Text Medoid Score": {
+      "main": [
+        [
+          {
+            "node": "Threshold Score1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for Searching Threshold": {
+      "main": [
+        [
+          {
+            "node": "Searching Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for Searching Threshold1": {
+      "main": [
+        [
+          {
+            "node": "Searching Text Medoid Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Qdrant cluster variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Textual (visual) crop descriptions": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

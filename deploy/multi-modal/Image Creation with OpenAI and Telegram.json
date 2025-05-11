@@ -1,0 +1,257 @@
+{
+  "meta": {
+    "instanceId": "f691e434c527bcfc50a22f01094756f14427f055aa0b6917a75441617ecd7fb2"
+  },
+  "nodes": [
+    {
+      "id": "a998289c-65da-49ea-ba8a-4b277d9e16f3",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        1060,
+        640
+      ],
+      "webhookId": "2901cde3-b35a-4b0b-a1ba-17a7d9f80125",
+      "parameters": {
+        "updates": [
+          "message",
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "pbbCqv0hRu9TDmWm",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "7f50072a-5312-4a47-823e-0513cd9d383a",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1380,
+        640
+      ],
+      "parameters": {
+        "prompt": "={{ $json.message.text }}",
+        "options": {},
+        "resource": "image"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "p4Qrsjiuev2epBzW",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "a59264d6-c199-4d7b-ade4-1e31f10eb632",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1580,
+        1000
+      ],
+      "parameters": {
+        "chatId": "={{ $json.data[1].message.from.id }}",
+        "operation": "sendPhoto",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "pbbCqv0hRu9TDmWm",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "e0719c38-75ae-4082-91ba-d68c7cd28339",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1060,
+        1000
+      ],
+      "parameters": {},
+      "typeVersion": 2.1
+    },
+    {
+      "id": "bee14b74-248b-4e17-9221-378daff965aa",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        1320,
+        1000
+      ],
+      "parameters": {
+        "options": {
+          "includeBinaries": true
+        },
+        "aggregate": "aggregateAllItemData"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "50293949-3dc0-4b35-a040-a3ad1a9e80d0",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -60,
+        479.3775380651615
+      ],
+      "parameters": {
+        "width": 1036.6634532467683,
+        "height": 671.0981521245417,
+        "content": "# N8N 워크플로우: AI 강화된 이미지 처리 및 커뮤니케이션\n\n## 설명:\n이 n8n 워크플로우는 인공 지능을 통합하여 이미지 처리 작업을 최적화하고 Telegram을 통해 커뮤니케이션을 간소화합니다. 워크플로우의 각 노드는 사용자 참여를 강화하고 효율적인 커뮤니케이션을 촉진하는 특정한 이점을 제공합니다.\n\n## 제목:\nAI 강화된 이미지 처리 및 커뮤니케이션 워크플로우 with n8n\n\n## 노드 이름 및 이점:\n\n\n3. Telegram 계정 및 OpenAI API에 필요한 자격 증명을 설정합니다.\n4. 각 노드를 구성하여 이점을 최대화하고 사용자 참여를 최적화합니다.\n5. 워크플로우를 실행하여 AI 강화된 이미지 처리 및 커뮤니케이션 기능을 활용하여 사용자 상호작용을 향상시킵니다.\n6. 처리 중 발생할 수 있는 오류나 문제를 워크플로우 실행을 모니터링합니다.\n7. 워크플로우 노드, 매개변수 또는 AI 모델을 맞춤화하여 특정 비즈니스 목표 및 사용자 참여 전략과 일치시킵니다.\n8. AI 기반 이미지 처리 및 Telegram의 대화형 커뮤니케이션의 힘을 활용하여 사용자 참여 및 만족도를 높입니다.\n\n## AI 기반 이미지 처리와 Telegram의 원활한 커뮤니케이션을 통해 사용자 참여 전략을 높이세요! n8n을 사용하여!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "529fb39e-5140-41b2-8454-2a1c45d670d0",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1000,
+        480
+      ],
+      "parameters": {
+        "width": 276.16526553869744,
+        "height": 296.62433647952383,
+        "content": "**텔레그램 트리거 노드**:\n\n- 이점: Telegram의 사용자들로부터 들어오는 메시지를 기반으로 워크플로를 시작하여 실시간 상호작용과 통신을 가능하게 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "339bc4ff-bca0-48ee-98ce-bbf7deb3f6fc",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1320,
+        480
+      ],
+      "parameters": {
+        "width": 238.40710655577766,
+        "height": 316.8446819098802,
+        "content": "**오픈AI 노드**:\n- 이점: 메시지의 텍스트 내용을 분석하기 위해 AI 알고리즘을 활용하여 지능적인 응답을 생성하고 커뮤니케이션의 질을 향상시킵니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "64216b05-5a6e-44f5-8cf1-86487368d892",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        820
+      ],
+      "parameters": {
+        "width": 229.95409290591755,
+        "height": 332.7896020182219,
+        "content": "**텔레그램 노드**:  \n- 이점: 처리된 데이터, 이미지와 응답을 포함하여, 텔레그램의 사용자에게 다시 전송하여 원활한 커뮤니케이션과 사용자 참여를 보장합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c15a57ee-f461-43d0-9232-b6d2728ee058",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1260,
+        820
+      ],
+      "parameters": {
+        "height": 332.78960201822133,
+        "content": "병합 노드:  \n- 이점: 처리된 데이터를 결합하고 조직화하여 효율적인 처리와 통합을 가능하게 하며, 워크플로의 데이터 관리 기능을 최적화합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f6f0aaac-426a-4923-9100-a52f53e78dec",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1000,
+        820
+      ],
+      "parameters": {
+        "height": 326.33042266316727,
+        "content": "**집계 노드**:  \n- 이점: 지정된 경우 이진 파일을 포함하여 모든 항목 데이터를 집계하여 포괄적인 보고와 분석을 가능하게 하며, 의사 결정과 성과 평가를 지원합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c36d8d68-0641-4e6d-92b1-82879d81e2c9",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        460
+      ],
+      "parameters": {
+        "color": 2,
+        "width": 1837.5703604833238,
+        "height": 706.8771853945606,
+        "content": "다음 텍스트를 영어에서 한국어로 번역하세요. 추가 설명이나 형식 없이 번역된 한국어 텍스트만 반환하세요."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  }
+}

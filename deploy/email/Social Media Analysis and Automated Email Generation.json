@@ -1,0 +1,693 @@
+{
+  "nodes": [
+    {
+      "id": "a768bce6-ae26-464c-95fc-009edea4f94d",
+      "name": "Set your company's variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a8063b6-1fd8-429a-9f13-b7512066c702",
+              "name": "your_company_name",
+              "type": "string",
+              "value": "Pollup Data Services"
+            },
+            {
+              "id": "3e6780d6-86d0-4353-aa17-8470a91f63a8",
+              "name": "your_company_activity",
+              "type": "string",
+              "value": "Whether it’s automating recurring tasks, analysing data faster, or personalising customer interactions, we build bespoke AI agents to help your workforce work smarter."
+            },
+            {
+              "id": "1b42f1b3-20ed-4278-952d-f28fe0f03fa3",
+              "name": "your_email",
+              "type": "string",
+              "value": "thomas@pollup.net"
+            },
+            {
+              "id": "7c109ba2-d855-49d5-8700-624b01a05bc1",
+              "name": "your_name",
+              "type": "string",
+              "value": "Justin"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "ca729f8d-cab8-4221-addb-aa23813d80b4",
+      "name": "Get linkedin Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1300,
+        0
+      ],
+      "parameters": {
+        "url": "https://fresh-linkedin-profile-data.p.rapidapi.com/get-profile-posts",
+        "options": {},
+        "sendQuery": true,
+        "sendHeaders": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "linkedin_url",
+              "value": "={{ $('Google Sheets Trigger').item.json.linkedin_url }}"
+            },
+            {
+              "name": "type",
+              "value": "posts"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "fresh-linkedin-profile-data.p.rapidapi.com"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nhoVFnkO31mejJrI",
+          "name": "RapidAPI Key"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "b9559958-f8ac-4ab6-93c6-50eb04113808",
+      "name": "Get twitter ID",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        680,
+        0
+      ],
+      "parameters": {
+        "url": "https://twitter-api47.p.rapidapi.com/v2/user/by-username",
+        "options": {},
+        "sendQuery": true,
+        "sendHeaders": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "username",
+              "value": "={{ $('Google Sheets Trigger').item.json.twitter_handler }}"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "twitter-api47.p.rapidapi.com"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nhoVFnkO31mejJrI",
+          "name": "RapidAPI Key"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "3e85565f-ebfa-4568-9391-869961c5b3ed",
+      "name": "Get tweets",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "url": "https://twitter-api47.p.rapidapi.com/v2/user/tweets",
+        "options": {},
+        "sendQuery": true,
+        "sendHeaders": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $json.rest_id }}"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "twitter-api47.p.rapidapi.com"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nhoVFnkO31mejJrI",
+          "name": "RapidAPI Key"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "6e060b21-9eaf-49e6-9665-c051b3f2397e",
+      "name": "Extract and limit Linkedin",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1520,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\noutput = []\nmax_posts = 10\nlet counter = 0\nfor (const item of $input.all()[0].json.data) {\n let post = {\n title: item.article_title,\n text: item.text\n }\n output.push(post)\n if(counter++ >= max_posts) break;\n}\n\nreturn {\"linkedIn posts\": output};"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "e65bc472-e7c6-43c5-8e84-fe8c4512e92f",
+      "name": "Exract and limit X",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1100,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\noutput = []\nmax_posts = 10\nlet counter = 0\nfor (const item of $input.all()[0].json.tweets) {\n if(!item.content.hasOwnProperty('itemContent')) continue\n let post = {\n text: item.content.itemContent?.tweet_results?.result.legacy?.full_text\n }\n console.log(post)\n output.push(post)\n if(counter++ >= max_posts) break;\n}\n\nreturn {\"Twitter tweets\": output};"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "10f088a0-0479-428e-96cf-fe0df9b37877",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1740,
+        200
+      ],
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "yepsCCAriRlCkICW",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9adfd648-8348-4a0a-8b9b-d54dc3b715bb",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1920,
+        220
+      ],
+      "parameters": {
+        "jsonSchemaExample": "{\n \"subject\": \"\",\n \"cover_letter\": \"\"\n}"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "af96003c-539d-4728-832c-4819d85bbbcc",
+      "name": "Generate Subject and cover letter based on match",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1720,
+        0
+      ],
+      "parameters": {
+        "text": "=## Me\n- My company name is: {{ $('Set your company\\'s variables').item.json.your_company_name }}\n- My company's activity is: {{ $('Set your company\\'s variables').item.json.your_company_activity }}\n- My name is: {{ $('Set your company\\'s variables').item.json.your_name }}\n- My email is: {{ $('Set your company\\'s variables').item.json.your_email }}\n\n## My lead:\nHis name: {{ $('Google Sheets Trigger').item.json.name }}\n\n## What I want you to do\n- According to the info about me, and the linkedin posts an twitter post of a user given below, I want you to find a common activity that I could propose to this person and generate a cover letter about it\n- Return ONLY the cover letter and the subject as a json like this:\n{\n \"subject\": \"\",\n \"cover_letter\": \"\"\n}\n\nTHe cover letter should be in HTML format\n\n## The Linkedin Posts:\n{{ JSON.stringify($json[\"linkedIn posts\"])}}\n\n## THe Twitter posts:\n{{ JSON.stringify($('Exract and limit X').item.json['Twitter tweets']) }}\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a helpful Marketing assistant"
+            }
+          ]
+        },
+        "promptType": "define",
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.5
+    },
+    {
+      "id": "6954285f-7ea5-4e3d-8be2-03051d716d03",
+      "name": "Send Cover letter and CC me",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        2080,
+        0
+      ],
+      "parameters": {
+        "html": "={{ $json.output.cover_letter }}",
+        "options": {},
+        "subject": "={{ $json.output.subject }}",
+        "toEmail": "={{ $('Google Sheets Trigger').item.json.email }}, {{ $('Set your company\\'s variables').item.json.your_email }}",
+        "fromEmail": "thomas@pollup.net"
+      },
+      "credentials": {
+        "smtp": {
+          "id": "yrsGGdbYvSB8u7sx",
+          "name": "SMTP account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "357477a8-98c3-48a5-8c88-965f90a4beb2",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        360,
+        -280
+      ],
+      "parameters": {
+        "color": 4,
+        "height": 480,
+        "content": "## 여기에 개인화하세요\n\n### 설정: \n- 귀하의 이름\n- 귀하의 회사 이름\n- 귀하의 회사 활동, 귀하의 리드와 매치를 찾는 데 사용\n- 귀하의 이메일, 보낸 사람으로 사용\n\n### 출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0c26383c-c8f1-44b1-995e-2c88118061bb",
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "position": [
+        -40,
+        20
+      ],
+      "parameters": {
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange"
+            }
+          }
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IcvbbG_WScVNyutXhzqyE9NxdxNbY90Dd63R8Y1UrAw/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1IcvbbG_WScVNyutXhzqyE9NxdxNbY90Dd63R8Y1UrAw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IcvbbG_WScVNyutXhzqyE9NxdxNbY90Dd63R8Y1UrAw/edit?usp=drivesdk",
+          "cachedResultName": "Analyze social media of a lead"
+        }
+      },
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "LBJHhfLqklwl9les",
+          "name": "Google Sheets Trigger account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "923cca3d-69a9-4d26-80a3-e9062d42d8a8",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2280,
+        0
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "done": "X",
+            "linkedin_url": "={{ $('Google Sheets Trigger').item.json.linkedin_url }}"
+          },
+          "schema": [
+            {
+              "id": "linkedin_url",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "linkedin_url",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "twitter_handler",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "twitter_handler",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "email",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "done",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "done",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "linkedin_url"
+          ]
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IcvbbG_WScVNyutXhzqyE9NxdxNbY90Dd63R8Y1UrAw/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1IcvbbG_WScVNyutXhzqyE9NxdxNbY90Dd63R8Y1UrAw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IcvbbG_WScVNyutXhzqyE9NxdxNbY90Dd63R8Y1UrAw/edit?usp=drivesdk",
+          "cachedResultName": "Analyze social media of a lead"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gdLmm513ROUyH6oU",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.5
+    },
+    {
+      "id": "6df02119-09db-4d87-b435-7753693b27aa",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        180,
+        20
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3839b337-6c33-4907-ba75-8ef04cefc14c",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.done }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "looseTypeValidation": true
+      },
+      "executeOnce": false,
+      "typeVersion": 2.2,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "2edaa85e-ef69-490c-9835-cf8779cada6d",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -120,
+        -320
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 260,
+        "height": 500,
+        "content": "## 다음 열을 가진 Gooogle 시트를 생성하세요:\n- linkedin_url\n- name\n- twitter_handler\n- email\n- done\n\n그리고 \"done\" 열을 제외하고 그 안에 일부 데이터를 넣으세요. \"done\"은 비어 있어야 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "19210bba-1db1-4568-b34e-4e9de002b0eb",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1680,
+        -160
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 340,
+        "height": 300,
+        "content": "## 여기에서 프롬프트를 수정할 수 있습니다\n- 몇 가지 예를 추가하여 더 좋게 만드세요\n- 알려진 프레임워크를 따르세요\n등."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "bebab4e5-35fa-49b7-bb85-a85231c44389",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        660,
+        -280
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 340,
+        "height": 480,
+        "content": "## RapidAPI Twitter API 프로필 데이터 호출\nRapidAPI([https://rapidapi.com/restocked-gAGxip8a_/api/twitter-api47](https://rapidapi.com/restocked-gAGxip8a_/api/twitter-api47))에서 계정을 만들어 Twitter API에 구독해야 합니다. 무료 계정으로 월 500개의 트윗을 스크랩할 수 있습니다.\n구독 후 Generic Auth Type으로 Header Auth를 선택한 다음, 헤더 이름으로 \"x-rapidapi-key\"를 넣고 RapidAPI 인터페이스에서 제공된 값을 입력해야 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "42df4665-2d46-4020-938c-f082db6f09d0",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1220,
+        -300
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 280,
+        "height": 480,
+        "content": "## RapidAPI Fresh LinkedIn Profile Data 호출\nRapidAPI([https://rapidapi.com](https://rapidapi.com))에서 계정을 만들어야 하며, Fresh LinkedIn Profile Data에 구독해야 합니다. 무료 계정으로 월 100개의 프로필을 스크랩할 수 있습니다.\n구독 후 Generic Auth Type으로 Header Auth를 선택해야 하며, 헤더 이름으로 \"x-rapidapi-key\"를 넣고 RapidAPI 인터페이스에서 제공된 값을 입력해야 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4a14febd-bd82-428c-8c97-15f1ba724b02",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -840,
+        -620
+      ],
+      "parameters": {
+        "width": 700,
+        "height": 1180,
+        "content": "## 소셜 미디어 분석 및 자동화된 이메일 생성\n\n> Thomas Vie 작 [Thomas@pollup.net](mailto:thomas@pollup.net)\n\n### **누구를 위한 것인가?**\n이 템플릿은 잠재적 리드의 소셜 미디어 프로필을 분석하고 개인화된 이메일 아웃리치를 효율적으로 자동화하려는 마케터, 리드 생성 전문가, 비즈니스 전문가에게 이상적입니다.\n\n### **이 워크플로우가 해결하는 문제는 무엇인가?**\n소셜 미디어 프로필을 수동으로 분석하고 개인화된 이메일을 작성하는 것은 시간이 많이 걸리고 오류가 발생하기 쉽습니다. 이 워크플로우는 소셜 미디어 API를 AI와 통합하여 맞춤형 커뮤니케이션을 생성하여 시간을 절약하고 아웃리치 효과를 높입니다.\n\n### **이 워크플로우가 하는 일:**\n1. **Google Sheets 통합:** LinkedIn URL, Twitter 핸들, 이름, 이메일 등의 리드 정보를 포함한 Google Sheet으로 시작합니다.\n2. **소셜 미디어 데이터 추출:** RapidAPI 통합을 사용하여 Twitter와 LinkedIn에서 프로필 및 활동 데이터를 자동으로 가져옵니다.\n3. **AI 기반 콘텐츠 생성:** 추출된 데이터를 분석하여 OpenAI의 Chat Model을 사용하여 개인화된 이메일 제목과 커버 레터를 생성합니다.\n4. **자동 이메일 발송:** 생성된 이메일을 리드에게 직접 보내고, 추적을 위해 자신에게 복사본을 보냅니다.\n5. **진행 추적:** Google Sheet을 업데이트하여 완료된 작업을 표시합니다.\n\n#### **설정:**\n1. **Google Sheets:**\n - LinkedIn URL, 이름, Twitter 핸들, 이메일, 그리고 \"완료\" 열을 포함한 시트를 생성합니다.\n - 시트에 리드를 채웁니다.\n\n2. **RapidAPI 계정:**\n - RapidAPI에 가입하고 Twitter 및 LinkedIn API 플랜을 구독합니다.\n - 워크플로우에서 API 인증 키를 구성합니다.\n\n3. **AI 구성:**\n - 텍스트 생성을 위해 OpenAI Chat Model을 API 키와 연결합니다.\n\n4. **이메일 통합:**\n - 자동 이메일 발송을 위해 이메일 자격증명이나 서비스(SMTP 또는 Gmail과 같은 타사 서비스)를 추가합니다.\n\n#### **이 워크플로우를 필요에 맞게 커스터마이징하는 방법:**\n- **AI 프롬프트 수정:** AI 노드의 프롬프트를 톤, 스타일 또는 특정 메시징 프레임워크에 맞게 조정합니다.\n- **데이터 필드 확장:** 추가 개인화를 위해 Google Sheets에 더 많은 데이터 필드를 추가합니다.\n- **API 제한:** 사용 제한에 맞게 API 구성을 조정하거나, 더 많은 데이터 스크래핑 기능을 위해 상위 티어로 업그레이드합니다.\n- **이메일 템플릿 개인화:** 다양한 대상이나 용도에 맞게 이메일 형식을 조정합니다.\n- **기능 확장:** 필요에 따라 추가 소셜 미디어 플랫폼이나 CRM 도구를 통합합니다.\n\n이 워크플로우를 구현하면 반복적인 작업에 소요되는 시간을 절약하고 더 효과적인 리드 생성 전략을 만들 수 있습니다."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set your company's variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get tweets": {
+      "main": [
+        [
+          {
+            "node": "Exract and limit X",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Get twitter ID": {
+      "main": [
+        [
+          {
+            "node": "Get tweets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Subject and cover letter based on match",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exract and limit X": {
+      "main": [
+        [
+          {
+            "node": "Get linkedin Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get linkedin Posts": {
+      "main": [
+        [
+          {
+            "node": "Extract and limit Linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate Subject and cover letter based on match",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract and limit Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Generate Subject and cover letter based on match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Cover letter and CC me": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set your company's variables": {
+      "main": [
+        [
+          {
+            "node": "Get twitter ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Subject and cover letter based on match": {
+      "main": [
+        [
+          {
+            "node": "Send Cover letter and CC me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

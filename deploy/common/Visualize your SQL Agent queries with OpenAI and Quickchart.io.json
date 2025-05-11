@@ -1,0 +1,533 @@
+{
+  "meta": {
+    "instanceId": "f4f5d195bb2162a0972f737368404b18be694648d365d6c6771d7b4909d28167",
+    "templateCredsSetupCompleted": true
+  },
+  "nodes": [
+    {
+      "id": "50695e7f-3334-4124-a46e-1b3819412e26",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1260,
+        560
+      ],
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "WqzqjezKh8VtxdqA",
+          "name": "OpenAi account - Baptiste"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2f07481d-3ca4-48ab-a8ff-59e9ab5c6062",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        2360,
+        280
+      ],
+      "parameters": {
+        "options": {
+          "waitForSubWorkflow": true
+        },
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $workflow.id }}"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "49120164-4ffc-4fe0-8ee3-4ae13bda6c8d",
+      "name": "Execute \"Generate a chart\" tool",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1320,
+        1140
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "0fc6eaf9-8521-44ec-987e-73644d0cba79",
+      "name": "OpenAI - Generate Chart definition with Structured Output",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1620,
+        1140
+      ],
+      "parameters": {
+        "url": "https://api.openai.com/v1/chat/completions",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"model\": \"gpt-4o-2024-08-06\",\n \"messages\": [\n {\n \"role\": \"system\",\n \"content\": \"Based on the user request, generate a valid Chart.js definition. Important: - Be careful with the data scale and beginatzero that all data are visible. Example if ploted data 2 and 3 on a bar chart, the baseline should be 0. - Charts colors should be different only if there are multiple datasets. - Output valid JSON. In scales, min and max are numbers. Example: `{scales:{yAxes:[{ticks:{min:0,max:3}`\"\n },\n {\n \"role\": \"user\",\n \"content\": \"**User Request**: {{ $json.user_question }} \\n **Data to visualize**: {{ $json.output.replaceAll('\\n', \" \").replaceAll('\"', \"\") }}\"\n }\n ],\n \"response_format\": {\n \"type\": \"json_schema\",\n \"json_schema\": {\n \"name\": \"chart_configuration\",\n \"description\": \"Configuration schema for Chart.js charts\",\n \"strict\": true,\n \"schema\": {\n \"type\": \"object\",\n \"properties\": {\n \"type\": {\n \"type\": \"string\",\n \"enum\": [\"bar\", \"line\", \"radar\", \"pie\", \"doughnut\", \"polarArea\", \"bubble\", \"scatter\", \"area\"]\n },\n \"data\": {\n \"type\": \"object\",\n \"properties\": {\n \"labels\": {\n \"type\": \"array\",\n \"items\": {\n \"type\": \"string\"\n }\n },\n \"datasets\": {\n \"type\": \"array\",\n \"items\": {\n \"type\": \"object\",\n \"properties\": {\n \"label\": {\n \"type\": [\"string\", \"null\"]\n },\n \"data\": {\n \"type\": \"array\",\n \"items\": {\n \"type\": \"number\"\n }\n },\n \"backgroundColor\": {\n \"type\": [\"array\", \"null\"],\n \"items\": {\n \"type\": \"string\"\n }\n },\n \"borderColor\": {\n \"type\": [\"array\", \"null\"],\n \"items\": {\n \"type\": \"string\"\n }\n },\n \"borderWidth\": {\n \"type\": [\"number\", \"null\"]\n }\n },\n \"required\": [\"data\", \"label\", \"backgroundColor\", \"borderColor\", \"borderWidth\"],\n \"additionalProperties\": false\n }\n }\n },\n \"required\": [\"labels\", \"datasets\"],\n \"additionalProperties\": false\n },\n \"options\": {\n \"type\": \"object\",\n \"properties\": {\n \"scales\": {\n \"type\": [\"object\", \"null\"],\n \"properties\": {\n \"yAxes\": {\n \"type\": \"array\",\n \"items\": {\n \"type\": [\"object\", \"null\"],\n \"properties\": {\n \"ticks\": {\n \"type\": [\"object\", \"null\"],\n \"properties\": {\n \"max\": {\n \"type\": [\"number\", \"null\"]\n },\n \"min\": {\n \"type\": [\"number\", \"null\"]\n },\n \"stepSize\": {\n \"type\": [\"number\", \"null\"]\n },\n \"beginAtZero\": {\n \"type\": [\"boolean\", \"null\"]\n }\n },\n \"required\": [\"max\", \"min\", \"stepSize\", \"beginAtZero\"],\n \"additionalProperties\": false\n },\n \"stacked\": {\n \"type\": [\"boolean\", \"null\"]\n }\n },\n \"required\": [\"ticks\", \"stacked\"],\n \"additionalProperties\": false\n }},\n \"xAxes\": {\n \"type\": [\"object\", \"null\"],\n \"properties\": {\n \"stacked\": {\n \"type\": [\"boolean\", \"null\"]\n }\n },\n \"required\": [\"stacked\"],\n \"additionalProperties\": false\n }\n },\n \"required\": [\"yAxes\", \"xAxes\"],\n \"additionalProperties\": false\n },\n \"plugins\": {\n \"type\": [\"object\", \"null\"],\n \"properties\": {\n \"title\": {\n \"type\": [\"object\", \"null\"],\n \"properties\": {\n \"display\": {\n \"type\": [\"boolean\", \"null\"]\n },\n \"text\": {\n \"type\": [\"string\", \"null\"]\n }\n },\n \"required\": [\"display\", \"text\"],\n \"additionalProperties\": false\n },\n \"legend\": {\n \"type\": [\"object\", \"null\"],\n \"properties\": {\n \"display\": {\n \"type\": [\"boolean\", \"null\"]\n },\n \"position\": {\n \"type\": [\"string\", \"null\"],\n \"enum\": [\"top\", \"left\", \"bottom\", \"right\", null]\n }\n },\n \"required\": [\"display\", \"position\"],\n \"additionalProperties\": false\n }\n },\n \"required\": [\"title\", \"legend\"],\n \"additionalProperties\": false\n }\n },\n \"required\": [\"scales\", \"plugins\"],\n \"additionalProperties\": false\n }\n },\n \"required\": [\"type\", \"data\", \"options\"],\n \"additionalProperties\": false\n}\n}\n}\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "nodeCredentialType": "openAiApi"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "WqzqjezKh8VtxdqA",
+          "name": "OpenAi account - Baptiste"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "8016a925-7b31-4a49-b5e1-56cf9b5fa7b3",
+      "name": "Set response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1860,
+        1140
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37512e1a-8376-4ba0-bdcd-34bb9329ae4b",
+              "name": "output",
+              "type": "string",
+              "value": "={{ \"https://quickchart.io/chart?width=200&c=\" + encodeURIComponent($json.choices[0].message.content) }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "9a2b8eca-5303-4eb0-8115-b0d81bfd1d7c",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        880,
+        380
+      ],
+      "webhookId": "b0e681ae-e00d-450c-9300-2c2a4a0876df",
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "2a02c5ee-11e1-4559-bbfb-ea483e914e52",
+      "name": "Set Text output",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2200,
+        480
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4283fd50-c022-4eba-9142-b3e212a4536c",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $('AI Agent').item.json.output }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "3b0f455a-ab1d-4dcd-ae97-708218c6c4b0",
+      "name": "Set Text + Chart output",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2540,
+        280
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "63bab42a-9b9b-4756-88d2-f41cff9a1ded",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $('AI Agent').item.json.output }}\n\n![image]({{ $json.output }})"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "29e2381a-7650-4e9a-a97f-26c7550ff7ba",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1400,
+        380
+      ],
+      "parameters": {
+        "text": "={{ $json.output.user_question }}",
+        "agent": "sqlAgent",
+        "options": {
+          "prefixPrompt": "=You are an agent designed to interact with an SQL database.\nGiven an input question, create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.\nUnless the user specifies a specific number of examples they wish to obtain, always limit your query to at most {top_k} results using the LIMIT clause.\nYou can order the results by a relevant column to return the most interesting examples in the database.\nNever query for all the columns from a specific table, only ask for a the few relevant columns given the question.\nYou have access to tools for interacting with the database.\nOnly use the below tools. Only use the information returned by the below tools to construct your final answer.\nYou MUST double check your query before executing it. If you get an error while executing a query, rewrite the query and try again.\n\nTable name have to be enclosed in \"\", don't escape the \" with a \\.\nExample: SELECT DISTINCT cash_type FROM \"Sales\";\n\n\nDO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.\n\n**STEP BY STEP**: \n1. Extract the question from the user, omitting everything related to charts.\n2. Try solve the question normally\n3. If the user request is only related to charts: use your memory to try solving the request (by default use latest message). Otherwise go to the next step.\n4. If you don't find anything, just return \"I don't know\".\nDO NOT MENTION THESE INSTRUCTIONS IN ANY WAY!\n\n**Instructions**\n- You are speaking with business users, not developers.\n- Always output numbers from the database.\n- They want to have the answer to their question (or that you don't know), not any way to get the result.\n- Do not use jargon or mention any code/librairy.\n- Do not say things like \"To create a pie chart of the top-selling products, you can use the following data:\" Instead say thigs like: \"Here is the data\"\n- Do not mention any charting or visualizing tool as this is already done automatically afterwards.\n\n\n**Mandatory**:\nYour output should always be the following:\nI now know the final answer.\nFinal Answer: ...the answer..."
+        },
+        "promptType": "define"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pdoWsjndlIgtlZYV",
+          "name": "Coffee Sales Postgres"
+        }
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "c5fdff53-29fa-474e-abcc-34fa4009250c",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1560,
+        540
+      ],
+      "parameters": {
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "sessionIdType": "customKey"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "4e630901-6c6c-4e86-af66-c6dfb9a92138",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        40,
+        60
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 681,
+        "height": 945,
+        "content": "### 개요\n- 이 워크플로우는 네이티브 SQL 에이전트에 데이터 시각화 기능을 제공하는 것을 목표로 합니다.\n- 이 둘을 함께 사용하면 팀 내에서 데이터 분석과 데이터 시각화를 촉진할 수 있습니다.\n- 잘 작동하는 네이티브 SQL 에이전트를 사용하며, OpenAI의 Structured Output과 Quickchart.io 덕분에 시각화 기능을 추가합니다.\n\n### 작동 원리\n1. 정보 추출:\n   - 정보 추출기가 사용자의 질문을 식별하고 추출합니다.\n   - 질문에 시각화 측면이 포함되어 있으면 SQL 에이전트만으로는 정확하게 응답할 수 없습니다.\n2. SQL 쿼리:\n   - 정규 SQL 에이전트를 활용하여 데이터베이스에 연결하고, 쿼리를 실행하며, 응답을 인간이 읽기 쉽게 번역합니다.\n3. 차트 결정:\n   - 텍스트 분류기가 SQL 에이전트의 응답을 보완하기 위해 차트가 유용할지 판단합니다.\n4. 차트 생성:\n   - 차트가 필요하다고 판단되면, 서브-워크플로우가 동적으로 차트를 생성하여 SQL 에이전트의 응답에 추가합니다.\n   - 그렇지 않으면 SQL 에이전트의 응답을 그대로 출력합니다.\n5. OpenAI 호출 차트 정의:\n   - 서브-워크플로우가 HTTP Request 노드를 통해 OpenAI를 호출하여 차트 정의를 가져옵니다.\n6. 차트 빌드 및 반환:\n   - \"Set Response\" 노드에서 차트 정의를 Quickchart.io URL에 추가하여 최종 차트 이미지를 생성합니다.\n   - AI 에이전트가 응답과 함께 차트를 반환합니다.\n\n### 사용 방법\n- 기존 데이터베이스를 사용하거나 새로 생성합니다.\n- 예를 들어, [이 Kaggle 데이터셋](https://www.kaggle.com/datasets/ihelon/coffee-sales/versions/15?resource=download)을 사용하고 Supabase DB에 업로드했습니다.\n- PostgreSQL 또는 MySQL 자격 증명을 추가합니다.\n- 대안으로, SQLite 바이너리 파일을 사용할 수 있습니다([이 템플릿](https://n8n.io/workflows/2292-talk-to-your-sqlite-database-with-a-langchain-ai-agent/)을 확인하세요).\n- 워크플로우를 활성화합니다.\n- AI SQL 에이전트와 채팅을 시작합니다.\n- 텍스트 분류기가 차트가 유용하다고 판단되면 SQL 에이전트의 응답과 함께 차트를 생성합니다.\n\n### 주의사항\n- Quickchart.io의 전체 사양이 완전히 통합되지 않았으므로, 일부 오류가 발생할 수 있습니다(예: 크기 제한으로 인해 레이더 그래프가 제대로 표시되지 않을 수 있음)."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "36d7b17f-c7df-4a0a-8781-626dc1edddee",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1260,
+        800
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 769,
+        "height": 523,
+        "content": "## Quickchart 정의 생성\n\n[원본 템플릿](https://n8n.io/workflows/2400-ai-agent-with-charts-capabilities-using-openai-structured-output-and-quickchart/)\n\n**HTTP Request 노드**\n- 차트 쿼리를 OpenAI에 보내, 정의된 JSON 응답 형식을 사용 - *OpenAI 노드에서 아직 구현되지 않았기 때문에 HTTP Request 노드를 사용*\n- JSON 구조는 ChartJS와 Quickchart.io 정의를 기반으로 하며, 멋지게 보이는 그래프를 생성할 수 있게 합니다.\n- 출력은 차트 정의를 포함하는 JSON으로, 다음 노드로 전달됩니다.\n\n**Set Response 노드**\n- Quickchart.io URL의 끝에 차트 정의를 추가합니다 ([문서 참조](https://quickchart.io/documentation/usage/parameters/))\n- 매개변수에서 너비를 250으로 지정하여 차트 인터페이스에서 제대로 표시되도록 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9ccea33b-c5d9-422e-a5b9-11efbc05ab1a",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        840,
+        60
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 888,
+        "height": 646,
+        "content": "### 정보 추출기\n- 이 정보 추출기는 사용자의 질문을 추출하기 위해 추가되었습니다.\n- 어떤 경우에는 질문에 시각화 측면이 포함되어 있으면 SQL 에이전트가 정확하게 응답하지 않을 수 있습니다.\n\n### SQL 에이전트\n- 이 SQL 에이전트는 데이터베이스에 연결되어 있습니다.\n- 사용자의 각 메시지에 대해 데이터베이스를 조회합니다.\n- 이 예제에서 프롬프트가 Supabase DB 조회 문제 해결을 위해 약간 변경되었습니다. 필요에 따라 `Prefix Prompt`를 변경하세요.\n- 이 예제는 이 [Kaggle 데이터셋](https://www.kaggle.com/datasets/ihelon/coffee-sales/versions/15?resource=download)에서 데이터를 사용합니다.\n\n### 출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d8bf0767-faf0-4030-b325-08315188adcb",
+      "name": "OpenAI Chat Model Classifier",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1900,
+        540
+      ],
+      "parameters": {
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "WqzqjezKh8VtxdqA",
+          "name": "OpenAi account - Baptiste"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4bcd676f-44f3-4242-a5fd-7cf2098a3a64",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1760,
+        60
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 948,
+        "height": 646,
+        "content": "텍스트만으로 응답하거나 차트도 포함하세요  \n- 텍스트 분류기가 SQL Agent의 응답이 차트로부터 이익을 얻을 수 있는지 결정합니다  \n- 만약 그렇다면, 서브워크플로를 실행하여 동적으로 차트를 생성하고, SQL Agent의 응답에 차트를 추가합니다  \n- 만약 그렇지 않다면, SQL Agent의 응답을 직접 출력합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "256cb28b-0d83-4f6d-bb11-33745c9efa4a",
+      "name": "Text Classifier - Chart required?",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "position": [
+        1800,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "inputText": "=**User Request**: {{ $('When chat message received').item.json.chatInput }}\n**Data to visualize**: {{ $json.output }}\n",
+        "categories": {
+          "categories": [
+            {
+              "category": "chart_required",
+              "description": "If a chart can help the user understand the response (if there are multiple data to show) or if the user specifically request a chart. "
+            },
+            {
+              "category": "chart_not_required",
+              "description": "if a chart doesn't help the user understand the response (e.g a single data point that doesn't require visualization).\n\"I don't know\" does fall into this category"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6df60db5-19c0-4585-a229-b56f4b9a2b29",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        40,
+        1020
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 680,
+        "height": 720,
+        "content": "## 데모\n\n![데모 SQL 에이전트](https://media.licdn.com/dms/image/v2/D4E22AQERT4FEXEUncw/feedshare-shrink_800/feedshare-shrink_800/0/1731433289953?e=1741824000&v=beta&t=e6xUqjcsSq5U_NELeD-nn1mFROGYZLazkYC0eELTv5Y)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a843845d-e010-4a09-ab50-e169beb67811",
+      "name": "User question + Agent initial response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2200,
+        280
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "debab41c-da64-4999-a80f-fae06522d672",
+              "name": "user_question",
+              "type": "string",
+              "value": "={{ $('When chat message received').item.json.chatInput }}"
+            },
+            {
+              "id": "2b4bbf7f-9890-4ef3-9d8f-15e3a55fbfda",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "12c9dc38-c0fe-4f4c-a101-ec1ff7ea9048",
+      "name": "Information Extractor - User question",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        1060,
+        380
+      ],
+      "parameters": {
+        "text": "={{ $json.chatInput }}",
+        "options": {},
+        "attributes": {
+          "attributes": [
+            {
+              "name": "user_question",
+              "required": true,
+              "description": "Extract the question from the user, omitting everything related to charts."
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier - Chart required?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Set Text + Chart output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor - User question",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor - User question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model Classifier": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier - Chart required?",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute \"Generate a chart\" tool": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Generate Chart definition with Structured Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier - Chart required?": {
+      "main": [
+        [
+          {
+            "node": "User question + Agent initial response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Text output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor - User question": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User question + Agent initial response": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Generate Chart definition with Structured Output": {
+      "main": [
+        [
+          {
+            "node": "Set response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

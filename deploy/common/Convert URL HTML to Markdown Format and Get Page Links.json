@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "instanceId": "6b6a2db47bdf8371d21090c511052883cc9a3f6af5d0d9d567c702d74a18820e"
+  },
+  "nodes": [
+    {
+      "id": "f4570aad-db25-4dcd-8589-b1c8335935de",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -180,
+        3800
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "bd481559-85f2-4865-8d85-e50e72369f26",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        940,
+        3620
+      ],
+      "webhookId": "f10708f0-38c6-4c75-b635-37222d5b183a",
+      "parameters": {
+        "amount": 45
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "cc9e9947-19e4-47c5-95b0-a631d688a8b6",
+      "name": "Sticky Note36",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        549.7858793743054,
+        3709.534654112671
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 327.8244990224782,
+        "height": 268.48353140372035,
+        "content": "한 번에 40개가 내 서버의 메모리 제한인 것 같아요 - 40개 배치로 완료할 때까지 실행하거나, 서버 메모리에 따라 증가시키세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9ebbd993-9194-40b1-a98e-352eb3a3f9eb",
+      "name": "Sticky Note28",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -50.797941767307435,
+        3729.028866440868
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 574.7594700148138,
+        "height": 248.90718753310907,
+        "content": "Firecrawl.dev은 제목, 설명, 링크 및 콘텐츠를 포함한 마크다운을 검색합니다. 먼저 스크랩하고 싶은 URL을 정의하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "71c0f975-c0f9-47ae-a245-f852387ad461",
+      "name": "Connect to your own data source",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1380,
+        3820
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "fba918e7-2c88-4de3-a789-cadbf4f2584e",
+      "name": "Get urls from own data source",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        0,
+        3800
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "221a75eb-0bc8-4747-9ec1-1879c46d9163",
+      "name": "Example fields from data source",
+      "type": "n8n-nodes-base.set",
+      "notes": "Define URLs in array",
+      "position": [
+        200,
+        3800
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc2c6af0-68d3-49eb-85fe-3288d2ed0f6b",
+              "name": "Page",
+              "type": "array",
+              "value": "[\"https://www.automake.io/\", \"https://www.n8n.io/\"]"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      },
+      "notesInFlow": true,
+      "typeVersion": 3.4
+    },
+    {
+      "id": "5a914964-e8ef-4064-8ecb-f1866de0d8c6",
+      "name": "Sticky Note33",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -40,
+        4000
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 510.3561134140244,
+        "height": 94.13486342358942,
+        "content": "필수  \nURL 데이터베이스에 연결하여 입력하세요. 열 이름을 `Example fields from data source` 노드처럼 `Page`으로 지정하고, 각 행에 하나의 링크가 있도록 하세요, `split out page urls`처럼."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5c004d5c-afeb-47c9-b30b-eb88880f87b9",
+      "name": "Sticky Note34",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        4000
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 284.87764467541297,
+        "height": 168.68864948728321,
+        "content": "필수  \nAuth 매개변수를 자신의 [Firecrawl](https://firecrawl.dev) 개발 토큰으로 업데이트하세요  \n  \n헤더 Auth 매개변수  \n이름 - Authorization  \n값 - 자신의 API 키"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "53d97054-a5e4-4819-bdd9-f8632c33eba2",
+      "name": "Sticky Note35",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1360,
+        4000
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 284.87764467541297,
+        "height": 91.91340067739628,
+        "content": "필수: 데이터를 자신의 데이터 소스(예: Airtable)에 출력하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "357a463f-7581-43ba-8930-af27e4762905",
+      "name": "Sticky Note37",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        3570.2075673933587
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 181.96744211154697,
+        "height": 189.23753199986137,
+        "content": "API 제한을 준수하세요 (분당 10 요청)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "77311c67-f50f-427a-87fd-b29b1f542bbc",
+      "name": "40 items at a time",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        580,
+        3800
+      ],
+      "parameters": {
+        "maxItems": 40
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "43557ab1-4e52-4598-83a9-e39d5afc6de7",
+      "name": "10 at a time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        740,
+        3800
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 10
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "555d52e7-010b-462b-9382-26804493de1c",
+      "name": "Markdown data and Links",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1160,
+        3820
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a959c64-4c3c-4072-8427-67f6f6ecba1b",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.data.metadata.title }}"
+            },
+            {
+              "id": "d2da0859-a7a0-4c39-913a-150ecb95d075",
+              "name": "description",
+              "type": "string",
+              "value": "={{ $json.data.metadata.description }}"
+            },
+            {
+              "id": "62bd2d76-b78d-4501-a59b-a25ed7b345b0",
+              "name": "content",
+              "type": "string",
+              "value": "={{ $json.data.markdown }}"
+            },
+            {
+              "id": "d4c712fa-b52a-498f-8abc-26dc72be61f7",
+              "name": "links",
+              "type": "string",
+              "value": "={{ $json.data.links }} "
+            }
+          ]
+        }
+      },
+      "notesInFlow": true,
+      "typeVersion": 3.4
+    },
+    {
+      "id": "aac948e6-ac86-4cea-be84-f27919d6d936",
+      "name": "Split out page URLs",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        380,
+        3800
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "Page"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "71c5a0d4-540e-4766-ae99-bdc427019dac",
+      "name": "Retrieve Page Markdown and Links",
+      "type": "n8n-nodes-base.httpRequest",
+      "notes": "curl -X POST https://api.firecrawl.dev/v1/scrape \\\n -H 'Content-Type: application/json' \\\n -H 'Authorization: Bearer YOUR_API_KEY' \\\n -d '{\n \"url\": \"https://docs.firecrawl.dev\",\n \"formats\" : [\"markdown\", \"html\"]\n }'\n",
+      "position": [
+        960,
+        3820
+      ],
+      "parameters": {
+        "url": "https://api.firecrawl.dev/v1/scrape",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"url\": \"{{ $json.Page }}\",\n \"formats\" : [\"markdown\", \"links\"]\n} ",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nbamiF1MDku2NNz7",
+          "name": "Firecrawl Bearer"
+        }
+      },
+      "retryOnFail": true,
+      "typeVersion": 4.2,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "a2f12929-262e-4354-baa3-f9e3c05ec2eb",
+      "name": "Sticky Note38",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -840,
+        3340
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 581.9949654101088,
+        "height": 818.5240734585421,
+        "content": "## URL HTML을 Markdown으로 변환하고 페이지 링크 가져오기\n\n## 사용 사례\n웹 페이지를 AI 친화적인 Markdown 형식으로 변환:\n- LLM 분석을 위해 웹페이지 콘텐츠를 처리해야 함\n- 웹 페이지에서 콘텐츠와 링크를 모두 추출하고 싶음\n- HTML 마크업 없이 깨끗하고 형식화된 텍스트가 필요함\n- 페이지 크롤링 시 API 속도 제한을 준수하고 싶음\n\n## 이 워크플로우가 하는 일\n워크플로우는 Firecrawl.dev API를 사용하여 웹페이지를 처리:\n- HTML 콘텐츠를 Markdown 형식으로 변환\n- 각 웹페이지의 모든 링크를 추출\n- API 속도 제한을 자동으로 처리\n- 데이터베이스에서 URL을 배치 단위로 처리\n\n## 설정\n1. [Firecrawl.dev](https://www.firecrawl.dev/) 계정을 만들고 API 키를 얻음\n2. HTTP Request 노드의 Authorization 헤더에 Firecrawl API 키를 추가\n3. URL 데이터베이스를 입력 노드에 연결 (열 이름은 \"Page\"여야 함) 또는 `Example fields from data source`의 배열을 편집\n4. 선호하는 출력 데이터베이스 연결을 구성\n\n## 필요에 맞게 조정하는 방법\n- 입력 소스를 다른 데이터베이스에서 URL을 가져오도록 수정\n- 필요 시 속도 제한 매개변수를 조정\n- 특정 용도에 맞게 출력 형식을 맞춤\n\n\nSimon @ [automake.io](https://automake.io) 제작"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "10 at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10 at a time": {
+      "main": [
+        null,
+        [
+          {
+            "node": "Retrieve Page Markdown and Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "40 items at a time": {
+      "main": [
+        [
+          {
+            "node": "10 at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out page URLs": {
+      "main": [
+        [
+          {
+            "node": "40 items at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown data and Links": {
+      "main": [
+        [
+          {
+            "node": "Connect to your own data source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get urls from own data source": {
+      "main": [
+        [
+          {
+            "node": "Example fields from data source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Connect to your own data source": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Example fields from data source": {
+      "main": [
+        [
+          {
+            "node": "Split out page URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Page Markdown and Links": {
+      "main": [
+        [
+          {
+            "node": "Markdown data and Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get urls from own data source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

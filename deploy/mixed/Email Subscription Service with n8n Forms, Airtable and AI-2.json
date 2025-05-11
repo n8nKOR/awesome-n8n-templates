@@ -1,0 +1,1536 @@
+{
+  "nodes": [
+    {
+      "id": "4dd52c72-9a9b-4db4-8de5-5b12b1e5c4be",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        180,
+        1480
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "9226181c-b84c-4ea1-a5b4-eedb6c62037b",
+      "name": "Search daily",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        440,
+        1480
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appL3dptT6ZTSzY9v",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v",
+          "cachedResultName": "Scheduled Emails"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblzR9vSuFUzlQNMI",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v/tblzR9vSuFUzlQNMI",
+          "cachedResultName": "Table 1"
+        },
+        "options": {},
+        "operation": "search",
+        "filterByFormula": "AND({Status} = 'active', {Interval} = 'daily')"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "1a3b6224-2f66-41c6-8b3d-be286cf16370",
+      "name": "Search weekly",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        440,
+        1660
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appL3dptT6ZTSzY9v",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v",
+          "cachedResultName": "Scheduled Emails"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblzR9vSuFUzlQNMI",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v/tblzR9vSuFUzlQNMI",
+          "cachedResultName": "Table 1"
+        },
+        "options": {},
+        "operation": "search",
+        "filterByFormula": "=AND(\n {Status} = 'active', \n {Interval} = 'weekly', \n {Last Sent} <= DATEADD(TODAY(), -7, 'days')\n)"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "1ea47e14-0a28-4780-95c7-31e24eb724d5",
+      "name": "confirmation email1",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        620,
+        820
+      ],
+      "webhookId": "dd8bd6df-2013-4f8d-a2cc-cd9b3913e3d2",
+      "parameters": {
+        "sendTo": "={{ $('Subscribe Form').item.json.email }}",
+        "message": "=This is to confirm your request to subscribe to \"Learn something every day!\" - a free service to send you facts about your favourite topics.\n\nTopic: {{ $('Subscribe Form').item.json.topic }}\nSchedule: {{ $('Subscribe Form').item.json.frequency }}",
+        "options": {
+          "appendAttribution": false
+        },
+        "subject": "Learn something every day confirmation"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Sf5Gfl9NiFTNXFWb",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "d95262af-1b52-4f9c-8346-183b4eee8544",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        1140,
+        1480
+      ],
+      "parameters": {
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        },
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $workflow.id }}"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "075292af-7a66-4275-ac2d-3c392189a10c",
+      "name": "Create Event",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        980,
+        1480
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b28a0142-a028-471a-8180-9883e930feea",
+              "name": "email",
+              "type": "string",
+              "value": "={{ $json.Email }}"
+            },
+            {
+              "id": "970f5495-05df-42b6-a422-b2ac27f8eb95",
+              "name": "topic",
+              "type": "string",
+              "value": "={{ $json.Topic }}"
+            },
+            {
+              "id": "e871c431-948f-4b80-aa17-1e4266674663",
+              "name": "interval",
+              "type": "string",
+              "value": "={{ $json.Interval }}"
+            },
+            {
+              "id": "9b72597d-1446-4ef3-86e5-0a071c69155b",
+              "name": "id",
+              "type": "string",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "id": "b17039c2-14a2-4811-9528-88ae963e44f7",
+              "name": "created_at",
+              "type": "string",
+              "value": "={{ $json.Created }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "28776aaf-6bd9-4f9f-bcf0-3d4401a74219",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1360,
+        1480
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "0eb62e75-228b-452b-80ab-f9ef3ad33204",
+      "name": "Unsubscribe Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        180,
+        1160
+      ],
+      "webhookId": "e64db96d-5e61-40d5-88fb-761621a829ab",
+      "parameters": {
+        "options": {
+          "path": "free-factoids-unsubscribe"
+        },
+        "formTitle": "Unsubscribe from Learn Something Every Day",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ID",
+              "requiredField": true
+            },
+            {
+              "fieldType": "dropdown",
+              "fieldLabel": "Reason For Unsubscribe",
+              "multiselect": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Emails not relevant"
+                  },
+                  {
+                    "option": "Too many Emails"
+                  },
+                  {
+                    "option": "I did not sign up to this service"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "formDescription": "We're sorry to see you go! Please take a moment to help us improve the service."
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "f889efe9-dc3c-428b-ad8e-4f7d17f23e75",
+      "name": "Set Email Vars",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2500,
+        1480
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62a684fb-16f9-4326-8eeb-777d604b305a",
+              "name": "to",
+              "type": "string",
+              "value": "={{ $('Execute Workflow Trigger').first().json.email }},jim@height.io"
+            },
+            {
+              "id": "4270849e-c805-4580-9088-e8d1c3ef2fb4",
+              "name": "subject",
+              "type": "string",
+              "value": "=Your {{ $('Execute Workflow Trigger').first().json.interval }} factoid"
+            },
+            {
+              "id": "81d0e897-2496-4a3c-b16c-9319338f899f",
+              "name": "message",
+              "type": "string",
+              "value": "=<p>\n<strong>You asked about \"{{ $('Execution Data').first().json.topic.replace('\"','') }}\"</strong>\n</p>\n<p>\n<i>{{ $('Content Generation Agent').first().json.output }}</i>\n</p>"
+            },
+            {
+              "id": "ee05de7b-5342-4deb-8118-edaf235d92cc",
+              "name": "unsubscribe_link",
+              "type": "string",
+              "value": "=https://<MY_HOST>/form/inspiration-unsubscribe?ID={{ $('Execute Workflow Trigger').first().json.id }}"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "84741e6d-f5be-440d-8633-4eb30ccce170",
+      "name": "Log Last Sent",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        2860,
+        1480
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appL3dptT6ZTSzY9v",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v",
+          "cachedResultName": "Scheduled Emails"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblzR9vSuFUzlQNMI",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v/tblzR9vSuFUzlQNMI",
+          "cachedResultName": "Table 1"
+        },
+        "columns": {
+          "value": {
+            "id": "={{ $('Execute Workflow Trigger').first().json.id }}",
+            "Last Sent": "2024-11-29T13:34:11"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": true,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true
+            },
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Email",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "inactive",
+                  "value": "inactive"
+                },
+                {
+                  "name": "active",
+                  "value": "active"
+                }
+              ],
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interval",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "daily",
+                  "value": "daily"
+                },
+                {
+                  "name": "weekly",
+                  "value": "weekly"
+                },
+                {
+                  "name": "surprise",
+                  "value": "surprise"
+                }
+              ],
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Interval",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Start Day",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "Mon",
+                  "value": "Mon"
+                },
+                {
+                  "name": "Tue",
+                  "value": "Tue"
+                },
+                {
+                  "name": "Wed",
+                  "value": "Wed"
+                },
+                {
+                  "name": "Thu",
+                  "value": "Thu"
+                },
+                {
+                  "name": "Fri",
+                  "value": "Fri"
+                },
+                {
+                  "name": "Sat",
+                  "value": "Sat"
+                },
+                {
+                  "name": "Sun",
+                  "value": "Sun"
+                }
+              ],
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Start Day",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Topic",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Created",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Modified",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Last Modified",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Sent",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Last Sent",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "id"
+          ]
+        },
+        "options": {},
+        "operation": "update"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "88f864d6-13fb-4f09-b22d-030d016678e1",
+      "name": "Search surprise",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        440,
+        1840
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appL3dptT6ZTSzY9v",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v",
+          "cachedResultName": "Scheduled Emails"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblzR9vSuFUzlQNMI",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v/tblzR9vSuFUzlQNMI",
+          "cachedResultName": "Table 1"
+        },
+        "options": {},
+        "operation": "search",
+        "filterByFormula": "=AND(\n {Status} = 'active', \n {Interval} = 'surprise'\n)"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "28238d9a-7bc0-4a22-bb4e-a7a2827e4da3",
+      "name": "Should Send = True",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        800,
+        1840
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "9aaf9ae2-8f96-443a-8294-c04270296b22",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.should_send }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "3a46dd3d-48a6-40ca-8823-0516aa9f73a4",
+      "name": "Should Send?",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        620,
+        1840
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const luckyPick = Math.floor(Math.random() * 10) + 1;\n$input.item.json.should_send = luckyPick == 8;\nreturn $input.item;"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "3611da19-920b-48e6-84a4-f7be0b3a78fc",
+      "name": "Create Subscriber",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        440,
+        820
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appL3dptT6ZTSzY9v",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v",
+          "cachedResultName": "Scheduled Emails"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblzR9vSuFUzlQNMI",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v/tblzR9vSuFUzlQNMI",
+          "cachedResultName": "Table 1"
+        },
+        "columns": {
+          "value": {
+            "Email": "={{ $json.email }}",
+            "Topic": "={{ $json.topic }}",
+            "Status": "active",
+            "Interval": "={{ $json.frequency }}",
+            "Start Day": "={{ $json.submittedAt.toDateTime().format('EEE') }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Email",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "inactive",
+                  "value": "inactive"
+                },
+                {
+                  "name": "active",
+                  "value": "active"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interval",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "daily",
+                  "value": "daily"
+                },
+                {
+                  "name": "weekly",
+                  "value": "weekly"
+                },
+                {
+                  "name": "surprise",
+                  "value": "surprise"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Interval",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Start Day",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "Mon",
+                  "value": "Mon"
+                },
+                {
+                  "name": "Tue",
+                  "value": "Tue"
+                },
+                {
+                  "name": "Wed",
+                  "value": "Wed"
+                },
+                {
+                  "name": "Thu",
+                  "value": "Thu"
+                },
+                {
+                  "name": "Fri",
+                  "value": "Fri"
+                },
+                {
+                  "name": "Sat",
+                  "value": "Sat"
+                },
+                {
+                  "name": "Sun",
+                  "value": "Sun"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Start Day",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Topic",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Created",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Modified",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Last Modified",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Sent",
+              "type": "dateTime",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Last Sent",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Email"
+          ]
+        },
+        "options": {},
+        "operation": "upsert"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "2213a81f-53a9-4142-9586-e87b88710eec",
+      "name": "Update Subscriber",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        440,
+        1160
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appL3dptT6ZTSzY9v",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v",
+          "cachedResultName": "Scheduled Emails"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblzR9vSuFUzlQNMI",
+          "cachedResultUrl": "https://airtable.com/appL3dptT6ZTSzY9v/tblzR9vSuFUzlQNMI",
+          "cachedResultName": "Table 1"
+        },
+        "columns": {
+          "value": {
+            "id": "={{ $json.ID }}",
+            "Status": "inactive"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": true,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true
+            },
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Email",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "inactive",
+                  "value": "inactive"
+                },
+                {
+                  "name": "active",
+                  "value": "active"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interval",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "daily",
+                  "value": "daily"
+                },
+                {
+                  "name": "weekly",
+                  "value": "weekly"
+                }
+              ],
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Interval",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Start Day",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "Mon",
+                  "value": "Mon"
+                },
+                {
+                  "name": "Tue",
+                  "value": "Tue"
+                },
+                {
+                  "name": "Wed",
+                  "value": "Wed"
+                },
+                {
+                  "name": "Thu",
+                  "value": "Thu"
+                },
+                {
+                  "name": "Fri",
+                  "value": "Fri"
+                },
+                {
+                  "name": "Sat",
+                  "value": "Sat"
+                },
+                {
+                  "name": "Sun",
+                  "value": "Sun"
+                }
+              ],
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Start Day",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Topic",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Created",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Modified",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Last Modified",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "id"
+          ]
+        },
+        "options": {},
+        "operation": "update"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Und0frCQ6SNVX3VV",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "c94ec18b-e0cf-4859-8b89-23abdd63739c",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        1280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 335,
+        "height": 173,
+        "content": "### 4. 서브워크플로를 사용하여 실행을 동시에 실행하기\n이 구성은 순차 실행이 느리고 불필요할 때 바람직합니다. 또한 하나의 이메일이 실패하면, 다른 모든 실행이 실패하지 않습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c14cab28-13eb-4d91-8578-8187a95a8909",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        700
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 380,
+        "height": 80,
+        "content": "1. 구독 흐름  \n폼을 사용하여 사용자가 서비스에 구독할 수 있도록 하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0e44ada0-f8a7-440e-aded-33b446190a08",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        1020
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 355,
+        "height": 115,
+        "content": "### 2. 구독 취소 흐름\n\n* Form의 사전 채우기 필드 기능을 사용하여 사용자를 식별합니다\n* \"email\"을 식별자로 사용하지 않으므로 다른 사람이 구독을 취소할 수 없습니다"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e67bdffe-ccfc-4818-990d-b2a5ab613035",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        1340
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 347,
+        "height": 114,
+        "content": "### 3. 예정된 트리거\n* 매일 오전 9시에 실행됩니다\n* 모든 3가지 빈도 유형을 처리합니다\n* 이메일을 동시에 보냅니다"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ce7d5310-7170-46d3-b8d8-3f97407f9dfd",
+      "name": "Subscribe Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        180,
+        820
+      ],
+      "webhookId": "c6abe3e3-ba87-4124-a227-84e253581b58",
+      "parameters": {
+        "options": {
+          "path": "free-factoids-subscribe",
+          "appendAttribution": false,
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Thanks! Your factoid is on its way!"
+            }
+          }
+        },
+        "formTitle": "Learn something every day!",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "textarea",
+              "fieldLabel": "topic",
+              "placeholder": "What topic(s) would you like to learn about?",
+              "requiredField": true
+            },
+            {
+              "fieldType": "email",
+              "fieldLabel": "email",
+              "placeholder": "eg. jim@example.com",
+              "requiredField": true
+            },
+            {
+              "fieldType": "dropdown",
+              "fieldLabel": "frequency",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "daily"
+                  },
+                  {
+                    "option": "weekly"
+                  },
+                  {
+                    "option": "surprise me"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "formDescription": "Get a fact a day (or week) about any subject sent to your inbox."
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "a5d50886-7d6b-4bf8-b376-b23c12a60608",
+      "name": "Execution Data",
+      "type": "n8n-nodes-base.executionData",
+      "position": [
+        1560,
+        1480
+      ],
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "email",
+              "value": "={{ $json.email }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "69b40d8d-7734-47f1-89fe-9ea0378424b7",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1860,
+        1680
+      ],
+      "parameters": {
+        "sessionKey": "=scheduled_send_{{ $json.email }}",
+        "sessionIdType": "customKey"
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "f83cff18-f41f-4a63-9d43-7e3947aae386",
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "position": [
+        2020,
+        1680
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "77457037-e3ab-42f1-948b-b994d42f2f6e",
+      "name": "Content Generation Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1780,
+        1460
+      ],
+      "parameters": {
+        "text": "=Generate an new factoid on the following topic: \"{{ $json.topic.replace('\"','') }}\"\nEnsure it is unique and not one generated previously.",
+        "options": {},
+        "promptType": "define"
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "cdfdd870-48b6-4c7d-a7d1-a22d70423e37",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "position": [
+        1720,
+        1680
+      ],
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "credentials": {
+        "groqApi": {
+          "id": "02xZ4o87lUMUFmbT",
+          "name": "Groq account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "87df322d-a544-476f-b2ff-83feb619fe7f",
+      "name": "Generate Image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2120,
+        1460
+      ],
+      "parameters": {
+        "prompt": "=Generate a child-friendly illustration which compliments the following paragraph:\n{{ $json.output }}",
+        "options": {},
+        "resource": "image"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "5c8d9e72-4015-44da-b5d5-829864d33672",
+      "name": "Resize Image",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        2280,
+        1460
+      ],
+      "parameters": {
+        "width": 480,
+        "height": 360,
+        "options": {},
+        "operation": "resize"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a9939fad-98b3-4894-aae0-c11fa40d09da",
+      "name": "Send Message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        2680,
+        1480
+      ],
+      "webhookId": "dd8bd6df-2013-4f8d-a2cc-cd9b3913e3d2",
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n <meta charset=\"UTF-8\">\n <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n <title>{{ $json.subject }}</title>\n</head>\n<body>\n {{ $json.message }}\n<p>\n<a href=\"{{ $json.unsubscribe_link }}\">Unsubscribe</a>\n</p>\n</body>\n</html>\n",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          },
+          "appendAttribution": false
+        },
+        "subject": "={{ $json.subject }}"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Sf5Gfl9NiFTNXFWb",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "10b6ad35-fc1c-47a2-b234-5de3557d1164",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1320,
+        1660
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 335,
+        "height": 113,
+        "content": "### 5. 실행 데이터를 사용하여 로그 필터링\n\n커뮤니티+에 등록했거나 n8n 클라우드를 사용 중이라면, 최선의 방법은 실행 노드를 사용하여 실행 로그의 필터링을 허용하는 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e3563fae-ff35-457b-9fb1-784eda637518",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1780,
+        1280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 340,
+        "height": 140,
+        "content": "### 6. AI를 사용하여 팩토이드 및 이미지 생성\n사용자가 요청한 팩토이드를 자동화하여 생성하기 위해 AI 에이전트를 사용하세요. 이것은 간단한 예시이지만, 군중 속에서 두드러지기 위해 독특한 터치를 추가하는 것을 추천합니다!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d1016c5d-c855-44c5-8ad3-a534bedaa8cf",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2500,
+        1040
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 460,
+        "height": 400,
+        "content": "7. 사용자에게 이메일 보내기  \n마지막으로, 텍스트와 이미지를 모두 포함한 메시지를 사용자에게 보내세요.  \n이벤트를 Airtable에 기록하여 나중에 분석할 수 있도록 하세요, 필요시."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "773075fa-e5a2-4d4f-8527-eb07c7038b00",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -420,
+        680
+      ],
+      "parameters": {
+        "width": 480,
+        "height": 900,
+        "content": "## 시도해 보세요!\n\n### 이 n8n 템플릿은 n8n 폼을 프론트엔드로, n8n을 백엔드로, Airtable을 저장 레이어로 사용하여 n8n에서 완전히 간단한 구독자 서비스를 구축하는 방법을 보여줍니다.\n\n이 템플릿은 특히 사용자가 요청한 주제에 대한 사실을 포함한 자동화된 메시지를 보내는 완전 자동화된 서비스를 보여줍니다.\n\n### 작동 원리\n* n8n 폼이 설정되어 사용자가 원하는 주제와 메시지를 받을 간격으로 구독할 수 있도록 하며, 이는 n8n 폼을 통해 Airtable에 추가됩니다.\n* 매일 아침에 스케줄된 트리거가 실행되어 구독자의 원하는 간격에 따라 메시지를 보낼 구독자를 검색합니다.\n* 검색된 구독자는 서브워크플로로 이동하여 AI 에이전트를 통해 텍스트 콘텐츠를 생성하고, 비전 모델을 사용하여 이미지를 생성합니다.\n* 생성된 텍스트와 이미지가 이메일에 첨부되어 구독자에게 보내지며, 이 이메일에는 구독 해지 링크가 포함됩니다.\n* 구독 해지 흐름은 n8n 폼 인터페이스를 통해 작동하며, 제출되면 사용자의 추가 스케줄된 이메일이 비활성화됩니다.\n\n## 사용 방법\n* 샘플 Airtable의 사본을 만드세요: https://airtable.com/appL3dptT6ZTSzY9v/shrLukHafy5bwDRfD\n* 워크플로가 \"활성화\"되어 있고, 폼이 청중이 접근할 수 있도록 사용 가능하도록 확인하세요.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d) 또는 [Forum](https://community.n8n.io/)에 참여하세요!\n\n즐거운 해킹!"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Generation Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Image": {
+      "main": [
+        [
+          {
+            "node": "Set Email Vars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search daily": {
+      "main": [
+        [
+          {
+            "node": "Create Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message": {
+      "main": [
+        [
+          {
+            "node": "Log Last Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Send?": {
+      "main": [
+        [
+          {
+            "node": "Should Send = True",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search weekly": {
+      "main": [
+        [
+          {
+            "node": "Create Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "node": "Content Generation Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Resize Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Email Vars": {
+      "main": [
+        [
+          {
+            "node": "Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subscribe Form": {
+      "main": [
+        [
+          {
+            "node": "Create Subscriber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Generation Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search surprise": {
+      "main": [
+        [
+          {
+            "node": "Should Send?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search surprise",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search daily",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search weekly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsubscribe Form": {
+      "main": [
+        [
+          {
+            "node": "Update Subscriber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Subscriber": {
+      "main": [
+        [
+          {
+            "node": "confirmation email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Send = True": {
+      "main": [
+        [
+          {
+            "node": "Create Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Content Generation Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Generation Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

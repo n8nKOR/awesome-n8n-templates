@@ -1,0 +1,487 @@
+{
+  "meta": {
+    "instanceId": "a2434c94d549548a685cca39cc4614698e94f527bcea84eefa363f1037ae14cd"
+  },
+  "nodes": [
+    {
+      "id": "deafa2e8-af41-4f11-92e0-09992f6c6970",
+      "name": "Read PDF",
+      "type": "n8n-nodes-base.readPDF",
+      "position": [
+        860,
+        1420
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "8e3ddbb1-83a1-4f79-9464-61d5a20f0427",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -760,
+        1300
+      ],
+      "parameters": {
+        "width": 444.034812880766,
+        "height": 599.5274151436035,
+        "content": "## Gmail에서 특정 PDF 첨부 파일을 OpenAI를 사용하여 Google Drive로 보내기\n\n_**면책 조항**: 이 워크플로를 사용할 때 결과가 다를 수 있으므로 OpenAI의 결과를 올바르게 검증할 준비를 하세요._\n\n이 워크플로는 PDF의 텍스트 내용을 읽어 OpenAI로 보냅니다. 관심 있는 첨부 파일은 지정된 Google Drive 폴더에 업로드됩니다. 예를 들어, 이메일로 받은 송장을 Google Drive의 받은 편지함 폴더로 보내 나중에 처리할 수 있습니다. 이 워크플로는 검색어를 쉽게 변경하여 귀하의 필요에 맞게 설계되었습니다. 자세한 내용은 워크플로를 참조하세요.\n\n### 작동 원리\n1. `On email received` 노드에서 트리거됩니다.\n2. 이메일의 첨부 파일을 반복합니다.\n3. `Configure` 노드에서 설정된 검색어와 일치하지 않는 첨부 파일을 필터링하기 위해 `OpenAI` 노드를 사용합니다. 다양한 PDF 파일(예: 송장, 영수증, 또는 계약서)을 매치할 수 있습니다.\n4. PDF 첨부 파일이 검색어와 일치하면, 워크플로는 `Google Drive` 노드를 사용하여 해당 PDF 첨부 파일을 특정 Google Drive 폴더에 업로드합니다.\n\n워크플로 작성자: [David Sha](https://davidsha.me)."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "fb2c3697-a92f-4be1-b9a6-0326f87de70b",
+      "name": "Configure",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -20,
+        1520
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "maxTokenSize",
+              "value": 4000
+            },
+            {
+              "name": "replyTokenSize",
+              "value": 50
+            }
+          ],
+          "string": [
+            {
+              "name": "Match on",
+              "value": "payslip"
+            },
+            {
+              "name": "Google Drive folder to upload matched PDFs",
+              "value": "https://drive.google.com/drive/u/0/folders/1SKdHTnYoBNlnhF_QJ-Zyepy-3-WZkObo"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "792c49f4-06e3-4d77-a31f-1513f70abf32",
+      "name": "Is PDF",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        640,
+        1520
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $binary.data.fileExtension }}",
+              "value2": "pdf"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "82be9111-665d-41c6-8190-2247acdb749b",
+      "name": "Not a PDF",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        860,
+        1620
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "c2ac155f-38ee-46f2-8a24-5614e3c32ff5",
+      "name": "Is matched",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1720,
+        1480
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json[\"text\"] }}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4a8f15b8-c153-493d-9a2a-d63d911d642d",
+      "name": "This is a matched PDF",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1940,
+        1380
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "89601591-5c7b-461c-859b-25c7c1f0c2e6",
+      "name": "This is not a matched PDF",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1940,
+        1580
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "ac517c4a-83b8-441f-b14c-c927c18f8012",
+      "name": "Iterate over email attachments",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        420,
+        1420
+      ],
+      "parameters": {
+        "jsCode": "// https://community.n8n.io/t/iterating-over-email-attachments/13588/3\nlet results = [];\n\nfor (const item of $input.all()) {\n for (key of Object.keys(item.binary)) {\n results.push({\n json: {},\n binary: {\n data: item.binary[key],\n }\n });\n }\n}\n\nreturn results;"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "79fdf2de-42fe-4ebb-80fb-cc80dcd284f9",
+      "name": "OpenAI matches PDF textual content",
+      "type": "n8n-nodes-base.openAi",
+      "position": [
+        1300,
+        1340
+      ],
+      "parameters": {
+        "prompt": "=Does this PDF file look like a {{ $(\"Configure\").first().json[\"Match on\"] }}? Return \"true\" if it is a {{ $(\"Configure\").first().json[\"Match on\"] }} and \"false\" if not. Only reply with lowercase letters \"true\" or \"false\".\n\nThis is the PDF filename:\n```\n{{ $binary.data.fileName }}\n```\n\nThis is the PDF text content:\n```\n{{ $json.text }}\n```",
+        "options": {
+          "maxTokens": "={{ $('Configure').first().json.replyTokenSize }}",
+          "temperature": 0.1
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "30",
+          "name": "REPLACE ME"
+        }
+      },
+      "typeVersion": 1,
+      "alwaysOutputData": false
+    },
+    {
+      "id": "8bdb3263-40f2-4277-8cc0-f6edef90a1cd",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1500,
+        1480
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1"
+            }
+          }
+        },
+        "combinationMode": "mergeByPosition"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "8e68e725-b2df-4c0c-8b17-e0cd4610714d",
+      "name": "Upload file to folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        2160,
+        1380
+      ],
+      "parameters": {
+        "name": "={{ $binary.data.fileName }}",
+        "options": {},
+        "parents": [
+          "={{ $('Configure').first().json[\"Google Drive folder to upload matched PDFs\"].split(\"/\").at(-1) }}"
+        ],
+        "binaryData": true
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "32",
+          "name": "REPLACE ME"
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "bda00901-5ade-471c-b6f9-a18ef4d71589",
+      "name": "On email received",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [
+        -240,
+        1520
+      ],
+      "parameters": {
+        "simple": false,
+        "filters": {},
+        "options": {
+          "downloadAttachments": true,
+          "dataPropertyAttachmentsPrefixName": "attachment_"
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "31",
+          "name": "REPLACE ME"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b2ff4774-336b-47a3-af3f-ada809ed9b8a",
+      "name": "Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -100,
+        1440
+      ],
+      "parameters": {
+        "width": 259.0890718059702,
+        "height": 607.9684549079709,
+        "content": "### 구성\n\n__`Match on`(필수)__: OpenAI의 검색 용어가 무엇이어야 하는가? 예시: invoice, callsheet, receipt, contract, payslip.\n\n__`Google Drive folder to upload matched PDFs`(필수)__: GDrive 폴더의 링크를 붙여넣으세요. 예시가 제공되었으나, 본인 소유의 폴더로 변경해야 합니다.\n\n__`maxTokenSize`(필수)__: 선택한 모델의 최대 토큰 크기입니다. 가능한 모델은 OpenAI [여기](https://platform.openai.com/docs/models/gpt-3)에서 확인하세요.\n\n__`replyTokenSize`(필수)__: 응답의 최대 토큰 크기입니다. 기본값은 300입니다. 이는 AI가 응답하는 텍스트 양을 결정합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "beb571fe-e7a3-4f3c-862b-dc01821e5f3f",
+      "name": "Ignore large PDFs",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1300,
+        1620
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "f3c4f249-08a7-4e5e-8f46-e07393ac10b5",
+      "name": "Is text within token limit?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1080,
+        1520
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.text.length() / 4 <= $('Configure').first().json.maxTokenSize - $('Configure').first().json.replyTokenSize }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "93b6fb96-3e0e-4953-bd09-cf882d2dc69c",
+      "name": "Has attachments?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        200,
+        1520
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $('On email received').item.binary.isNotEmpty() }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "554d415e-a965-46be-8442-35c4cb6b005c",
+      "name": "There are no attachments",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        420,
+        1620
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Is matched",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is PDF": {
+      "main": [
+        [
+          {
+            "node": "Read PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not a PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read PDF": {
+      "main": [
+        [
+          {
+            "node": "Is text within token limit?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure": {
+      "main": [
+        [
+          {
+            "node": "Has attachments?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is matched": {
+      "main": [
+        [
+          {
+            "node": "This is a matched PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "This is not a matched PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has attachments?": {
+      "main": [
+        [
+          {
+            "node": "Iterate over email attachments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "There are no attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On email received": {
+      "main": [
+        [
+          {
+            "node": "Configure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "This is a matched PDF": {
+      "main": [
+        [
+          {
+            "node": "Upload file to folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is text within token limit?": {
+      "main": [
+        [
+          {
+            "node": "OpenAI matches PDF textual content",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Ignore large PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iterate over email attachments": {
+      "main": [
+        [
+          {
+            "node": "Is PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI matches PDF textual content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

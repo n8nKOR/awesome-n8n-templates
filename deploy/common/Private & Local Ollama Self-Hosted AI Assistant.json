@@ -1,0 +1,314 @@
+{
+  "id": "Telr6HU0ltH7s9f7",
+  "meta": {
+    "instanceId": "31e69f7f4a77bf465b805824e303232f0227212ae922d12133a0f96ffeab4fef"
+  },
+  "name": "🗨️Ollama Chat",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "9560e89b-ea08-49dc-924e-ec8b83477340",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        280,
+        60
+      ],
+      "webhookId": "4d06a912-2920-489c-a33c-0e3ea0b66745",
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "c7919677-233f-4c48-ba01-ae923aef511e",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "onError": "continueErrorOutput",
+      "position": [
+        640,
+        60
+      ],
+      "parameters": {
+        "text": "=Provide the users prompt and response as a JSON object with two fields:\n- Prompt\n- Response\n\nAvoid any preample or further explanation.\n\nThis is the question: {{ $json.chatInput }}",
+        "promptType": "define"
+      },
+      "typeVersion": 1.5
+    },
+    {
+      "id": "b9676a8b-f790-4661-b8b9-3056c969bdf5",
+      "name": "Ollama Model",
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "position": [
+        740,
+        340
+      ],
+      "parameters": {
+        "model": "llama3.2:latest",
+        "options": {}
+      },
+      "credentials": {
+        "ollamaApi": {
+          "id": "IsSBWGtcJbjRiKqD",
+          "name": "Ollama account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "61dfcda5-083c-43ff-8451-b2417f1e4be4",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -380,
+        -380
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 520,
+        "height": 860,
+        "content": "# 🦙 Ollama 채팅 워크플로우\n\n간단한 N8N 워크플로우로, Ollama LLM을 채팅 메시지 처리에 통합하여 구조화된 JSON 객체를 반환합니다.\n\n## 개요\n이 워크플로우는 Ollama를 통해 Llama 3.2 모델을 사용하여 메시지를 처리하는 채팅 인터페이스를 생성합니다. 채팅 메시지가 수신되면 기본 LLM 체인을 통해 처리되고 응답이 반환됩니다.\n\n## 구성 요소\n- **트리거 노드**\n- **처리 노드**\n- **모델 노드**\n- **JSON to Object 노드**\n- **구조화된 응답 노드**\n- **오류 응답 노드**\n\n## 워크플로우 구조\n1. 채팅 트리거 노드가 들어오는 메시지를 수신합니다.\n2. 메시지가 기본 LLM 체인으로 전달됩니다.\n3. Ollama 모델이 Llama 3.2를 사용하여 입력을 처리합니다.\n4. 응답이 체인을 통해 반환됩니다.\n\n## 전제 조건\n- N8N 설치\n- Llama 3.2 모델이 포함된 Ollama 설정\n- 유효한 Ollama API 자격 증명\n\n## 구성\n1. N8N에서 Ollama API 자격 증명을 설정합니다.\n2. Ollama 설치에 Llama 3.2 모델이 사용 가능하도록 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "64f60ee1-7870-461e-8fac-994c9c08b3f9",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        340,
+        280
+      ],
+      "parameters": {
+        "width": 560,
+        "height": 200,
+        "content": "## 모델 노드\n- 이름: Ollama Model\n- 유형: LangChain Ollama Integration\n- 모델: llama3.2:latest\n- 목적: 언어 모델 기능을 제공합니다"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "bb46210d-450c-405b-a451-42458b3af4ae",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        200,
+        -160
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 280,
+        "height": 400,
+        "content": "## 트리거 노드\n- 이름: 채팅 메시지 수신 시\n- 유형: 채팅 트리거\n- 목적: 새 채팅 메시지가 도착할 때 워크플로를 시작합니다"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7f21b9e6-6831-4117-a2e2-9c9fb6edc492",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        520,
+        -380
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 500,
+        "height": 620,
+        "content": "## 처리 노드\n- 이름: 기본 LLM 체인\n- 유형: LangChain LLM 체인\n- 목적: 언어 모델을 통해 메시지의 처리를 처리하고 구조화된 JSON 객체를 반환합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "871bac4e-002f-4a1d-b3f9-0b7d309db709",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        560,
+        -200
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 420,
+        "height": 200,
+        "content": "### 프롬프트 (사용 사례에 맞게 변경하세요)\n사용자의 프롬프트와 응답을 두 필드를 가진 JSON 객체로 제공하세요:\n- 프롬프트\n- 응답\n\n어떠한 서문이나 추가 설명도 피하세요.\n이것은 질문입니다: {{ $json.chatInput }}\n\n### 출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c9e1b2af-059b-4330-a194-45ae0161aa1c",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1060,
+        -280
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 420,
+        "height": 520,
+        "content": "## JSON을 객체 노드로\n- 유형: Set 노드\n- 목적: 워크플로우를 통해 보내기 전에 응답 데이터를 특정 형식으로 변환하고 구조화하도록 설계된 노드. 수동 매핑 모드에서 작동하여 응답 형식에 대한 정밀한 제어를 허용합니다.\n\n**주요 기능**\n- 수동 필드 매핑 기능\n- 객체 변환 및 재구성\n- JSON 데이터 형식 지원\n- 필드 간 값 매핑\n- 추가 입력 필드 추가 옵션 포함"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3fb912b8-86ac-42f7-a19c-45e59898a62e",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        -180
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 460,
+        "height": 420,
+        "content": "## 구조화된 응답 노드\n- 유형: Set Node\n- 목적: 워크플로우가 사용자 채팅 프롬프트에 어떻게 응답하는지를 제어합니다.\n\n**응답 모드**\n- 수동 매핑: 응답 데이터의 맞춤 형식화를 허용합니다.\n- 설정 필드: 응답에 포함할 데이터 필드를 지정합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "fdfd1a5c-e1a6-4390-9807-ce665b96b9ae",
+      "name": "Structured Response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1700,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13c4058d-2d50-46b7-a5a6-c788828a1764",
+              "name": "text",
+              "type": "string",
+              "value": "=Your prompt was: {{ $json.response.Prompt }}\n\nMy response is: {{ $json.response.Response }}\n\nThis is the JSON object:\n\n{{ $('Basic LLM Chain').item.json.text }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "76baa6fc-72dd-41f9-aef9-4fd718b526df",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1460,
+        660
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13c4058d-2d50-46b7-a5a6-c788828a1764",
+              "name": "text",
+              "type": "string",
+              "value": "=There was an error."
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "bde3b9df-af55-451b-b287-1b5038f9936c",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1240,
+        280
+      ],
+      "parameters": {
+        "color": 2,
+        "width": 540,
+        "height": 560,
+        "content": "## 오류 응답 노드\n- 유형: Set 노드\n- 목적: Basic LLM Chain이 채팅 메시지를 제대로 처리하지 못할 때 오류 사례를 처리합니다. 이는 워크플로가 견고하게 유지되도록 대체 응답 메커니즘을 제공합니다.\n\n**주요 기능**\n- 기본 오류 메시지를 제공합니다\n- 일관된 응답 구조를 유지합니다\n- LLM Chain의 오류 출력 브랜치에 연결합니다\n- 우아한 실패 처리를 보장합니다\n\n오류 응답 노드는 주 처리 체인에 문제가 발생할 때 활성화되어, 언어 모델 처리에서 오류가 발생하더라도 사용자가 항상 피드백을 받을 수 있도록 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b9b2ab8d-9bea-457a-b7bf-51c8ef0de69f",
+      "name": "JSON to Object",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1220,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12af1a54-62a2-44c3-9001-95bb0d7c769d",
+              "name": "response",
+              "type": "object",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5175454a-91b7-4c57-890d-629bd4e8d2fd",
+  "connections": {
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON to Object": {
+      "main": [
+        [
+          {
+            "node": "Structured Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "JSON to Object",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

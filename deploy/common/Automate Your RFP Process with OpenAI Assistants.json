@@ -1,0 +1,563 @@
+{
+  "meta": {
+    "instanceId": "26ba763460b97c249b82942b23b6384876dfeb9327513332e743c5f6219c2b8e"
+  },
+  "nodes": [
+    {
+      "id": "51dbe3b4-42f6-43c9-85dc-42ae49be6ba9",
+      "name": "Get RFP Data",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        1003,
+        278
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "pdf"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c42e6bfc-a426-4d12-bf95-f3fe6e944631",
+      "name": "Item List Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserItemList",
+      "position": [
+        2140,
+        540
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1703e9c3-f49e-4272-ad11-0b9d4e9a76c6",
+      "name": "For Each Question...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        2460,
+        340
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "a54fa4ee-6f67-41a9-89fe-fd9f2bf094de",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        760,
+        60
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 532.597092515486,
+        "height": 508.1316876142587,
+        "content": "## 1. 워크플로우를 트리거하는 API\n\n[웹훅 사용에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/)\n\n이 워크플로우는 사용자가 API 요청을 통해 RFP 문서를 제출해야 합니다. 이 목적을 위해 웹훅 노드를 사용하는 것은 일반적인 패턴입니다. 프로덕션 환경에서 이 웹훅 엔드포인트를 안전하게 보호하세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "fdef005f-7838-4b8c-8af4-4b7c6f947ee2",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1143,
+        278
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "={\n \"doc_title\": \"{{ $('Wait for Request').item.json.body.title }}\",\n \"doc_filename\": \"{{ $('Wait for Request').item.json.body.id }} | {{ $('Wait for Request').item.json.body.title }} | {{ $now.format('yyyyMMddhhmmss') }}| RFP Response\",\n \"reply_to\": \"{{ $('Wait for Request').item.json.body.reply_to }}\"\n}\n"
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "a64f6274-62fc-42fb-b7c7-5aa85746c621",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1320,
+        148.42417112849222
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 493.289385759178,
+        "height": 418.29352785836636,
+        "content": "## 2. RFP 질문에 대한 응답을 캡처하기 위한 새 문서 생성\n\n[Google Docs 작업에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googledocs/)\n\n우리가 처리하는 각 RFP에 대해, 결과를 저장하기 위한 고유한 문서를 생성해 보자. 그것은 RFP 응답의 초안 문서로 작용할 것이다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2b3df6af-c1ab-44a1-8907-425944294477",
+      "name": "Create new RFP Response Document",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        1420,
+        340
+      ],
+      "parameters": {
+        "title": "={{ $json.doc_filename }}",
+        "folderId": "=1y0I8MH32maIWCJh767mRE_NMHC6A3bUu"
+      },
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "V0G0vi1DRj7Cqbp9",
+          "name": "Google Docs account"
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "0bf30bef-2910-432b-b5eb-dee3fe39b797",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1840,
+        110.52747078833045
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 500.1029039641811,
+        "height": 599.9895116376663,
+        "content": "## 3. AI를 사용한 질문 식별\n\n[Question & Answer Chain에 대해 자세히 읽기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainretrievalqa/)\n\nLLM의 힘을 이용하여, 원본 형식이나 레이아웃에 상관없이 RFP 설문지를 추출할 수 있습니다. 이로 인해 AutoRFP는 다양한 RFP를 처리할 수 있으며, 에지 케이스에 대한 명시적인 추출 규칙을 요구하지 않습니다.\n\n또한, Input List Output Parser를 사용하여 질문을 목록으로 반환하여 추가 처리를 할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1c064047-1f6a-47c8-bb49-85b4d6f8e854",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2380,
+        84.66944065837868
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 746.3888903304862,
+        "height": 600.3660610069576,
+        "content": "## 4. AI를 사용한 질문 및 답변 쌍 생성  \n[n8n에서 OpenAI Assistants 사용에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-langchain.openai/)  \n\n우리 회사와 사업에 대한 마케팅 자료와 판매 문서를 OpenAI Assistant에 준비하여, AI를 사용하여 RFP 질문에 정확하고 관련된 맥락으로 답변할 수 있습니다. 잠재적으로 판매 팀이 답변할 수 있는 RFP의 수를 증가시킬 수 있습니다.  \n\n이 워크플로의 이 부분은 각 질문을 개별적으로 반복하여 더 나은 답변을 제공합니다. 우리는 이전에 만든 RFP 응답 문서에 질문과 답변 쌍을 기록할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e663ba01-e9a6-4247-9d97-8f796d29d72a",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1960,
+        540
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ec0b439e-9fd8-4960-b8bb-04f4f7814a0a",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        300,
+        60
+      ],
+      "parameters": {
+        "width": 421.778219154496,
+        "height": 515.8006969458895,
+        "content": "## 직접 해보세요!\n\n**이 워크플로는 다음을 수행합니다:**\n* 웹훅을 통해 RFP 문서를 수신합니다\n* Google Docs를 통해 새로운 RFP 응답 문서를 생성합니다\n* LLM을 사용하여 RFP 문서에서 질문을 추출하여 질문 목록으로 만듭니다\n* 각 질문을 반복적으로 처리하며 OpenAI Assistant를 사용하여 답변을 생성하고, 각 답변을 응답 문서에 저장합니다\n* 완료되면 팀에게 Gmail과 Slack 알림을 보냅니다\n\n📃**예시 문서**  \n이 워크플로를 실행하려면 다음 2개의 문서가 필요합니다:  \n* [RFP 문서](https://drive.google.com/file/d/1G42h4Vz2lBuiNCnOiXF_-EBP1MaIEVq5/view?usp=sharing)  \n* [예시 회사 문서](https://drive.google.com/file/d/16WywCYcxBgYHXB3TY3wXUTyfyG2n_BA0/view?usp=sharing)\n\n### 도움이 필요하신가요?  \n[Discord](https://discord.com/invite/XPKeKXeB7d) 또는 [Forum](https://community.n8n.io/)에 참여하세요!\n\n즐겁게 해킹하세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "244ff32d-9bc4-4a67-a6c2-4a7dc308058e",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3160,
+        80
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 474.3513281516049,
+        "height": 390.51033452105344,
+        "content": "## 5. 완료되면 알림 보내기\n[Slack 사용에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.slack)\n\n마지막으로, 프로세스가 완료될 때 판매 팀에 알리는 여러 방법을 사용할 수 있습니다. 여기서, 우리는 RFP 응답 문서에 대한 링크가 포함된 이메일을 요청한 사용자에게 보내기로 했습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "94243b69-43b8-4731-9a6b-2934db832cc6",
+      "name": "Send Chat Notification",
+      "type": "n8n-nodes-base.slack",
+      "position": [
+        3440,
+        280
+      ],
+      "parameters": {
+        "text": "=RFP document \"{{ $('Set Variables').item.json.title }}\" completed!",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "RFP-channel"
+        },
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "VfK3js0YdqBdQLGP",
+          "name": "Slack account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "391d7e07-2a6d-4c4d-bf42-9cc5466cc1b5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        3240,
+        280
+      ],
+      "parameters": {
+        "sendTo": "={{ $('Set Variables').item.json.reply_to }}",
+        "message": "=Your RFP document \"{{ $('Set Variables').item.json.title }}\" is now complete!",
+        "options": {},
+        "subject": "=RFP Questionnaire \"{{ $('Set Variables').item.json.title }}\" Completed!",
+        "emailType": "text"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Sf5Gfl9NiFTNXFWb",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "34115f45-21ff-49a0-95f4-1fed53b53583",
+      "name": "Add Metadata to Response Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        1600,
+        340
+      ],
+      "parameters": {
+        "actionsUi": {
+          "actionFields": [
+            {
+              "text": "=Title: {{ $('Set Variables').item.json.doc_title }}\nDate generated: {{ $now.format(\"yyyy-MM-dd @ hh:mm\") }}\nRequested by: {{ $('Set Variables').item.json.reply_to }}\nExecution Id: http://localhost:5678/workflow/{{ $workflow.id }}/executions/{{ $execution.id }}\n\n---\n\n",
+              "action": "insert"
+            }
+          ]
+        },
+        "operation": "update",
+        "documentURL": "={{ $json.id }}"
+      },
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "V0G0vi1DRj7Cqbp9",
+          "name": "Google Docs account"
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "f285d896-ba15-4f8a-b041-7cbcbe2e1050",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        783,
+        238
+      ],
+      "parameters": {
+        "width": 192.30781285767205,
+        "height": 306.5264325350084,
+        "content": "🚨**필수**  \n* Postman과 같은 도구를 사용하여 웹훅에 데이터를 보내세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b6e4e40e-b10b-48f2-bfe2-1ad38b1c6518",
+      "name": "Record Question & Answer in Response Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        2940,
+        460
+      ],
+      "parameters": {
+        "actionsUi": {
+          "actionFields": [
+            {
+              "text": "={{ $runIndex+1 }}. {{ $json.content }}\n{{ $json.output }}\n\n",
+              "action": "insert"
+            }
+          ]
+        },
+        "operation": "update",
+        "documentURL": "={{ $('Create new RFP Response Document').item.json.id }}"
+      },
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "V0G0vi1DRj7Cqbp9",
+          "name": "Google Docs account"
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "ae8cc28f-4fd3-41d7-8a30-2675f58d1067",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2600,
+        440
+      ],
+      "parameters": {
+        "width": 306.8994213707367,
+        "height": 481.01365258903786,
+        "content": "🚨**필수**  \n이 워크플로를 사용하려면 OpenAI Assistant를 만들어야 합니다.  \n* 아직 하지 않았다면 [OpenAI Dashboard](https://platform.openai.com)에 가입하세요.  \n* [OpenAI Assistant](https://platform.openai.com/playground/assistants)를 생성하세요.  \n* 어시스턴트에 [예시 회사 문서](https://drive.google.com/file/d/16WywCYcxBgYHXB3TY3wXUTyfyG2n_BA0/view?usp=sharing)를 업로드하세요.  \n\n어시스턴트는 회사 문서를 사용하여 질문을 답변할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "81825554-5cbe-469b-8511-a92d5ea165cb",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3200,
+        460
+      ],
+      "parameters": {
+        "width": 386.79263167741857,
+        "height": 94.04968721739164,
+        "content": "🚨**필수**  \n* Gmail Node에서 보내는 이메일 주소를 업데이트하세요.  \n* Slack의 채널과 메시지를 업데이트하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "25a57ca0-6789-499c-873b-07aba40530ed",
+      "name": "Answer Question with Context",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2620,
+        460
+      ],
+      "parameters": {
+        "text": "={{ $json.response.text }}",
+        "prompt": "define",
+        "options": {},
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "asst_QBI5lLKOsjktr3DRB4MwrgZd",
+          "cachedResultName": "Nexus Digital Solutions Bot"
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "1b4cc83b-a793-47c1-9dd6-0d7484db07b4",
+      "name": "Wait for Request",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        823,
+        278
+      ],
+      "webhookId": "35e874df-2904-494e-a9f5-5a3f20f517f8",
+      "parameters": {
+        "path": "35e874df-2904-494e-a9f5-5a3f20f517f8",
+        "options": {},
+        "httpMethod": "POST"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "2f97e3e6-c100-4045-bcb3-6fbd17cfb420",
+      "name": "Extract Questions From RFP",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1960,
+        380
+      ],
+      "parameters": {
+        "text": "=You have been given a RFP document as part of a tender process of a buyer. Please extract all questions intended for the supplier. You must ensure the questions extracted are exactly has they are written in the RFP document.\n\n<RFP>{{ $('Get RFP Data').item.json.text }}<RFP>",
+        "promptType": "define",
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.4
+    },
+    {
+      "id": "4945b975-ac84-406e-8482-44cfa5679ef9",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        760,
+        600
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 529.9947173986736,
+        "height": 157.64231937074243,
+        "content": "### 예시 웹훅 요청\ncurl --location 'https://<n8n_webhook_url>' \\\n--form 'id=\"RFP001\"' \\\n--form 'title=\"BlueChip 여행 및 StarBus 웹 서비스\"' \\\n--form 'reply_to=\"jim@example.com\"' \\\n--form 'data=@\"k9pnbALxX/RFP 설문지.pdf\"'"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get RFP Data": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Create new RFP Response Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Request": {
+      "main": [
+        [
+          {
+            "node": "Get RFP Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Questions From RFP",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Question...": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Answer Question with Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Extract Questions From RFP",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Chat Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Questions From RFP": {
+      "main": [
+        [
+          {
+            "node": "For Each Question...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Metadata to Response Doc": {
+      "main": [
+        [
+          {
+            "node": "Extract Questions From RFP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer Question with Context": {
+      "main": [
+        [
+          {
+            "node": "Record Question & Answer in Response Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create new RFP Response Document": {
+      "main": [
+        [
+          {
+            "node": "Add Metadata to Response Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Question & Answer in Response Doc": {
+      "main": [
+        [
+          {
+            "node": "For Each Question...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

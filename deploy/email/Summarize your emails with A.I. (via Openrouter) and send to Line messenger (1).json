@@ -1,0 +1,177 @@
+{
+  "id": "QnVdtKiTf3nbrNkh",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Summarize emails with A.I. then send to messenger",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "50e12e63-df28-45ac-9208-48cbf5116d09",
+      "name": "Read emails (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "position": [
+        340,
+        260
+      ],
+      "parameters": {
+        "options": {},
+        "postProcessAction": "nothing"
+      },
+      "credentials": {
+        "imap": {
+          "id": "gXtdakU9M02LBQc3",
+          "name": "IMAP account"
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "6565350b-2269-44e3-8f36-8797f32d3e09",
+      "name": "Send email to A.I. to summarize",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        700,
+        260
+      ],
+      "parameters": {
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"model\": \"meta-llama/llama-3.1-70b-instruct:free\",\n \"messages\": [\n {\n \"role\": \"user\",\n \"content\": \"I want you to read and summarize all the emails. If it's not rimportant, just give me a short summary with less than 10 words.\\n\\nHighlight as important if it is, add an emoji to indicate it is urgent:\\nFor the relevant content, find any action items and deadlines. Sometimes I need to sign up before a certain date or pay before a certain date, please highlight that in the summary for me.\\n\\nPut the deadline in BOLD at the top. If the email is not important, keep the summary short to 1 sentence only.\\n\\nHere's the email content for you to read:\\nSender email address: {{ encodeURIComponent($json.from) }}\\nSubject: {{ encodeURIComponent($json.subject) }}\\n{{ encodeURIComponent($json.textHtml) }}\"\n }\n ]\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "WY7UkF14ksPKq3S8",
+          "name": "Header Auth account 2"
+        }
+      },
+      "typeVersion": 4.2,
+      "alwaysOutputData": false
+    },
+    {
+      "id": "d04c422a-c000-4e48-82d0-0bf44bcd9fff",
+      "name": "Send summarized content to messenger",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1100,
+        260
+      ],
+      "parameters": {
+        "url": "https://api.line.me/v2/bot/message/push",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"to\": \"U3ec262c49811f30cdc2d2f2b0a0df99a\",\n \"messages\": [\n {\n \"type\": \"text\",\n \"text\": \"{{ $json.choices[0].message.content.replace(/\\n/g, \"\\\\n\") }}\"\n }\n ]\n}\n\n\n ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SzcKjO9Nn9vZPL2H",
+          "name": "Header Auth account 5"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "57a1219c-4f40-407c-855b-86c4c7c468bb",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        0
+      ],
+      "parameters": {
+        "width": 361,
+        "height": 90,
+        "content": "## A.I.로 이메일 요약  \n사용 사례에 대해 더 자세히 알아볼 수 있습니다. [사용 사례](https://rumjahn.com/how-a-i-saved-my-kids-school-life-and-my-marriage/)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "17686264-56ac-419e-a32b-dc5c75f15f1f",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        283,
+        141
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 229,
+        "height": 280,
+        "content": "귀하의 이메일 서버의 IMAP 설정을 찾으세요.  \n- [Gmail](https://www.getmailspring.com/setup/access-gmail-via-imap-smtp) 링크"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1862abd6-7dca-4c66-90d6-110d4fcf4d99",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        580,
+        0
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 365,
+        "height": 442,
+        "content": "AI를 위해 Openrouter.ai를 사용할 수 있습니다.  \n- 무료 계정을 설정하세요  \n- 선택된 AI 모델은 무료로 사용할 수 있습니다.  \n## 자격 증명  \n- 헤더 인증을 사용하세요  \n- 사용자 이름: Authorization  \n- 비밀번호: Bearer {insert your API key}.  \n- 비밀번호는 \"Bearer\" 공백 플러스 당신의 API 키입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c4a3a76f-539d-4bbf-8f95-d7aaebf39a55",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1000,
+        0
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 307,
+        "height": 439,
+        "content": "공식 Line 노드를 사용하지 마세요. 그것은 구식이입니다.\n\n## 자격 증명\n- 헤더 인증을 사용하세요\n- 사용자 이름: Authorization\n- 비밀번호: Bearer {channel access token}\n\n채널 액세스 토큰을 [Line API 콘솔](https://developers.line.biz/console/)에서 찾을 수 있습니다. Messaging API로 이동하여 맨 아래로 스크롤하세요."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "81216e6a-2bd8-4215-8a96-376ee520469d",
+  "connections": {
+    "Read emails (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Send email to A.I. to summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email to A.I. to summarize": {
+      "main": [
+        [
+          {
+            "node": "Send summarized content to messenger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

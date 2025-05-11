@@ -1,0 +1,461 @@
+{
+  "id": "G8jRDBvwsMkkMiLN",
+  "meta": {
+    "instanceId": "205b3bc06c96f2dc835b4f00e1cbf9a937a74eeb3b47c99d0c30b0586dbf85aa"
+  },
+  "name": "[3/3] Anomaly detection tool (crops dataset)",
+  "tags": [
+    {
+      "id": "spMntyrlE9ydvWFA",
+      "name": "anomaly-detection",
+      "createdAt": "2024-12-08T22:05:15.945Z",
+      "updatedAt": "2024-12-09T12:50:19.287Z"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "e01bafec-eb24-44c7-b3c4-a60f91666350",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        180
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 400,
+        "height": 740,
+        "content": "우리는 여기에서 작물 데이터셋과 함께 작업하고 있습니다:   \n데이터셋에 있는 기존 (그래서 이상이 아닌) 작물 이미지들은:  \n- '진주 기장(바즈라)',  \n- '담배 식물',  \n- '체리',  \n- '목화',  \n- '바나나',  \n- '오이',  \n- '옥수수',  \n- '밀',  \n- '정향',  \n- '수수',  \n- '올리브 나무',  \n- '대두',  \n- '커피 나무',  \n- '쌀',  \n- '레몬',  \n- '겨자',  \n- '녹두',  \n- '코코넛',  \n- '병아리 콩',  \n- '파인애플',  \n- '사탕수수',  \n- '해바라기',  \n- '고추',  \n- '호박 열매(마카나)',  \n- '황마',  \n- '파파야',  \n- '차',  \n- '카르다몬',  \n- '아몬드'"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b9943781-de1f-4129-9b81-ed836e9ebb11",
+      "name": "Embed image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        680,
+        60
+      ],
+      "parameters": {
+        "url": "https://api.voyageai.com/v1/multimodalembeddings",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"inputs\": [\n {\n \"content\": [\n {\n \"type\": \"image_url\",\n \"image_url\": $('Image URL hardcode').first().json.imageURL\n }\n ]\n }\n ],\n \"model\": \"voyage-multimodal-3\",\n \"input_type\": \"document\"\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Vb0RNVDnIHmgnZOP",
+          "name": "Voyage API"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "47b72bc2-4817-48c6-b517-c1328e402468",
+      "name": "Get similarity of medoids",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        940,
+        60
+      ],
+      "parameters": {
+        "url": "={{ $('Variables for medoids').first().json.qdrantCloudURL }}/collections/{{ $('Variables for medoids').first().json.collectionName }}/points/query",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"query\": $json.data[0].embedding,\n \"using\": \"voyage\",\n \"limit\": $('Info About Crop Labeled Clusters').first().json.cropsNumber,\n \"with_payload\": true,\n \"filter\": {\n \"must\": [\n { \n \"key\": $('Variables for medoids').first().json.clusterCenterType,\n \"match\": {\n \"value\": true\n }\n }\n ]\n }\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "42d7eb27-ec38-4406-b5c4-27eb45358e93",
+      "name": "Compare scores",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1140,
+        60
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "points = _input.first()['json']['result']['points']\nthreshold_type = _('Variables for medoids').first()['json']['clusterThresholdCenterType']\n\nmax_score = -1\ncrop_with_max_score = None\nundefined = True\n\nfor center in points:\n if center['score'] >= center['payload'][threshold_type]:\n undefined = False\n if center['score'] > max_score:\n max_score = center['score']\n crop_with_max_score = center['payload']['crop_name']\n\nif undefined:\n result_message = \"ALERT, we might have a new undefined crop!\"\nelse:\n result_message = f\"Looks similar to {crop_with_max_score}\"\n\nreturn [{\n \"json\": {\n \"result\": result_message\n }\n}]\n"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "23aa604a-ff0b-4948-bcd5-af39300198c0",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        -220
+      ],
+      "parameters": {
+        "width": 400,
+        "height": 380,
+        "content": "## 작물 이상 감지 도구\n### 이 도구는 작물의 이상을 직접 감지하는 데 사용할 수 있습니다.  \n입력으로 (어떤) **이미지 URL**을 받아서, 이 이미지가 Qdrant에 저장된 작물 데이터셋과 비교하여 이상인지 여부를 알려주는 **텍스트 메시지**를 반환합니다. \n\n* 이미지 URL은 Execute Workflow Trigger를 통해 수신되며, 이를 Voyage.ai Embeddings API를 사용하여 임베딩 벡터를 생성합니다.\n* 반환된 벡터는 Qdrant 컬렉션을 조회하여, 주어진 작물이 각 이미지 클래스(작물 유형)의 **임계값 점수**와 비교해 알려진 작물인지 판단합니다.\n* 만약 이미지의 점수가 모든 임계값보다 낮으면, 해당 이미지는 데이터셋의 이상으로 간주됩니다.\n\n### 출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3a79eca2-44f9-4aee-8a0d-9c7ca2f9149d",
+      "name": "Variables for medoids",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -200,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dbbc1e7b-c63e-4ff1-9524-8ef3e9f6cd48",
+              "name": "clusterCenterType",
+              "type": "string",
+              "value": "is_medoid"
+            },
+            {
+              "id": "a994ce37-2530-4030-acfb-ec777a7ddb05",
+              "name": "qdrantCloudURL",
+              "type": "string",
+              "value": "https://152bc6e2-832a-415c-a1aa-fb529f8baf8d.eu-central-1-0.aws.cloud.qdrant.io"
+            },
+            {
+              "id": "12f0a9e6-686d-416e-a61b-72d034ec21ba",
+              "name": "collectionName",
+              "type": "string",
+              "value": "=agricultural-crops"
+            },
+            {
+              "id": "4c88a617-d44f-4776-b457-8a1dffb1d03c",
+              "name": "clusterThresholdCenterType",
+              "type": "string",
+              "value": "is_medoid_cluster_threshold"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "13b25434-bd66-4293-93f1-26c67b9ec7dd",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -340,
+        260
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 360,
+        "height": 200,
+        "content": "**클러스터 센터 유형** - 다음 중 하나  \n* \"is_text_anchor_medoid\" 또는  \n* \"is_medoid\"  \n\n**클러스터 임계값 센터 유형** - 다음 중 하나  \n* \"is_text_anchor_medoid_cluster_threshold\" 또는  \n* \"is_medoid_cluster_threshold\""
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "869b0962-6cae-487d-8230-539a0cc4c14c",
+      "name": "Info About Crop Labeled Clusters",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        440,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5327b254-b703-4a34-a398-f82edb1d6d6b",
+              "name": "=cropsNumber",
+              "type": "number",
+              "value": "={{ $json.result.hits.length }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "5d3956f8-f43b-439e-b176-a594a21d8011",
+      "name": "Total Points in Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        40,
+        60
+      ],
+      "parameters": {
+        "url": "={{ $json.qdrantCloudURL }}/collections/{{ $json.collectionName }}/points/count",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"exact\": true\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "14ba3db9-3965-4b20-b333-145616d45c3a",
+      "name": "Each Crop Counts",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        240,
+        60
+      ],
+      "parameters": {
+        "url": "={{ $('Variables for medoids').first().json.qdrantCloudURL }}/collections/{{ $('Variables for medoids').first().json.collectionName }}/facet",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"key\": \"crop_name\",\n \"limit\": $json.result.count,\n \"exact\": true\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "e37c6758-0556-4a56-ab14-d4df663cb53a",
+      "name": "Image URL hardcode",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -480,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "46ceba40-fb25-450c-8550-d43d8b8aa94c",
+              "name": "imageURL",
+              "type": "string",
+              "value": "={{ $json.query.imageURL }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "b24ad1a7-0cf8-4acc-9c18-6fe9d58b10f2",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -720,
+        60
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "50424f2b-6831-41bf-8de4-81f69d901ce1",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -240,
+        -80
+      ],
+      "parameters": {
+        "width": 180,
+        "height": 120,
+        "content": "이전 2개의 파이프라인에서 업로드하고 준비한 Qdrant의 컬렉션을 접근하기 위한 변수, 이상 탐지를 위해"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2e8ed3ca-1bba-4214-b34b-376a237842ff",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        40,
+        -120
+      ],
+      "parameters": {
+        "width": 560,
+        "height": 140,
+        "content": "이 세 노드는 우리 Qdrant 컬렉션에 얼마나 많은 다른 클래스(작물)가 있는지 알아내기 위해 필요합니다: **cropsNumber** (*\"Get similarity of medoids\"* 노드에서 필요합니다. \n[노트] *\"Total Points in Collection\"* -> *\"Each Crop Counts\"* 는 *\"[2/4] Set up medoids (2 types) for anomaly detection (crops dataset)\"* 파이프라인에서 이미 사용되고 설명되었습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e2fa5763-6e97-4ff5-8919-1cb85a3c6968",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        620,
+        240
+      ],
+      "parameters": {
+        "height": 120,
+        "content": "여기서, 우리는 이 워크플로우 도구에 전달된 이미지를 Voyage 임베딩 모델로 임베딩하여 데이터베이스의 모든 작물 이미지와 비교합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "cdb6b8d3-f7f4-4d66-850f-ce16c8ed98b9",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        920,
+        220
+      ],
+      "parameters": {
+        "width": 400,
+        "height": 180,
+        "content": "이미지가 클러스터의 모든 중심(작물)과 얼마나 유사한지 확인하는 중. 이전 워크플로우에서 설정하고 중심에 저장한 임계값보다 더 유사하다면, 이미지가 이 작물 클래스에 속할 가능성이 높습니다. 그렇지 않으면, 클래스에 비정상적입니다. 이미지가 모든 클래스에 비정상적이라면, 그것은 이상입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "03b4699f-ba43-4f5f-ad69-6f81deea2641",
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -620,
+        580
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 540,
+        "height": 300,
+        "content": "### 이상 탐지를 위한\n1. 첫 번째 파이프라인은 (crops) 데이터셋을 Qdrant의 컬렉션에 업로드합니다.\n2. 두 번째 파이프라인은 이 Qdrant 컬렉션에 클러스터 (클래스) 센터를 설정하고 클러스터 (클래스) 임계값 점수를 설정합니다.\n3. **이것은 입력으로 어떤 이미지든 받아들이고 Qdrant (crops) 컬렉션으로 수행된 모든 준비 작업을 사용하는 이상 탐지 도구입니다.**\n\n### 이를 재현하기 위해\nKaggle의 [crops](https://www.kaggle.com/datasets/mdwaquarazam/agricultural-crops-image-classification) 데이터셋을 자신의 Google Storage 버킷에 업로드하고, [Qdrant Cloud](https://qdrant.tech/documentation/quickstart-cloud/) ( **무료 티어** 클러스터를 사용할 수 있음)와 Voyage AI API, Google Cloud Storage에 대한 API/연결을 재구성해야 합니다.\n\n**일반적으로 파이프라인은 어떤 이미지 데이터셋에도 적용 가능합니다.**"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "active": false,
+  "pinData": {
+    "Execute Workflow Trigger": [
+      {
+        "json": {
+          "query": {
+            "imageURL": "https://storage.googleapis.com/n8n-qdrant-demo/agricultural-crops%2Fcotton%2Fimage%20(36).jpg"
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f67b764b-9e1a-4db0-b9f2-490077a62f74",
+  "connections": {
+    "Embed image": {
+      "main": [
+        [
+          {
+            "node": "Get similarity of medoids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Each Crop Counts": {
+      "main": [
+        [
+          {
+            "node": "Info About Crop Labeled Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image URL hardcode": {
+      "main": [
+        [
+          {
+            "node": "Variables for medoids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables for medoids": {
+      "main": [
+        [
+          {
+            "node": "Total Points in Collection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Image URL hardcode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get similarity of medoids": {
+      "main": [
+        [
+          {
+            "node": "Compare scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total Points in Collection": {
+      "main": [
+        [
+          {
+            "node": "Each Crop Counts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info About Crop Labeled Clusters": {
+      "main": [
+        [
+          {
+            "node": "Embed image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

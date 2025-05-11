@@ -1,0 +1,828 @@
+{
+  "meta": {
+    "instanceId": "03e9d14e9196363fe7191ce21dc0bb17387a6e755dcc9acc4f5904752919dca8"
+  },
+  "nodes": [
+    {
+      "id": "94dd7f48-0013-4fb5-89c4-826ecd7f2d66",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [
+        1460,
+        120
+      ],
+      "parameters": {
+        "simple": false,
+        "filters": {},
+        "options": {},
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kkhNhqKpZt6IUZd0",
+          "name": "Gmail"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "ca2023fa-ceca-4923-80e4-a3843803536c",
+      "name": "Microsoft Outlook Trigger",
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "disabled": true,
+      "position": [
+        1480,
+        680
+      ],
+      "parameters": {
+        "fields": [
+          "body",
+          "toRecipients",
+          "subject",
+          "bodyPreview"
+        ],
+        "output": "fields",
+        "filters": {},
+        "options": {},
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "vTCK0oVQ0WjFrI5H",
+          "name": " Outlook Credential"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "1f011214-91a0-4cfa-9d9e-29864937c0a3",
+      "name": "Screenshot HTML",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2620,
+        420
+      ],
+      "parameters": {
+        "url": "https://hcti.io/v1/image",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendQuery": true,
+        "authentication": "genericCredentialType",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "html",
+              "value": "={{ $('Set Email Variables').item.json.htmlBody }}"
+            }
+          ]
+        },
+        "genericAuthType": "httpBasicAuth",
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "8tm8mUWmPvtmPFPk",
+          "name": "hcti.io"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "64f4789f-9de8-414f-af62-ddc339f0d0ac",
+      "name": "Retrieve Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2800,
+        420
+      ],
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth"
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "8tm8mUWmPvtmPFPk",
+          "name": "hcti.io"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "db707bd9-6abc-4ab7-8ffa-ad25c5e8adc4",
+      "name": "Set Outlook Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2040,
+        680
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "38bd3db2-1a8d-4c40-a2dd-336e0cc84224",
+              "name": "htmlBody",
+              "type": "string",
+              "value": "={{ $('Microsoft Outlook Trigger').item.json.body.content }}"
+            },
+            {
+              "id": "13bdd95b-ef02-486e-b38b-d14bd05a4a8a",
+              "name": "headers",
+              "type": "string",
+              "value": "={{ $json}}"
+            },
+            {
+              "id": "20566ad4-7eb7-42b1-8a0d-f8b759610f10",
+              "name": "subject",
+              "type": "string",
+              "value": "={{ $('Microsoft Outlook Trigger').item.json.subject }}"
+            },
+            {
+              "id": "7171998f-a5a2-4e23-946a-9c1ad75710e7",
+              "name": "recipient",
+              "type": "string",
+              "value": "={{ $('Microsoft Outlook Trigger').item.json.toRecipients[0].emailAddress.address }}"
+            },
+            {
+              "id": "cc262634-2470-4524-8319-abe2518a6335",
+              "name": "textBody",
+              "type": "string",
+              "value": "={{ $('Retrieve Headers of Email').item.json.body.content }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "7a3622c0-6949-4ea3-ae13-46a1ee26de7b",
+      "name": "Set Gmail Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2020,
+        120
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "38bd3db2-1a8d-4c40-a2dd-336e0cc84224",
+              "name": "htmlBody",
+              "type": "string",
+              "value": "={{ $json.html }}"
+            },
+            {
+              "id": "18fbcf78-6d3c-4036-b3a2-fb5adf22176a",
+              "name": "headers",
+              "type": "string",
+              "value": "={{ $json.headers }}"
+            },
+            {
+              "id": "1d690098-be2a-4604-baf8-62f314930929",
+              "name": "subject",
+              "type": "string",
+              "value": "={{ $json.subject }}"
+            },
+            {
+              "id": "8009f00a-547f-4eb1-b52d-2e7305248885",
+              "name": "recipient",
+              "type": "string",
+              "value": "={{ $json.to.text }}"
+            },
+            {
+              "id": "1932e97d-b03b-4964-b8bc-8262aaaa1f7a",
+              "name": "textBody",
+              "type": "string",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "4b4c6b34-f74c-4402-91a1-4d002e02a3bd",
+      "name": "Retrieve Headers of Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1700,
+        680
+      ],
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/me/messages/{{ $json.id }}?$select=internetMessageHeaders,body",
+        "options": {},
+        "sendHeaders": true,
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "outlook.body-content-type=\"text\""
+            }
+          ]
+        },
+        "nodeCredentialType": "microsoftOutlookOAuth2Api"
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "vTCK0oVQ0WjFrI5H",
+          "name": " Outlook Credential"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "0c9883b5-3eb7-45db-9803-d1b30166a3b5",
+      "name": "Format Headers",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1880,
+        680
+      ],
+      "parameters": {
+        "jsCode": "const input = $('Retrieve Headers of Email').item.json.internetMessageHeaders;\n\nconst result = input.reduce((acc, { name, value }) => {\n if (!acc[name]) acc[name] = [];\n acc[name].push(value);\n return acc;\n}, {});\n\nreturn result;"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "c21a976c-00e5-4823-bd94-4c95a7d60438",
+      "name": "Analyze Email with ChatGPT",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        3000,
+        420
+      ],
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "GPT-4O"
+        },
+        "options": {},
+        "messages": {
+          "values": [
+            {
+              "content": "=Describe the following email using the HTML body and headers. Determine if the email could be a phishing email. \n\nHere is the HTML body:\n{{ $('Set Email Variables').item.json.htmlBody }}\n\nThe message headers are as follows:\n{{ $('Set Email Variables').item.json.headers }}\n\n"
+            },
+            {
+              "role": "system",
+              "content": "Please make sure to output all responses using the following structured JSON output:\n{\n \"malicious\": false,\n \"summary\": \"The email appears to be a legitimate communication from a known sender. It contains no suspicious links, attachments, or language that indicates phishing or malicious intent.\"\n}\n\nFormat the response for Jira who uses a wiki-style renderer. Do not include ``` around your response. Make the summary as verbose as possible including a full breakdown of why the email is benign or malicious."
+            }
+          ]
+        },
+        "jsonOutput": true
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "76",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.6
+    },
+    {
+      "id": "a91f4095-9245-4276-b21f-f415de22df62",
+      "name": "Create Potentially Malicious Ticket",
+      "type": "n8n-nodes-base.jira",
+      "position": [
+        3640,
+        400
+      ],
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "list",
+          "value": "10001",
+          "cachedResultName": "Support"
+        },
+        "summary": "=Potentially Malicious - Phishing Email Reported: \"{{ $('Set Email Variables').item.json.subject }}\"",
+        "issueType": {
+          "__rl": true,
+          "mode": "list",
+          "value": "10008",
+          "cachedResultName": "Task"
+        },
+        "additionalFields": {
+          "description": "=A phishing email was reported by {{ $('Set Email Variables').item.json.recipient }} with the subject line \"{{ $('Set Email Variables').item.json.subject }}\"\n\\\\\nh2. Here is ChatGPT's analysis of the email:\n{{ $json.message.content.summary }}"
+        }
+      },
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "BZmmGUrNIsgM9fDj",
+          "name": "New Jira Cloud"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a5a66a0e-9d8a-45a9-b1ae-aec78ddfec27",
+      "name": "Create Potentially Benign Ticket",
+      "type": "n8n-nodes-base.jira",
+      "position": [
+        3640,
+        580
+      ],
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "list",
+          "value": "10001",
+          "cachedResultName": "Support"
+        },
+        "summary": "=Potentially Benign - Phishing Email Reported: \"{{ $('Set Email Variables').item.json.subject }}\"",
+        "issueType": {
+          "__rl": true,
+          "mode": "list",
+          "value": "10008",
+          "cachedResultName": "Task"
+        },
+        "additionalFields": {
+          "description": "=A phishing email was reported by {{ $('Set Email Variables').item.json.recipient }} with the subject line \"{{ $('Set Email Variables').item.json.subject }}\"\n\\\\\nh2. Here is ChatGPT's analysis of the email:\n{{ $json.message.content.summary }}"
+        }
+      },
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "BZmmGUrNIsgM9fDj",
+          "name": "New Jira Cloud"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5af0d60b-d021-4dd9-98f7-b2842800764a",
+      "name": "Rename Screenshot",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        4020,
+        480
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "$('Retrieve Screenshot').item.binary.data.fileName = 'emailScreenshot.png'\n\nreturn $('Retrieve Screenshot').item;"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "441c4cbb-bd93-4213-bd34-e18f2a49389f",
+      "name": "Set Jira ID",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        3860,
+        480
+      ],
+      "parameters": {
+        "options": {},
+        "includeOtherFields": true
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "4c71188c-011d-4f8e-a36c-87900bfab59a",
+      "name": "Upload Screenshot of Email to Jira",
+      "type": "n8n-nodes-base.jira",
+      "position": [
+        4220,
+        480
+      ],
+      "parameters": {
+        "issueKey": "={{ $('Set Jira ID').item.json.key }}",
+        "resource": "issueAttachment"
+      },
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "BZmmGUrNIsgM9fDj",
+          "name": "New Jira Cloud"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3c031c34-8306-44e1-8e0e-a584c5323112",
+      "name": "Upload Email Body to Jira",
+      "type": "n8n-nodes-base.jira",
+      "position": [
+        4620,
+        480
+      ],
+      "parameters": {
+        "issueKey": "={{ $('Set Jira ID').item.json.key }}",
+        "resource": "issueAttachment"
+      },
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "BZmmGUrNIsgM9fDj",
+          "name": "New Jira Cloud"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d033dcbd-7ccb-451f-ab81-cc6d32d2e01f",
+      "name": "Convert Email Body to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2420,
+        420
+      ],
+      "parameters": {
+        "options": {
+          "fileName": "emailBody.txt"
+        },
+        "operation": "toText",
+        "sourceProperty": "textBody"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "bda5e2fe-d8c0-456b-975a-35e82ff02816",
+      "name": "Set Email Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2240,
+        420
+      ],
+      "parameters": {
+        "options": {},
+        "includeOtherFields": true
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "54ecd8ab-ac4a-4b6b-bd1b-bf8c70082a33",
+      "name": "Rename Email Body Screenshot",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        4420,
+        480
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "$('Convert Email Body to File').item.binary.data.fileName = 'emailBody.txt'\n\nreturn $('Convert Email Body to File').item;"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "fe5b82cc-b4bb-4c97-9477-075d5a280e9f",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2574.536755825029,
+        0
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 376.8280004374956,
+        "height": 595.590013880477,
+        "content": "![hctiapi](https://uploads.n8n.io/templates/hctiapi2.png)  \n## 이메일 본문 스크린샷 생성  \n\n**스크린샷 HTML** 노드는 이메일의 HTML 본문을 **hcti.io** API로 보내, 이메일 레이아웃을 시각적으로 표현하는 스크린샷을 생성합니다. **리트리브 스크린샷** 노드는 이 이미지를 가져와 후속 단계에서 첨부하거나 검토할 수 있도록 합니다. 이 이중 형식 처리는 이메일 분석 작업 흐름에서 명확성과 유연성을 보장합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "86b21049-f65e-4c6a-a854-c4376f870da9",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1380,
+        -149.99110983560342
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 814.4556539379754,
+        "height": 444.5525554815556,
+        "content": "![Gmail](https://uploads.n8n.io/templates/gmail.png)  \n## Gmail 통합 및 데이터 추출  \n\n이 워크플로의 이 섹션은 **Gmail Trigger** 노드를 사용하여 Gmail 계정에 연결되며, 실시간으로 수신 이메일을 캡처하며, 1분마다 확인을 수행합니다. 이메일이 감지되면, 그 주요 구성 요소(예: 제목, 수신자, 본문, 및 헤더)가 **Set Gmail Variables** 노드를 사용하여 추출되어 변수에 할당됩니다. 이러한 변수들은 이후 단계에서의 후속 분석 및 처리에 맞게 구성됩니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b1a786cf-7a8d-49e1-90ed-31f3d0e65b13",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1380,
+        308
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 809.7918597571277,
+        "height": 602.9002284617277,
+        "content": "![지메일](https://uploads.n8n.io/templates/outlook.png)  \n## 마이크로소프트 아웃룩 통합 및 이메일 헤더 처리  \n\n이 섹션은 마이크로소프트 아웃룩의 통합을 활성화하여 들어오는 이메일을 모니터링하고 캡처합니다. 마이크로소프트 아웃룩 트리거 노드는 매 분 새 메시지를 확인합니다. 이메일이 감지되면, 이메일 헤더를 검색하는 노드가 마이크로소프트 그래프 API를 통해 상세한 헤더와 본문 내용을 가져옵니다. 헤더 형식화 노드는 자바스크립트 함수를 사용하여 이메일 헤더를 구조화된 형식으로 정리하여 명확성과 추가 처리를 위한 준비를 보장합니다. 마지막으로, 아웃룩 변수 설정 노드는 이메일 제목, 수신자, 본문, 그리고 형식화된 헤더와 같은 주요 세부 사항을 변수에 추출하여 할당하여 후속 워크플로 단계에서 사용합니다. 이 섹션은 아웃룩 이메일 처리를 위해 필수적이며, 분석 및 보고를 위한 준비를 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e7ace035-b5f5-4ef3-a117-22c7c938868d",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2958.4325220284563,
+        24.744924120002338
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 593.0990401534098,
+        "height": 573.1750519720028,
+        "content": "![hctiapi](https://uploads.n8n.io/templates/openai.png)  \n## AI 기반 이메일 분석 및 위협 감지\n\n이 섹션은 ChatGPT를 활용하여 고급 이메일 내용 및 헤더 분석을 통해 잠재적인 피싱 위협을 판단합니다. **Analyze Email with ChatGPT** 노드는 이메일의 HTML 본문과 헤더를 처리하여, 이메일을 악성 또는 양성으로 분류하는 상세한 JSON 응답을 생성합니다. 응답에는 분류 이유를 설명하는 자세한 설명이 포함되어 있으며, Jira 형식으로 포맷팅됩니다. **Check if Malicious** 노드는 AI 출력 결과를 평가하여 이메일의 위협 상태에 따라 다음 단계를 결정합니다. 악성으로 플래그가 지정되면 보고 및 티켓 생성과 같은 후속 조치가 트리거됩니다. 이 섹션은 이메일 보안 워크플로를 강화하기 위해 정확한 AI 기반 분석을 보장합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "02c1ad8e-f952-42d2-ae9f-cf3a77e49e52",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3562.4948140707697,
+        -125.79607719303533
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1251.7025543502837,
+        "height": 891.579206098173,
+        "content": "![hctiapi](https://uploads.n8n.io/templates/jira.png)  \n## 자동화된 Jira 티켓 생성 및 이메일 첨부\n\n이 섹션은 상세한 분석과 첨부를 포함하여 Jira에 피싱 이메일 보고를 기록하는 프로세스를 간소화합니다. 워크플로는 이메일의 AI 분류에 따라 두 가지 distinct Jira 티켓을 생성합니다:\n\n1. **잠재적으로 악성**: 이메일이 피싱 시도로 플래그된 경우, **Create Potentially Malicious Ticket** 노드가 ChatGPT 분석 요약과 이메일 세부 정보를 포함한 티켓을 생성합니다.\n2. **잠재적으로 무해**: 이메일이 안전하다고 분류된 경우, **Create Potentially Benign Ticket** 노드가 유사한 세부 정보를 비악성 카테고리 아래에 기록합니다.\n\n**Set Jira ID** 노드는 생성된 티켓의 ID를 후속 작업을 위해 추적합니다. 첨부 파일은 효율적으로 처리됩니다:\n\n- **Rename Screenshot**은 이메일 스크린샷을 업로드할 준비를 합니다.\n- **Upload Screenshot of Email to Jira**는 시각적 맥락을 위해 스크린샷을 Jira 티켓에 추가합니다.\n- **Rename Email Body Screenshot** 및 **Upload Email Body to Jira**는 이메일 텍스트 본문을 `.txt` 파일로 첨부합니다.\n\n이 섹션은 티켓 생성을 자동화하여 보안 팀이 관련 이메일 데이터를 쉽게 검토할 수 있도록 보고를 강화합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "597ef23e-c61c-4e27-8c14-74ec20079c96",
+      "name": "Check if Malicious",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        3400,
+        420
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "493f412c-5f11-4173-8940-90f5bc7f5fab",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.message.content.malicious }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "af512af9-924b-4019-bdf9-62aac9cd0dac",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2200,
+        39.041733604283195
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 365.6458805720866,
+        "height": 559.8072303111675,
+        "content": "![n8n](https://uploads.n8n.io/templates/n8n.png)  \n## 이메일 본문 변환  \n\n이 섹션은 이메일 본문을 텍스트 및 시각적 형식으로 처리하여 상세 분석 및 보고를 위해 사용합니다. **Set Email Variables** 노드는 이메일의 데이터, 그 중 HTML 본문과 텍스트 콘텐츠를 포함하여 후속 단계를 위해 정리합니다. **Convert Email Body to File** 노드는 이메일 본문의 평문 버전을 포함한 `.txt` 파일을 생성하며, 문서화나 추가 분석에 유용합니다."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set Jira ID": {
+      "main": [
+        [
+          {
+            "node": "Rename Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Gmail Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Headers": {
+      "main": [
+        [
+          {
+            "node": "Set Outlook Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Screenshot HTML": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Upload Screenshot of Email to Jira",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Malicious": {
+      "main": [
+        [
+          {
+            "node": "Create Potentially Malicious Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Potentially Benign Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Analyze Email with ChatGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Email Variables": {
+      "main": [
+        [
+          {
+            "node": "Convert Email Body to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Gmail Variables": {
+      "main": [
+        [
+          {
+            "node": "Set Email Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Outlook Variables": {
+      "main": [
+        [
+          {
+            "node": "Set Email Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Headers of Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Headers of Email": {
+      "main": [
+        [
+          {
+            "node": "Format Headers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Email with ChatGPT": {
+      "main": [
+        [
+          {
+            "node": "Check if Malicious",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Email Body to File": {
+      "main": [
+        [
+          {
+            "node": "Screenshot HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename Email Body Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Upload Email Body to Jira",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Potentially Benign Ticket": {
+      "main": [
+        [
+          {
+            "node": "Set Jira ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Screenshot of Email to Jira": {
+      "main": [
+        [
+          {
+            "node": "Rename Email Body Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Potentially Malicious Ticket": {
+      "main": [
+        [
+          {
+            "node": "Set Jira ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

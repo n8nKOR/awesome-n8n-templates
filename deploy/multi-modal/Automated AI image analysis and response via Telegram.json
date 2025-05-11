@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "instanceId": "84ba6d895254e080ac2b4916d987aa66b000f88d4d919a6b9c76848f9b8a7616"
+  },
+  "nodes": [
+    {
+      "id": "ecb4bbc8-939a-4c6c-80b6-6f053d1d7745",
+      "name": "Get the Image",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        1640,
+        880
+      ],
+      "webhookId": "8404b32c-14bd-428e-88a6-560755f0f7ba",
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "2fd523b7-5f89-4e53-9445-4336b51cad51",
+      "name": "Send Content for the Analyzed image",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2380,
+        760
+      ],
+      "parameters": {
+        "text": "={{ $json.content }}",
+        "chatId": "={{ $('Get the Image').item.json.message.chat.id }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "b77fe84f-7651-42aa-aa40-f903b10c8fb1",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        360
+      ],
+      "parameters": {
+        "width": 1235.4238259410247,
+        "height": 1361.9843517631348,
+        "content": "# 자동화된 이미지 분석 및 응답 via Telegram\n\n## 예시: @SubAlertMe_Bot\n\n## 요약:\nn8n을 사용한 자동화된 이미지 분석 및 응답 워크플로는, Telegram을 통해 전송된 이미지를 분석하고 분석 결과를 기반으로 유익한 응답을 제공하는 정교한 솔루션입니다. 이 최첨단 워크플로는 원활한 자동화와 이미지 처리 작업의 효율성을 보장하기 위해 세심하게 조정된 일련의 노드를 활용합니다.\n\n## 사용 사례:\n이 고급 워크플로는 실시간 이미지 분석 및 응답 메커니즘이 필수적인 다양한 시나리오에 적용됩니다. 사용 사례는 다음과 같습니다:\n- Telegram 그룹 내에서 공유된 이미지에 대한 즉각적인 피드백 제공.\n- 이미지 콘텐츠 분석에 기반한 자동화된 콘텐츠 중재 활성화.\n- 분석 결과를 기반으로 이미지의 신속한 분류 및 태깅 촉진.\n\n## 상세 워크플로 설정:\n이 워크플로를 효과적으로 구현하기 위해 사용자는 세심한 설정 과정을 따르게 해야 합니다. 이는 다음과 같습니다:\n- 다재다능한 n8n 플랫폼에 대한 접근, 원활한 워크플로 조정을 보장.\n- 이미지 수신 및 커뮤니케이션을 위한 Telegram 계정 통합.\n- 고급 이미지 분석 기능에 대한 OpenAI 계정 활용.\n- n8n 환경 내에서 Telegram 및 OpenAI 자격 증명 구성, 원활한 통합을 위해.\n- n8n 워크플로 내에서 노드 생성 및 연결에 대한 숙련도.\n\n## 상세 노드 설명:\n1. **이미지 가져오기 (Telegram 트리거):**\n - Telegram을 통해 이미지를 수신하면 즉시 트리거되어 즉각적인 처리를 보장.\n - 수신된 이미지 메시지에서 필수 정보를 추출하여 후속 작업을 시작.\n\n2. **모든 필드 병합 To get data from trigger:**\n - 트리거 노드에서 추출된 모든 관련 데이터 필드를 원활하게 통합하여 포괄적인 데이터 통합.\n\n3. **이미지 분석 (OpenAI):**\n - OpenAI 서비스의 강력한 기능을 활용하여 수신된 이미지를 심층 분석.\n - 이미지를 base64 형식으로 처리하여 시각 콘텐츠에서 의미 있는 통찰을 도출.\n\n4. **모든 필드 집계:**\n - 후속 처리 및 분석을 위해 모든 데이터 항목을 컴파일 및 통합하여 포괄적인 데이터 집계.\n\n5. **분석된 이미지 콘텐츠 보내기 (Telegram):**\n - 분석된 콘텐츠를 Telegram 채팅 인터페이스로 전송하여 원활한 커뮤니케이션.\n - 분석된 정보를 텍스트 형식으로 제공하여 사용자 이해와 상호작용 향상.\n\n6. **스위치 노드:**\n - 워크플로 내에서 미리 정의된 조건에 기반한 의사 결정에 핵심적인 역할.\n - 수신된 데이터를 평가하여 특정 요소(예: 이 맥락에서 이미지)의 존재 여부를 판단.\n - 메시지 페이로드에 이미지 데이터의 존재를 평가하는 규칙 세트를 활용하여 이미지 감지 여부에 따라 구분.\n - 이 중요한 노드는 평가 결과에 따라 워크플로 흐름을 지시하는 역할을 합니다.\n\n## 결론:\n이 정교한 워크플로를 통해 이미지 분석 프로세스의 자동화는 운영 효율성을 높일 뿐만 아니라 Telegram 상호작용의 커뮤니케이션 역학을 혁신합니다. 이 고급 워크플로 솔루션을 도입하여 사용자는 이미지 분석 워크플로를 최적화하고, 커뮤니케이션 효능을 강화하며, 이미지 처리 작업에서 새로운 수준의 자동화를 해제할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7a588ccb-7a97-4776-82fd-c4f42640e8f7",
+      "name": "Update Telegram Error Message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2380,
+        1000
+      ],
+      "parameters": {
+        "text": "Please Upload an Image ....",
+        "chatId": "={{ $json.message.chat.id }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "k3RE6o9brmFRFE9p",
+          "name": "Telegram account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "0cd83b82-0a20-4bf6-82bc-24827a368b89",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        2180,
+        1000
+      ],
+      "webhookId": "d4d6fc13-d8ad-42b6-b4dd-e922b5534282",
+      "parameters": {
+        "amount": 3
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "a6d52335-72e7-4ce4-92e9-861b2806e9ae",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1620,
+        360
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 1139.7707284714515,
+        "height": 1359.6943046286056,
+        "content": "### Output은 비어 있으므로 번역할 텍스트가 없습니다. 이는 빈 응답입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0222b4f6-a7c1-4183-8df8-b47b9e0cd685",
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2180,
+        760
+      ],
+      "parameters": {
+        "options": {},
+        "resource": "image",
+        "inputType": "base64",
+        "operation": "analyze"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "kDo5LhPmHS2WQE0b",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "f83c7dc2-a986-40e7-831c-b7968866ef4e",
+      "name": "Switch ( image or not )",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        1820,
+        880
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "Image",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.message.photo }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "Empty",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "3fe3a96d-6ee9-4f12-a32c-f5f5b729e257",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notExists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.message.photo }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 3
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Update Telegram Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Send Content for the Analyzed image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the Image": {
+      "main": [
+        [
+          {
+            "node": "Switch ( image or not )",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch ( image or not )": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

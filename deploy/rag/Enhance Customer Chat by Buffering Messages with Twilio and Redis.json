@@ -1,0 +1,457 @@
+{
+  "meta": {
+    "instanceId": "26ba763460b97c249b82942b23b6384876dfeb9327513332e743c5f6219c2b8e"
+  },
+  "nodes": [
+    {
+      "id": "d61d8ff3-532a-4b0d-a5a7-e02d2e79ddce",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2660,
+        480
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b6d5c1cf-b4a1-4901-b001-0c375747ee63",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1660,
+        520
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "f4e08e32-bb96-4b5d-852e-26ad6fec3c8c",
+      "name": "Add to Messages Stack",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        1340,
+        200
+      ],
+      "parameters": {
+        "list": "=chat-buffer:{{ $json.From }}",
+        "tail": true,
+        "operation": "push",
+        "messageData": "={{ $json.Body }}"
+      },
+      "credentials": {
+        "redis": {
+          "id": "zU4DA70qSDrZM1El",
+          "name": "Redis account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "181ae99e-ebe7-4e99-b5a5-999acc249621",
+      "name": "Should Continue?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1660,
+        360
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "ec39573f-f92a-4fe4-a832-0a137de8e7d0",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Get Latest Message Stack').item.json.messages.last() }}",
+              "rightValue": "={{ $('Twilio Trigger').item.json.Body }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "640c63ca-2798-48a9-8484-b834c1a36301",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        2780,
+        480
+      ],
+      "parameters": {
+        "sessionKey": "=chat-debouncer:{{ $('Twilio Trigger').item.json.From }}",
+        "sessionIdType": "customKey"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "123c35c5-f7b2-4b4d-b220-0e5273e25115",
+      "name": "Twilio Trigger",
+      "type": "n8n-nodes-base.twilioTrigger",
+      "position": [
+        940,
+        360
+      ],
+      "webhookId": "0ca3da0e-e4e1-4e94-8380-06207bf9b429",
+      "parameters": {
+        "updates": [
+          "com.twilio.messaging.inbound-message.received"
+        ]
+      },
+      "credentials": {
+        "twilioApi": {
+          "id": "TJv4H4lXxPCLZT50",
+          "name": "Twilio account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f4e86455-7f4d-4401-8f61-a859be1433a9",
+      "name": "Get Latest Message Stack",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        1500,
+        360
+      ],
+      "parameters": {
+        "key": "=chat-buffer:{{ $json.From }}",
+        "keyType": "list",
+        "options": {},
+        "operation": "get",
+        "propertyName": "messages"
+      },
+      "credentials": {
+        "redis": {
+          "id": "zU4DA70qSDrZM1El",
+          "name": "Redis account"
+        }
+      },
+      "typeVersion": 1,
+      "alwaysOutputData": false
+    },
+    {
+      "id": "02f8e7f5-12b4-4a5a-9ce9-5f0558e447aa",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232.162872321277,
+        -50.203627749982275
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 632.8309394802918,
+        "height": 766.7069233634998,
+        "content": "## 2단계. 들어오는 메시지 버퍼링  \n[Redis 사용에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.redis)  \n\n* 새로운 메시지가 목록에 캡처됩니다.  \n* X초 후에 이 목록의 새로운 복사본을 가져옵니다.  \n* 목록의 마지막 메시지가 들어오는 메시지와 동일하다면, 지난 5초 동안 새로운 후속 메시지가 보내지 않았다는 것을 알 수 있습니다. 따라서 사용자가 기다려야 하며, 답변하는 것이 안전합니다.  \n* 그러나 그 반대가 사실이라면, 여기서 실행을 중단할 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "311c0d69-a735-4435-91b6-e80bf7d4c012",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.twilio",
+      "position": [
+        3000,
+        320
+      ],
+      "parameters": {
+        "to": "={{ $('Twilio Trigger').item.json.From }}",
+        "from": "={{ $('Twilio Trigger').item.json.To }}",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "credentials": {
+        "twilioApi": {
+          "id": "TJv4H4lXxPCLZT50",
+          "name": "Twilio account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c0e0cd08-66e3-4ca3-9441-8436c0d9e664",
+      "name": "Wait 5 seconds",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1340,
+        360
+      ],
+      "webhookId": "d486979c-8074-4ecb-958e-fcb24455086b",
+      "parameters": {},
+      "typeVersion": 1.1
+    },
+    {
+      "id": "c7959fa2-69a5-46b4-8e67-1ef824860f4e",
+      "name": "Get Chat History",
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "position": [
+        2000,
+        280
+      ],
+      "parameters": {
+        "options": {
+          "groupMessages": true
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "55933c54-5546-4770-8b36-a31496163528",
+      "name": "Window Buffer Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        2000,
+        420
+      ],
+      "parameters": {
+        "sessionKey": "=chat-debouncer:{{ $('Twilio Trigger').item.json.From }}",
+        "sessionIdType": "customKey"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "459c0181-d239-4eec-88b6-c9603868d518",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        774.3250485705519,
+        198.07493876489747
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 431.1629802181097,
+        "height": 357.49804533541777,
+        "content": "## 1단계. Twilio 메시지 수신 대기\n\n[Twilio Trigger에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/trigger-nodes/n8n-nodes-base.twiliotrigger)\n\n이 예제에서, 발신자의 전화 번호를 세션 ID로 사용할 것입니다. 이는 채팅 기록을 검색하는 데 중요합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e06313a9-066a-4387-a36c-a6c6ff57d6f9",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1900,
+        80
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 618.970917763344,
+        "height": 501.77420646931444,
+        "content": "## 3단계. 마지막 답변 이후 메시지 가져오기\n\n[Chat Memory 사용에 대해 자세히 읽기](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.memorymanager)\n\n조건이 충족되고 에이전트가 답변을 허용하면, 봇의 마지막 답변을 찾아 그 이후의 사용자 메시지 버퍼를 처리해야 합니다. 이를 위해 채팅 메모리를 사용하여 우리 Redis 메시지 스택의 최신 메시지와 비교할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "601a71f6-c6f8-4b73-98c7-cfa11b1facaa",
+      "name": "Get Messages Buffer",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2320,
+        280
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "01434acb-c224-46d2-99b0-7a81a2bb50c5",
+              "name": "messages",
+              "type": "string",
+              "value": "={{\n$('Get Latest Message Stack').item.json.messages\n .slice(\n $('Get Latest Message Stack').item.json.messages.lastIndexOf(\n $('Get Chat History').item.json.messages.last().human\n || $('Twilio Trigger').item.json.chatInput\n ),\n $('Get Latest Message Stack').item.json.messages.length\n )\n .join('\\n')\n}}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "9e49f2de-89e6-4152-8e9c-ed47c5fc4654",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2549,
+        120
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 670.2274698011594,
+        "height": 522.5993538768389,
+        "content": "## 4단계. 여러 메시지에 대한 단일 에이전트 응답 보내기\n\n[AI 에이전트 사용에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent)\n\n마침내, 우리의 버퍼링된 메시지들이 모든 메시지에 대해 단일 응답을 생성할 수 있는 AI 에이전트에게 보내집니다. 이것은 채팅 상호작용이 자연스럽게 더 빠르고 즉흥적일 경우 대화 경험을 잠재적으로 향상시킬 수 있습니다. 그러나 단점은 응답이 훨씬 느리게 느껴질 수 있다는 것입니다 - 필요에 맞게 대기 임계값을 조정하세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "be13c74a-467c-4ab1-acca-44878c68dba4",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        80
+      ],
+      "parameters": {
+        "width": 375.55385425077225,
+        "height": 486.69228315530853,
+        "content": "## 시도해 보세요!\n### 이 워크플로는 사용자가 부분 메시지를 연속으로 짧은 시간에 보내는 경우 AI 에이전트의 응답을 지연시키는 간단한 접근 방식을 보여줍니다.\n\n* Twilio 웹훅이 사용자의 메시지를 수신하여 Redis에 의해 구동되는 메시지 스택에 기록합니다.\n* 실행이 즉시 5초 동안 일시 중지된 후 메시지 스택에 대해 최신 메시지를 확인합니다.\n* 이 확인의 목적은 사용자가 더 많은 메시지를 보내고 있는지 또는 응답을 기다리고 있는지 알려줍니다.\n* 스택의 최신 메시지가 들어오는 메시지와 다르면 실행이 중단되고, 같으면 계속됩니다.\n* 후자의 경우, 에이전트가 버퍼링된 메시지를 수신하여 모두를 단일 응답으로 처리할 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "334d38e1-ec16-46f2-a57d-bf531adb8d3d",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2660,
+        320
+      ],
+      "parameters": {
+        "text": "={{ $json.messages }}",
+        "agent": "conversationalAgent",
+        "options": {},
+        "promptType": "define"
+      },
+      "typeVersion": 1.6
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio Trigger": {
+      "main": [
+        [
+          {
+            "node": "Add to Messages Stack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 seconds": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Message Stack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Chat History": {
+      "main": [
+        [
+          {
+            "node": "Get Messages Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Continue?": {
+      "main": [
+        [
+          {
+            "node": "Get Chat History",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Messages Buffer": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Get Chat History",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Message Stack": {
+      "main": [
+        [
+          {
+            "node": "Should Continue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

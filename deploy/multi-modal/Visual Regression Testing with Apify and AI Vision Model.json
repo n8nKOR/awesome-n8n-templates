@@ -1,0 +1,1001 @@
+{
+  "meta": {
+    "instanceId": "408f9fb9940c3cb18ffdef0e0150fe342d6e655c3a9fac21f0f644e8bedabcd9"
+  },
+  "nodes": [
+    {
+      "id": "cb62c9a5-2f43-4328-af94-84c2cb731d9c",
+      "name": "Base Image",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        260,
+        660
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.base }}"
+        },
+        "options": {
+          "binaryPropertyName": "data_1"
+        },
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "b1c304cc-9949-441a-ac2a-275c8d4c51fc",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1120,
+        900
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-1.5-pro-latest"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dSxo6ns5wn658r8N",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "964d94bf-be2a-424e-ab0e-c1c1fe260ebd",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1320,
+        900
+      ],
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n \"type\": \"array\",\n \"items\": {\n \"type\": \"object\",\n\t\"properties\": {\n\t\t\"type\": {\n \t\t\"type\": \"string\",\n \"description\": \"type of regression. One of text, number, image, color or position.\"\n \t\t},\n\t\t\"description\": { \"type\": \"string\" },\n \"previous_state\": { \"type\": \"string\" },\n \"current_state\": { \"type\": \"string\" }\n\t}\n }\n}"
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "67195eb2-1729-42b0-8275-bdd6128b81aa",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2340,
+        20
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 405.95003875719203,
+        "height": 180.74812634463558,
+        "content": "### 부분 A. 기본 이미지 생성\n\n우리가 시각 회귀 테스트를 실행하기 전에, 비교 대상으로 기본 스크린샷 시리즈를 생성해야 합니다. 이 워크플로의 이 부분은 이를 달성하기 위해 외부 웹사이트 스크린샷 서비스인 [Apify.com](https://www.apify.com?fpr=414q6)을 사용합니다. 이 워크플로의 이 부분은 우리의 기본 스크린샷을 업데이트하고 싶을 때만 실행해야 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "85f9b371-1710-4c9c-a0ed-210d9c0e5d64",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        162.7495769165307,
+        500
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 702.1744987652204,
+        "height": 548.4621171664835,
+        "content": "## 5. 기본 스크린샷 다운로드 및 새 웹페이지 스크린샷 생성  \n[Apify.com에 대해 더 알아보기](https://www.apify.com?fpr=414q6)  \n\n각 웹페이지에 대해 반복하면서, 우리는 2개의 작업을 수행할 것입니다 (1) URL에 대한 기본 스크린샷 다운로드 및 (2) 우리 [Apify.com](https://www.apify.com?fpr=414q6) 웹페이지 스크린샷 액터를 다시 사용하여 새로운 스크린샷을 생성합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8bff4efc-d9f9-485c-b51d-a8edc29d1105",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        500
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 759.5372282495247,
+        "height": 548.702446115556,
+        "content": "## 6. 비전 모델을 사용하여 스크린샷 비교\n\n[기본 LLM 체인에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm/)\n\n우리의 시각적 회귀 테스트를 수행하기 위해, 두 스크린샷을 동시에 우리의 Vision 모델에 보내야 합니다. 이는 n8n의 내장된 기본 LLM 체인을 사용하여 쉽게 달성할 수 있습니다. 여기서 이진 유형의 두 사용자 메시지를 정의할 수 있습니다. 우리의 비전 모델의 경우, Google의 Gemini를 사용할 것입니다. 하지만 어떤 유능한 비전 모델도 작업을 수행할 수 있습니다. Structured Output Parser는 AI의 응답을 JSON 형식으로 반환하기 위해 여기에서 사용되며, 이는 다음 단계에서 다룰 더 쉬운 형식화 목적을 위한 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a92d11e5-0985-4a8f-bc43-8bc0ca48e744",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        397.518987341772,
+        93.8157360237642
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 885.2402868841493,
+        "height": 388.92815062755926,
+        "content": "## 7. Linear에서 보고서 생성\n\n[Linear.app과의 통합에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.linear)\n\n마지막 단계에서, 웹페이지 목록에서 감지된 모든 변경 사항을 캡처하는 간단한 보고서를 생성할 것입니다. 이를 위해 먼저 웹페이지와 그 테스트 결과를 결합하고, 변경 사항이 감지되지 않은 페이지를 필터링합니다. 다음으로, 모든 변경 사항을 Linear.app 노드로 집계하여 마크다운 스니펫으로 형식화하고, Linear에서 새 이슈를 생성하는 데 사용합니다. Linear를 사용하지 않는 경우, JIRA나 Slack으로 교체하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3f52c006-6c0a-456d-ab3c-ee5a16726299",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -1680,
+        580
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "478ee25d-3f0f-4f6c-bf34-add1dc14c3cb",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -1240,
+        820
+      ],
+      "webhookId": "f06eab66-30a7-48ad-90ee-cb3394eb2edb",
+      "parameters": {
+        "amount": 2
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "64b5f755-a85e-4ae5-ad81-113c1ef9b64c",
+      "name": "Download Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1260,
+        360
+      ],
+      "parameters": {
+        "url": "={{ $json.screenshotUrl }}",
+        "options": {}
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "8f99ef1f-1cdc-4d80-b858-e9960a805dd4",
+      "name": "Upload to Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        -1080,
+        360
+      ],
+      "parameters": {
+        "name": "={{ $('Merge').item.json.url.urlEncode() }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "options": {
+          "simplifyOutput": true
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1lAFxJPWcA_sOcjr3UUKKfFfoTwd4Stkh",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1lAFxJPWcA_sOcjr3UUKKfFfoTwd4Stkh",
+          "cachedResultName": "base_images"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "5e253123-89ba-42d5-b743-60bfd1ebae5b",
+      "name": "Update Base Image",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -900,
+        360
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "url": "={{ $('Merge').item.json.url }}",
+            "base": "={{ $json.id }}"
+          },
+          "schema": [
+            {
+              "id": "service",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "service",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "url",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "base",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "base",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "url"
+          ]
+        },
+        "options": {},
+        "operation": "appendOrUpdate",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit?usp=drivesdk",
+          "cachedResultName": "Visual Regression List"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.5
+    },
+    {
+      "id": "fa7339b7-b7dd-4ecd-8dc2-f42f6549adb6",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        -1440,
+        360
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "47845df9-a50e-429e-b81e-5eefd996d5c7",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -560,
+        380
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "63492aa4-3535-4832-a9d0-0a949e46ec81",
+      "name": "Get URLs with Missing Base Images",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -1980,
+        480
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit?usp=drivesdk",
+          "cachedResultName": "Visual Regression List"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.5
+    },
+    {
+      "id": "8907f3b9-0613-4057-8adb-fd5c4e25cf72",
+      "name": "Run Webpage Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1420,
+        820
+      ],
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/apify~screenshot-url/run-sync-get-dataset-items",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"delay\": 0,\n \"format\": \"png\",\n \"proxy\": {\n \"useApifyProxy\": true\n },\n \"scrollToBottom\": false,\n \"urls\": [\n {\n \"url\": $json.url\n }\n ],\n \"viewportWidth\": 1280,\n \"waitUntil\": \"domcontentloaded\",\n \"waitUntilNetworkIdleAfterScroll\": false\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth"
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "cO2w8RDNOZg8DRa8",
+          "name": "Apify API"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "3dc45b2d-4c4a-44d5-9b45-3e2144479603",
+      "name": "Run Webpage Screenshot1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        273,
+        833
+      ],
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/apify~screenshot-url/run-sync-get-dataset-items",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"delay\": 0,\n \"format\": \"png\",\n \"proxy\": {\n \"useApifyProxy\": true\n },\n \"scrollToBottom\": false,\n \"urls\": [\n {\n \"url\": $json.url\n }\n ],\n \"viewportWidth\": 1280,\n \"waitUntil\": \"domcontentloaded\",\n \"waitUntilNetworkIdleAfterScroll\": false\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth"
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "cO2w8RDNOZg8DRa8",
+          "name": "Apify API"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "672d64fb-7782-427e-8779-953e51118fbc",
+      "name": "Has Changes",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "20b18a7e-bf98-4f39-baa9-4d965097526a",
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              },
+              "leftValue": "={{ $json.output }}",
+              "rightValue": 0
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "efa168ec-ff05-471b-869f-cee5a222594a",
+      "name": "Combine Row and Result",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "={{\n{\n ...$('Get Webpages List').item.json,\n output: $json.output\n}\n}}\n"
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "1fe901dc-f460-41b8-8042-0fcb0474092f",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1580,
+        900
+      ],
+      "webhookId": "6bbf2e65-bed1-4efc-bb31-09d12c644dc5",
+      "parameters": {
+        "amount": 1
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "7891f052-4073-4746-a04b-27c7c4fa1e63",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        860,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ef2b2ddb-51f9-4576-bd99-9efa39be5163",
+      "name": "Create Report",
+      "type": "n8n-nodes-base.linear",
+      "position": [
+        1040,
+        300
+      ],
+      "parameters": {
+        "title": "=Visual Regression Report {{ $now.format('yyyy-MM-dd') }}",
+        "teamId": "1c721608-321d-4132-ac32-6e92d04bb487",
+        "additionalFields": {
+          "description": "=Visual Regression Workflow picked up the following changes:\n\n{{\n$json.data.map(row =>\n`### ${row.url}\n${row.output.map(issue =>\n`* **${issue.description}** - expected \"${issue.previous_state}\" but got \"${issue.current_state}\"`\n).join('\\n')}`\n).join('\\n');\n}}"
+        }
+      },
+      "credentials": {
+        "linearApi": {
+          "id": "Nn0F7T9FtvRUtEbe",
+          "name": "Linear account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "477b89f7-00ca-4001-a246-0887bcb553eb",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -2180,
+        480
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "eb7f6310-5465-4638-b702-5ecbd98a0199",
+      "name": "Get Webpages List",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -360,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupValue": "2",
+              "lookupColumn": "=row_number"
+            }
+          ]
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit?usp=drivesdk",
+          "cachedResultName": "Visual Regression List"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XHvC7jIRR8A2TlUl",
+          "name": "Google Sheets account"
+        }
+      },
+      "typeVersion": 4.5
+    },
+    {
+      "id": "6c0f7341-14c9-48c2-9447-edab0ad18df7",
+      "name": "For Each Webpage...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -40,
+        440
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "62e13166-458d-4c63-8911-740f9ceaeb54",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        160
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 561.2038065501644,
+        "height": 408.0284015307624,
+        "content": "## 4. 시각 회귀 테스트 실행 트리거\n\n[스케줄 트리거에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/)\n\nPart A에서 비교할 기본 이미지를 생성한 후, 이제 시각 회귀 테스트를 실행할 수 있습니다. 이 테스트는 이미지 감지를 통해 웹 페이지의 예상치 못한 변경을 확인하기 위한 것입니다. Part B를 트리거하기 위해, 스케줄 트리거부터 시작하여 Google Sheets에서 테스트할 웹 페이지 목록을 가져옵니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8d958f44-fd2c-49b4-adbd-d8a99b2614c8",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2340,
+        218.0216140230686
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 626.9985071319608,
+        "height": 487.40071048786325,
+        "content": "## 1. 기본 이미지 생성을 위한 웹페이지 목록 가져오기  \n[Google Sheets 사용에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/)  \n\n이 워크플로는 2개의 부분으로 나뉩니다: Part A는 새로운 스크린샷과 비교하기 위한 '기본' 스크린샷을 생성합니다. 이러한 기본 스크린샷을 캡처하기 위해, 우리는 웹페이지 목록과 그 스크린샷 참조를 보유하기 위해 Google Sheets를 사용할 것입니다 (나중에 그에 대해 다룰 것입니다).  \n\n예시 시트: https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRZRi55dUbLAsWZboJqH5U-EK0ZRSse8pkqANAV4Ss70otpQ97zgT8YBd3dL4d2u2UC1TTx_o1o1R/pubhtml"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ee776b4d-4532-4c08-ac38-35d40afbd8ad",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1480,
+        580
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 653.369086691465,
+        "height": 443.1120543367141,
+        "content": "## 2. Apify를 통해 웹페이지 스크린샷 생성\n\n[Apify.com에 대해 더 알아보기](https://www.apify.com?fpr=414q6)\n\n웹페이지의 스크린샷을 생성하기 위해, 이 기능이 n8n의 범위를 벗어나기 때문에 타사 서비스가 필요합니다. 자유롭게 내부 또는 외부 서비스 중에서 당신에게 맞는 것을 선택하세요. 하지만 [Apify.com](https://www.apify.com?fpr=414q6)을 사용한 경험이 훌륭했습니다 - 인기 있는 웹 스크래핑 SaaS로, 관대한 무료 플랜을 제공하고 시작하기 위해 거의 설정이 필요하지 않습니다.\n\nApify의 \"actor\"(즉, 스크래퍼 유형)는 웹페이지 스크린샷을 찍기 위해 특별히 설계되었습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3d90e103-2829-4075-b3d4-5ba848af4843",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1520,
+        160
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 808.188722669735,
+        "height": 397.73072497123115,
+        "content": "## 3. 스크린샷을 Google Drive에 업로드\n\n[Google Drive 노드 사용에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googledrive/)\n\n스크린샷을 얻은 후, Apify에서 다운로드하여 Google Drive에 안전하게 업로드하겠습니다. 업로드 후, 이미지의 새로운 Google Drive ID를 Google Sheet에 캡처하여 시각적 회귀 테스트를 수행할 때 다시 참조할 수 있도록 하겠습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "e47d14ec-ad78-42c8-a294-301dcd581a67",
+      "name": "Download New Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        453,
+        833
+      ],
+      "parameters": {
+        "url": "={{ $json.screenshotUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data_2"
+            }
+          }
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "8ca118bc-3d19-48ac-9d9c-0892993da736",
+      "name": "Combine Screenshots",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        660,
+        660
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "03359cbb-d7af-4118-a32a-3fe24062dc9f",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        20
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 394.03359370567625,
+        "height": 111.52173490405977,
+        "content": "부분 B. 시각 회귀 테스트 실행  \n이 워크플로우의 이 부분에서, 우리는 AI 비전 모델로 테스트하기 위한 웹페이지 목록을 가져올 것입니다. 이 부분은 필요한 만큼의 횟수로 실행될 수 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a78c0f92-aa61-483b-95bf-dd60958f182d",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2920,
+        220
+      ],
+      "parameters": {
+        "width": 553.2963720930223,
+        "height": 473.4987906976746,
+        "content": "## 시도해 보세요!\n\n### 이 워크플로는 AI 비전 모델을 사용하여 웹사이트의 결함을 테스트하는 수단인 Visual Regression Testing에 대한 접근 방식을 구현합니다.\n\n이 워크플로는 테스트할 웹페이지 목록을 추적하기 위해 Google Sheet를 사용하며, 2개의 부분으로 나뉩니다; Part A는 목록의 기본 스크린샷을 생성하고 Part B는 시각적 회귀 테스트를 실행합니다.\n\n예제 스프레드시트는 여기에서 찾을 수 있습니다: https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRZRi55dUbLAsWZboJqH5U-EK0ZRSse8pkqANAV4Ss70otpQ97zgT8YBd3dL4d2u2UC1TTx_o1o1R/pubhtml\n\n**[Apify.com](https://www.apify.com?fpr=414q6)**는 선택된 스크린샷 생성기이며, 이 [링크](https://www.apify.com?fpr=414q6)를 통해 $5 크레딧이 포함된 무료 계정을 이용할 수 있습니다.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 참여하거나 [Forum](https://community.n8n.io/)에서 문의하세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "a0b257e5-99f8-409a-bc67-2468db377d6c",
+      "name": "Visual Regression Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1120,
+        740
+      ],
+      "parameters": {
+        "text": "Identify changes between the base image and test image.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You help with visual regression testing for websites. Identify changes to text content, images, colors, position and layouts of the elements in the screenshots. Ignore text styling or casing changes.\nThe first image will be the base image and the second image will be the test. Note all changes to the test image which differ from the base. If there are no changes, it is okay to return an empty array."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "data_1"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "data_2"
+            }
+          ]
+        },
+        "promptType": "define",
+        "hasOutputParser": true
+      },
+      "typeVersion": 1.4
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Download Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "For Each Webpage...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Create Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base Image": {
+      "main": [
+        [
+          {
+            "node": "Combine Screenshots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Changes": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Run Webpage Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Drive": {
+      "main": [
+        [
+          {
+            "node": "Update Base Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Webpages List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Webpages List": {
+      "main": [
+        [
+          {
+            "node": "For Each Webpage...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Screenshots": {
+      "main": [
+        [
+          {
+            "node": "Visual Regression Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Upload to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Webpage...": {
+      "main": [
+        [
+          {
+            "node": "Combine Row and Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Base Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Run Webpage Screenshot1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Row and Result": {
+      "main": [
+        [
+          {
+            "node": "Has Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Webpage Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download New Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Combine Screenshots",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Run Webpage Screenshot1": {
+      "main": [
+        [
+          {
+            "node": "Download New Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visual Regression Agent": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Visual Regression Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Visual Regression Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URLs with Missing Base Images": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get URLs with Missing Base Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

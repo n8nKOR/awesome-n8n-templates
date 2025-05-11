@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "instanceId": "cb484ba7b742928a2048bf8829668bed5b5ad9787579adea888f05980292a4a7"
+  },
+  "nodes": [
+    {
+      "id": "f1142274-898d-43da-a7ff-2b2e03f2dc73",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1220,
+        840
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "1f407421-2dd6-4e0c-bc74-cfb291e475ed",
+      "name": "Query Confluence",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1640,
+        840
+      ],
+      "parameters": {
+        "url": "https://n8n-labs.atlassian.net/wiki/rest/api/search",
+        "options": {},
+        "sendQuery": true,
+        "sendHeaders": true,
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "cql",
+              "value": "=text ~ \"{{ $json.query }}\""
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "B1Cj4Uh9d9WKWxBO",
+          "name": "Confluence API Key"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "f1ab7e79-6bd8-4b87-b6dc-96f9d46cdd16",
+      "name": "Return Tool Response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2040,
+        840
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1d46e59-9340-43f3-bc2a-fbd4e0def74f",
+              "name": "response",
+              "type": "string",
+              "value": "=\"Title\": \"{{ $json.results[0].content.title }}\"\n\"Link\": \"{{ $json._links.base }}{{ $json.results[0].content._links.webui }}\"\n\"Content\": {{ $json[\"results\"][0][\"excerpt\"] }}\nWhen users request the password, make sure to send them the link above to reset it in markdown. "
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.3
+    },
+    {
+      "id": "19be50a2-4835-48a6-b06a-7996231c519d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1037.1879432624112,
+        466.2978723404259
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 460.26595744680884,
+        "height": 598.588007755415,
+        "content": "부모 워크플로우에서 쿼리 받기\n\n이 노드는 최상위 워크플로우의 AI 에이전트로부터 입력을 받습니다. AI 에이전트가 Slack 메시지만 이 워크플로우로 직접 전달합니다.\n\n출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0012feaa-89f5-40a4-86d6-98e0e9648bd5",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        469.2511978555872
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 350.94680851063845,
+        "height": 588.3931371954408,
+        "content": "![컨플루언스](https://i.imgur.com/rM48yHY.png)  \n## Confluence 검색  \n새로 생성된 프롬프트는 Confluence의 API로 검색 문자열로 보내집니다.  \n\n이를 자신의 지식 기반 도구로 대체하려면, 검색을 허용하는 Endpoint를 찾고, 이 HTTP Request 노드를 자신의 HTTP Request 또는 내장 n8n 노드로 대체한 후, 검색 변수를 검색 입력에 전달하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6982692e-61c5-47fc-9946-ada32d5fa2a1",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1900,
+        460
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 648.2749545725208,
+        "height": 597.2865893156994,
+        "content": "![n8n](https://i.imgur.com/lKnBNnH.png)  \n## Confluence 결과를 상위 워크플로에 응답하기  \n최종 출력은 상위 워크플로로 보내져 사용자의 선택한 LLM에 대한 최종 AI 에이전트 API 호출의 일부로 최종 출력에서 사용됩니다. 다음은 프롬프트 출력입니다:  \n```  \n\"Title\": \"AI 에이전트가 내용의 이름을 알 수 있도록 내용의 제목\"  \n\"Link\": \"KB 기사의 URL 링크. 사용자가 자가 도움을 위해 제공하는 데 좋음\"  \n\"Content\": 내용의 잘린 출력으로, 대형 언어 모델이 최종 응답에서 더 많은 맥락을 가질 수 있도록 함.   \n사용자가 비밀번호를 요청할 때, 위 링크를 마크다운으로 보내 재설정하도록 하세요.  \n```"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9570ee97-8508-4c7f-a2da-a327fbc7db46",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        460
+      ],
+      "parameters": {
+        "width": 543.0233137166141,
+        "height": 854.6009864319319,
+        "content": "![n8n](https://i.imgur.com/qXWqiOd.png)  \n## 지식 기반 도구로 쿼리 해결 향상!\n\n우리 **지식 기반 도구**는 IT 부서 Q&A 워크플로에 원활하게 통합되도록 설계되어, Slack을 통해 정교한 검색 및 응답 기능을 제공하여 IT 지원 프로세스를 향상시킵니다.\n\n**워크플로 기능:**  \n- **쿼리 수신**: 주요 워크플로에서 사용자 쿼리를 직접 수신하여 동적 검색 프로세스를 시작합니다.  \n- **AI 기반 쿼리 변환**: OpenAI의 GPT-4를 활용하여 사용자 쿼리를 검색 가능한 키워드로 정제하여 지식 기반에서 관련 정보를 가장 효과적으로 검색할 수 있도록 합니다.  \n- **Confluence 통합**: 정제된 키워드를 사용하여 Confluence에서 검색을 실행하여 가장 적합한 기사와 정보를 찾습니다.  \n- **정확한 응답 제공**: Confluence 결과에서 기사 제목, 링크 및 요약과 같은 필수 세부 정보를 수집하여 부모 워크플로로 전송하여 최종 사용자 응답을 준비합니다.\n\n**빠른 설정 가이드:**  \n- OpenAI 및 Confluence API 통합에 대한 올바른 구성을 확인합니다.  \n- 귀하의 특정 지식 기반 구조에 따라 쿼리 변환 로직을 맞춤화하여 검색 정확도를 향상시킵니다.\n\n**도움이 필요하신가요?**  \n- 우리 [문서](https://docs.n8n.io)를 살펴보거나 [커뮤니티 포럼](https://community.n8n.io)에서 지원을 받으세요!\n\n이 도구를 배포하여 정확하고 유익한 응답을 제공하여 IT 지원 워크플로의 효율성과 신뢰성을 크게 높이세요."
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Query Confluence": {
+      "main": [
+        [
+          {
+            "node": "Return Tool Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Query Confluence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

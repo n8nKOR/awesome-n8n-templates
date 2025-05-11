@@ -1,0 +1,116 @@
+{
+  "id": "af8RV5b2TWB2LclA",
+  "meta": {
+    "instanceId": "95f2ab28b3dabb8da5d47aa5145b95fe3845f47b20d6343dd5256b6a28ba8fab",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Chat with local LLMs using n8n and Ollama",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "475385fa-28f3-45c4-bd1a-10dde79f74f2",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        700,
+        460
+      ],
+      "webhookId": "ebdeba3f-6b4f-49f3-ba0a-8253dd226161",
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "61133dc6-dcd9-44ff-85f2-5d8cc2ce813e",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [
+        900,
+        680
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "ollamaApi": {
+          "id": "MyYvr1tcNQ4e7M6l",
+          "name": "Local Ollama"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3e89571f-7c87-44c6-8cfd-4903d5e1cdc5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        80
+      ],
+      "parameters": {
+        "width": 485,
+        "height": 473,
+        "content": "## 로컬 LLM과 채팅하기: n8n과 Ollama 사용\n\n이 n8n 워크플로는 사용자 친화적인 채팅 인터페이스를 통해 자가 호스팅된 대형 언어 모델(LLMs)과 원활하게 상호작용할 수 있습니다. Ollama에 연결하여, 로컬 LLMs를 관리하는 강력한 도구를 통해 n8n 내에서 직접 프롬프트를 보내고 AI 생성 응답을 받을 수 있습니다.\n\n### 작동 원리\n\n1. 채팅 메시지 수신: 채팅 인터페이스에서 사용자의 입력을 캡처합니다.\n2. Chat LLM Chain: 입력을 Ollama 서버로 보내고 AI 생성 응답을 받습니다.\n3. LLM의 응답을 채팅 인터페이스로 전달합니다.\n\n### 설정 단계\n\n* 이 워크플로를 실행하기 전에 Ollama가 귀하의 기기에 설치되어 있고 실행 중인지 확인하세요.\n* 기본값과 다르다면 Ollama 주소를 수정하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9345cadf-a72e-4d3d-b9f0-d670744065fe",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1040,
+        660
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 368,
+        "height": 258,
+        "content": "## Ollama 설정\n* 로컬 Ollama에 연결하세요, 보통 http://localhost:11434에 있습니다\n* Docker에서 실행 중인 경우, n8n 컨테이너가 호스트의 네트워크에 접근할 수 있도록 하세요. Ollama에 연결하기 위함입니다. n8n Docker 컨테이너를 시작할 때 `--net=host` 옵션을 전달하여 할 수 있습니다"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "eeffdd4e-6795-4ebc-84f7-87b5ac4167d9",
+      "name": "Chat LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        920,
+        460
+      ],
+      "parameters": {},
+      "typeVersion": 1.4
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3af03daa-e085-4774-8676-41578a4cba2d",
+  "connections": {
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Chat LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Chat LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

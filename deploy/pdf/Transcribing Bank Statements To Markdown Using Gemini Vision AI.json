@@ -1,0 +1,506 @@
+{
+  "meta": {
+    "instanceId": "408f9fb9940c3cb18ffdef0e0150fe342d6e655c3a9fac21f0f644e8bedabcd9"
+  },
+  "nodes": [
+    {
+      "id": "490493d1-e9ac-458a-ac9e-a86048ce6169",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -700,
+        260
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "116f1137-632f-4021-ad0f-cf59ed1776fd",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        980,
+        440
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-1.5-pro-latest"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dSxo6ns5wn658r8N",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "44695b4f-702c-4230-9ec3-e37447fed38e",
+      "name": "Sort Pages",
+      "type": "n8n-nodes-base.sort",
+      "position": [
+        400,
+        320
+      ],
+      "parameters": {
+        "options": {},
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "fileName"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f2575b2c-0808-464e-b982-1eed8e0d9df7",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        0
+      ],
+      "parameters": {
+        "width": 437.0502325581392,
+        "height": 430.522325581395,
+        "content": "## 나를 시험해 보세요!\n\n### 이 워크플로는 뱅크 명세서를 마크다운으로 변환하며, Vision Language Models(\"VLMs\")의 힘을 사용하여 세부 사항을 충실하게 캡처합니다. 결과 마크다운은 표준 LLM에 의해 다시 구문 분석되어 문서의 모든 입금 테이블 행을 식별하는 등의 데이터를 추출할 수 있습니다.\n\n이 워크플로는 다운로드된 PDF와 스캔된 PDF를 모두 처리할 수 있습니다. 이 워크플로를 실행하기 전에 민감한 데이터를 보호하세요.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 가입하거나 [Forum](https://community.n8n.io/)에서 물어보세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d62d7b0e-29eb-48a9-a471-4279e663c521",
+      "name": "Get Bank Statement",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        -500,
+        260
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1wS9U7MQDthj57CvEcqG_Llkr-ek6RqGA"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "1329973b-a4e0-4272-9e24-3674bb9d4923",
+      "name": "Split PDF into Images",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -140,
+        320
+      ],
+      "parameters": {
+        "url": "http://stirling-pdf:8080/api/v1/convert/pdf/img",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "fileInput",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "imageFormat",
+              "value": "jpg"
+            },
+            {
+              "name": "singleOrMultiple",
+              "value": "multiple"
+            },
+            {
+              "name": "dpi",
+              "value": "300"
+            }
+          ]
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "4e263346-9f55-4316-a505-4a54061ccfbb",
+      "name": "Extract Zip File",
+      "type": "n8n-nodes-base.compression",
+      "position": [
+        40,
+        320
+      ],
+      "parameters": {},
+      "typeVersion": 1.1
+    },
+    {
+      "id": "5e97072f-a7c5-45aa-99d1-3231a9230b53",
+      "name": "Images To List",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        220,
+        320
+      ],
+      "parameters": {
+        "jsCode": "let results = [];\n\nfor (item of items) {\n for (key of Object.keys(item.binary)) {\n results.push({\n json: {\n fileName: item.binary[key].fileName\n },\n binary: {\n data: item.binary[key],\n }\n });\n }\n}\n\nreturn results;"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "62836c73-4cf7-4225-a45d-0cd62b7e227d",
+      "name": "Resize Images For AI",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        800,
+        280
+      ],
+      "parameters": {
+        "width": 75,
+        "height": 75,
+        "options": {},
+        "operation": "resize",
+        "resizeOption": "percent"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "59fc6716-9826-4463-be33-923a8f6f33f1",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -820,
+        0
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 546.4534883720931,
+        "height": 478.89348837209275,
+        "content": "## 1. 은행 명세서 PDF 다운로드\n\n[Google Drive 노드에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googledrive)\n\n이번 데모를 위해 Google Drive에서 예시 은행 명세서를 가져올 것입니다. 하지만 웹훅과 같은 다른 트리거로 교체할 수도 있습니다.\n\n이 워크플로우를 위해 특별히 만들어진 예시 은행 명세서를 여기에서 사용할 수 있습니다: https://drive.google.com/file/d/1wS9U7MQDthj57CvEcqG_Llkr-ek6RqGA/view?usp=sharing"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8e68a295-ff35-4d28-86bb-c8ea5664b3c6",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -240,
+        3.173953488372149
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 848.0232558139535,
+        "height": 533.5469767441862,
+        "content": "## 2. PDF 페이지 분리하여 개별 이미지로 만들기\n\n현재 사용할 비전 모델은 원시 PDF를 수용할 수 없으므로 PDF를 이미지로 변환해야 합니다. 이를 위해 편의상 무료 [Stirling PDF 웹서비스](https://stirlingpdf.io/)를 사용할 예정이지만, 데이터 프라이버시가 필요하다면(추천!) 대신 [Stirling PDF 인스턴스](https://github.com/Stirling-Tools/Stirling-PDF/)를 자체 호스팅할 수 있습니다. 대안으로, PDF를 이미지로 변환할 수 있는 다른 서비스로 교체해도 됩니다!\n\nPDF 서비스에 문서의 각 페이지를 개별 이미지로 반환하도록 요청하면, 이를 ZIP 파일로 제공합니다. 다음 단계는 ZIP 파일을 풀고 출력을 이미지 목록으로 변환하는 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5286aa35-9687-4d5b-987c-79322a1ddc84",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        -40
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 775.3441860465115,
+        "height": 636.0809302325588,
+        "content": "## 3. PDF 페이지를 Markdown으로 변환하는 Vision 모델 사용  \n[기본 LLM 노드 사용에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm)  \n\n전통적인 OCR과 달리, 비전 모델(\"VLMs\")은 보는 것을 \"전사\"하므로 문서의 정확한 복제를 기대해서는 안 되지만, 복잡한 문서 레이아웃(예: 수평으로 쌓인 테이블처럼)을 이해하는 데 더 나은 성능을 발휘할 수 있습니다.  \n\n이 데모에서, 은행 거래 명세서 스캔을 마크다운 텍스트로 전사하여 추가 처리를 목적으로 합니다. 마크다운을 사용하면 문서에 있는 테이블이나 열 데이터 등을 유지할 수 있습니다. 그러나 토큰 및 시간 초과 제한을 우회하기 위한 두 가지 최적화 방식을 적용하겠습니다. (1) 한 번에 한 페이지만 전사하고, (2) 처리를 가속화할 만큼 페이지 크기를 약간 줄이되, 필요한 해상도를 줄이지 않을 정도입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "49deef00-4617-4b19-a56f-08fd195dfb82",
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1760,
+        480
+      ],
+      "parameters": {
+        "options": {
+          "safetySettings": {
+            "values": [
+              {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_NONE"
+              }
+            ]
+          }
+        },
+        "modelName": "models/gemini-1.5-pro-latest"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dSxo6ns5wn658r8N",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8e9c5d1d-d610-4bad-8feb-7ff0d5e1e64f",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1440,
+        80
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 719.7534883720941,
+        "height": 574.3134883720929,
+        "content": "## 4. 진술서에서 주요 데이터를 자신 있게 추출하기  \n[정보 추출기에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor)  \n\n우리가 새로 생성한 대본으로, 진술서에서 입금 항목만 추출해 보겠습니다. 모든 페이지를 이미지로 함께 처리하는 것은 계산 집약적일 수 있지만, 텍스트로 하면 LLM에게는 보통 아무런 문제가 되지 않습니다.  \n\n예시 은행 진술서 PDF의 경우, 결과 추출은 \"deposits\" 열에 값이 존재하는 8개의 테이블 행이어야 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f849ad3c-69ec-443c-b7cd-ab24e210af73",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        500
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 366.00558139534894,
+        "height": 125.41023255813957,
+        "content": "### 💡 예제 PDF에 대해\n스캔된 PDF(즉, 각 페이지가 스캔된 이미지인 경우)는 PDF 텍스트 내용을 추출할 수 없는 사용 사례입니다. 비전 모델은 훌륭한 솔루션으로, 이 워크플로우가 이를 시연하는 것을 목표로 합니다!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "be6f529b-8220-4879-bd99-4333b4d764b6",
+      "name": "Combine All Pages",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        1580,
+        320
+      ],
+      "parameters": {
+        "options": {},
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "renameField": true,
+              "outputFieldName": "pages",
+              "fieldToAggregate": "text"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "2b35755c-7bae-4896-b9f9-1e9110209526",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -190.1172093023256,
+        280
+      ],
+      "parameters": {
+        "width": 199.23348837209306,
+        "height": 374.95069767441856,
+        "content": "이 예시는 공개된 제3자 서비스를 사용합니다. 데이터가 민감한 경우, 자체 호스팅 버전으로 교체해 주세요!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "f638ba05-9ae2-447f-82af-eb22d8b9d6f1",
+      "name": "Extract All Deposit Table Rows",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        1760,
+        320
+      ],
+      "parameters": {
+        "text": "= {{ $json.pages.join('---') }}",
+        "options": {
+          "systemPromptTemplate": "This statement contains tables with rows showing deposit and withdrawal made to the user's account. Deposits and withdrawals are identified by have the amount in their respective columns. What are the deposits to the account found in this statement?"
+        },
+        "schemaType": "manual",
+        "inputSchema": "{\n \"type\": \"array\",\n \"items\": {\n\t\"type\": \"object\",\n\t\"properties\": {\n \"date\": { \"type\": \"string\" },\n \"description\": { \"type\": \"string\" },\n \"amount\": { \"type\": \"number\" }\n\t}\n }\n}"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "cf1e8d85-5c92-469d-98af-7bdd5f469167",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        913.9944186046506,
+        620
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 498.18790697674433,
+        "height": 130.35162790697677,
+        "content": "💡 Google을 사용하지 마세요?\n\n모델을 자유롭게 최신 상태의 다중 모달 모델로 교체하세요. 이 모델은 이미지 입력을 지원해야 하며, 예를 들어 GPT4o(-mini) 또는 Claude Sonnet/Opus와 같은 것입니다. 참고로, 저는 Gemini가 이 예시 용도에 대해 가장 정확하고 일관되게 작동한다고 발견했습니다. 따라서 교체할 경우 보장은 없습니다!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "20f33372-a6b6-4f4d-987d-a94c85313fa8",
+      "name": "Transcribe to Markdown",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        980,
+        280
+      ],
+      "parameters": {
+        "text": "transcribe the image to markdown.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You help transcribe documents to markdown, keeping faithful to all text printed and visible to the best of your ability. Ensure you capture all headings, subheadings, titles as well as small print.\nFor any tables found with the document, convert them to markdown tables. If table row descriptions overflow into more than 1 row, concatanate and fit them into a single row. If two or more tables are adjacent horizontally, stack the tables vertically instead. There should be a newline after every markdown table.\nFor any graphics, use replace with a description of the image. Images of scanned checks should be converted to the phrase \"<scanned image of check>\"."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary"
+            }
+          ]
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.4
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Sort Pages": {
+      "main": [
+        [
+          {
+            "node": "Resize Images For AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Images To List": {
+      "main": [
+        [
+          {
+            "node": "Sort Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Zip File": {
+      "main": [
+        [
+          {
+            "node": "Images To List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine All Pages": {
+      "main": [
+        [
+          {
+            "node": "Extract All Deposit Table Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Bank Statement": {
+      "main": [
+        [
+          {
+            "node": "Split PDF into Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Images For AI": {
+      "main": [
+        [
+          {
+            "node": "Transcribe to Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split PDF into Images": {
+      "main": [
+        [
+          {
+            "node": "Extract Zip File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe to Markdown": {
+      "main": [
+        [
+          {
+            "node": "Combine All Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Transcribe to Markdown",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract All Deposit Table Rows",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Bank Statement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

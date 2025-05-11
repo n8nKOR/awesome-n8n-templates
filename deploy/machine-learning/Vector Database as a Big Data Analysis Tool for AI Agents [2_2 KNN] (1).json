@@ -1,0 +1,544 @@
+{
+  "id": "itzURpN5wbUNOXOw",
+  "meta": {
+    "instanceId": "205b3bc06c96f2dc835b4f00e1cbf9a937a74eeb3b47c99d0c30b0586dbf85aa"
+  },
+  "name": "[2/2] KNN classifier (lands dataset)",
+  "tags": [
+    {
+      "id": "QN7etptCmdcGIpkS",
+      "name": "classifier",
+      "createdAt": "2024-12-08T22:08:15.968Z",
+      "updatedAt": "2024-12-09T19:25:04.113Z"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "33373ccb-164e-431c-8a9a-d68668fc70be",
+      "name": "Embed image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -140,
+        -240
+      ],
+      "parameters": {
+        "url": "https://api.voyageai.com/v1/multimodalembeddings",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"inputs\": [\n {\n \"content\": [\n {\n \"type\": \"image_url\",\n \"image_url\": $json.imageURL\n }\n ]\n }\n ],\n \"model\": \"voyage-multimodal-3\",\n \"input_type\": \"document\"\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Vb0RNVDnIHmgnZOP",
+          "name": "Voyage API"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "58adecfa-45c7-4928-b850-053ea6f3b1c5",
+      "name": "Query Qdrant",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        440,
+        -240
+      ],
+      "parameters": {
+        "url": "={{ $json.qdrantCloudURL }}/collections/{{ $json.collectionName }}/points/query",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"query\": $json.ImageEmbedding,\n \"using\": \"voyage\",\n \"limit\": $json.limitKNN,\n \"with_payload\": true\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi"
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "it3j3hP9FICqhgX6",
+          "name": "QdrantApi account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "258026b7-2dda-4165-bfe1-c4163b9caf78",
+      "name": "Majority Vote",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        840,
+        -240
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from collections import Counter\n\ninput_json = _input.all()[0]\npoints = input_json['json']['result']['points']\nmajority_vote_two_most_common = Counter([point[\"payload\"][\"landscape_name\"] for point in points]).most_common(2)\n\nreturn [{\n \"json\": {\n \"result\": majority_vote_two_most_common \n }\n}]\n"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "e83e7a0c-cb36-46d0-8908-86ee1bddf638",
+      "name": "Increase limitKNN",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1240,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b5d257b-1b27-48bc-bec2-78649bc844cc",
+              "name": "limitKNN",
+              "type": "number",
+              "value": "={{ $('Propagate loop variables').item.json.limitKNN + 5}}"
+            },
+            {
+              "id": "afee4bb3-f78b-4355-945d-3776e33337a4",
+              "name": "ImageEmbedding",
+              "type": "array",
+              "value": "={{ $('Qdrant variables + embedding + KNN neigbours').first().json.ImageEmbedding }}"
+            },
+            {
+              "id": "701ed7ba-d112-4699-a611-c0c134757a6c",
+              "name": "qdrantCloudURL",
+              "type": "string",
+              "value": "={{ $('Qdrant variables + embedding + KNN neigbours').first().json.qdrantCloudURL }}"
+            },
+            {
+              "id": "f5612f78-e7d8-4124-9c3a-27bd5870c9bf",
+              "name": "collectionName",
+              "type": "string",
+              "value": "={{ $('Qdrant variables + embedding + KNN neigbours').first().json.collectionName }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "8edbff53-cba6-4491-9d5e-bac7ad6db418",
+      "name": "Propagate loop variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        640,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "880838bf-2be2-4f5f-9417-974b3cbee163",
+              "name": "=limitKNN",
+              "type": "number",
+              "value": "={{ $json.result.points.length}}"
+            },
+            {
+              "id": "5fff2bea-f644-4fd9-ad04-afbecd19a5bc",
+              "name": "result",
+              "type": "object",
+              "value": "={{ $json.result }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "6fad4cc0-f02c-429d-aa4e-0d69ebab9d65",
+      "name": "Image Test URL",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -320,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "46ceba40-fb25-450c-8550-d43d8b8aa94c",
+              "name": "imageURL",
+              "type": "string",
+              "value": "={{ $json.query.imageURL }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "f02e79e2-32c8-4af0-8bf9-281119b23cc0",
+      "name": "Return class",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1240,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bd8ca541-8758-4551-b667-1de373231364",
+              "name": "class",
+              "type": "string",
+              "value": "={{ $json.result[0][0] }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "83ca90fb-d5d5-45f4-8957-4363a4baf8ed",
+      "name": "Check tie",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1040,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "980663f6-9d7d-4e88-87b9-02030882472c",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "leftValue": "={{ $json.result.length }}",
+              "rightValue": 1
+            },
+            {
+              "id": "9f46fdeb-0f89-4010-99af-624c1c429d6a",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.result[0][1] }}",
+              "rightValue": "={{ $json.result[1][1] }}"
+            },
+            {
+              "id": "c59bc4fe-6821-4639-8595-fdaf4194c1e1",
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              },
+              "leftValue": "={{ $('Propagate loop variables').item.json.limitKNN }}",
+              "rightValue": 100
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "847ced21-4cfd-45d8-98fa-b578adc054d6",
+      "name": "Qdrant variables + embedding + KNN neigbours",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        120,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "de66070d-5e74-414e-8af7-d094cbc26f62",
+              "name": "ImageEmbedding",
+              "type": "array",
+              "value": "={{ $json.data[0].embedding }}"
+            },
+            {
+              "id": "58b7384d-fd0c-44aa-9f8e-0306a99be431",
+              "name": "qdrantCloudURL",
+              "type": "string",
+              "value": "=https://152bc6e2-832a-415c-a1aa-fb529f8baf8d.eu-central-1-0.aws.cloud.qdrant.io"
+            },
+            {
+              "id": "e34c4d88-b102-43cc-a09e-e0553f2da23a",
+              "name": "collectionName",
+              "type": "string",
+              "value": "=land-use"
+            },
+            {
+              "id": "db37e18d-340b-4624-84f6-df993af866d6",
+              "name": "limitKNN",
+              "type": "number",
+              "value": "=10"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "d1bc4edc-37d2-43ac-8d8b-560453e68d1f",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -940,
+        -120
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 320,
+        "height": 540,
+        "content": "여기서는 기존의 토지 유형 위성 영상 유형을 분류하고 있습니다:\n- '농업',\n- '비행기',\n- '야구장',\n- '해변',\n- '건물',\n- '챠파랄',\n- '밀집 주거지',\n- '숲',\n- '고속도로',\n- '골프장',\n- '항구',\n- '교차로',\n- '중밀도 주거지',\n- '이동 주택 공원',\n- '육교',\n- '주차장',\n- '강',\n- '활주로',\n- '저밀도 주거지',\n- '저장 탱크',\n- '테니스 코트'"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "13560a31-3c72-43b8-9635-3f9ca11f23c9",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -520,
+        -460
+      ],
+      "parameters": {
+        "color": 6,
+        "content": "이 KNN 분류기를 데이터셋의 전체 `test` 세트에서 테스트했습니다 (이것은 컬렉션의 일부가 아니며, 오직 `validation` + `train` 부분만입니다). `test`에서의 분류 정확도는 **93.24%**, 미세 조정 없음, 메트릭 학습 없음."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8c9dcbcb-a1ad-430f-b7dd-e19b5645b0f6",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -520,
+        -240
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "b36fb270-2101-45e9-bb5c-06c4e07b769c",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1080,
+        -520
+      ],
+      "parameters": {
+        "width": 460,
+        "height": 380,
+        "content": "## KNN 분류 워크플로 도구\n\n### 이 n8n 템플릿은 이미지 URL을 입력으로 받아 (비정상 감지 도구처럼), 출력으로 이미지의 객체 클래스를 반환합니다 (지상 유형 목록 중에서)\n\n* 이미지 URL은 Execute Workflow Trigger를 통해 수신되며, 이를 Voyage.ai Multimodal Embeddings API로 보내 임베딩을 가져옵니다.\n* 이미지의 임베딩 벡터를 사용하여 Qdrant를 쿼리하여, 미리 라벨링된 클래스를 가진 X개의 유사한 이미지를 반환합니다.\n* 이웃 이미지의 클래스에 대해 다수결 투표를 수행합니다.\n* 다수결 투표에서 동점 상황을 해결하기 위해 루프를 사용합니다 (예: 5개의 \"forest\"와 5개의 \"beach\"), 이웃 수를 증가시켜 검색합니다.\n* 루프가 최종적으로 해결되면, 식별된 클래스가 호출 워크플로로 반환됩니다.\n\n### 출력"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "51ece7fc-fd85-4d20-ae26-4df2d3893251",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        -40
+      ],
+      "parameters": {
+        "height": 200,
+        "content": "변수들은 풍경이 포함된 또 하나의 Qdrant 컬렉션을 정의합니다(작물 컬렉션과 유사하게 업로드되었으며, 이를 당신의 데이터로 교체하는 것을 잊지 마세요) + 이웃의 수 **limitKNN** 이 데이터베이스에서 입력 이미지 분류에 사용될 것입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7aad5904-eb0b-4389-9d47-cc91780737ba",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -180,
+        -60
+      ],
+      "parameters": {
+        "height": 80,
+        "content": "이상 탐지 도구와 유사하게, 우리는 입력 이미지를 Voyage 모델로 임베딩하고 있습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d3702707-ee4a-481f-82ca-d9386f5b7c8a",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        440,
+        -500
+      ],
+      "parameters": {
+        "width": 740,
+        "height": 200,
+        "content": "## 무승부 루프\n여기서 우리는 [쿼리](https://api.qdrant.tech/api-reference/search/query-points) Qdrant을 쿼리하며, **limitKNN** 우리의 이미지에 가장 가까운 이웃을 가져옵니다 <*Query Qdrant node*>, 페이로드에서 그들의 클래스를 파싱합니다 (이미지들은 미리 레이블링되어 레이블과 함께 Qdrant에 업로드되었습니다) & 가장 빈번한 클래스 이름을 계산합니다 <*Majority Vote node*>. 만약 2개의 가장 공통된 클래스에 무승부가 있으면 <*check tie node*>, 예를 들어 5개의 \"forest\"와 5개의 \"harbor\"가 있으면, 이웃의 수를 5 증가시켜 절차를 반복합니다 <*propagate loop variables node* and *increase limitKNN node*>.\n만약 무승부가 없거나, 이미 100개의 이웃을 확인했다면, 루프를 종료하고 <*check tie node*> 클래스-답변을 반환합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d26911bb-0442-4adc-8511-7cec2d232393",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1240,
+        160
+      ],
+      "parameters": {
+        "height": 80,
+        "content": "여기서 다수결에 의해 결정된 입력 이미지 클래스의 이름을 추출합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "84ffc859-1d5c-4063-9051-3587f30a0017",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -520,
+        80
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 540,
+        "height": 260,
+        "content": "### KNN (k 최근접 이웃) 분류\n1. 첫 번째 파이프라인은 (lands) 데이터셋을 Qdrant의 컬렉션에 업로드하는 것입니다.\n2. **이것은 KNN 분류기 도구로, 어떤 이미지든 입력으로 받아 Qdrant (lands) 컬렉션에 대한 쿼리에 기반하여 분류합니다.**\n\n### 이를 재현하기 위해\nKaggle에서 [lands](https://www.kaggle.com/datasets/apollo2506/landuse-scene-classification) 데이터셋을 자신의 Google Storage 버킷에 업로드해야 하며, [Qdrant Cloud](https://qdrant.tech/documentation/quickstart-cloud/)에 대한 APIs/연결을 재생성해야 합니다 (**Free Tier** 클러스터를 사용할 수 있음), Voyage AI API 및 Google Cloud Storage\n\n**일반적으로, 파이프라인은 이미지 데이터셋에 적응할 수 있습니다**"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "active": false,
+  "pinData": {
+    "Execute Workflow Trigger": [
+      {
+        "json": {
+          "query": {
+            "imageURL": "https://storage.googleapis.com/n8n-qdrant-demo/land-use/images_train_test_val/test/buildings/buildings_000323.png"
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c8cfe732-fd78-4985-9540-ed8cb2de7ef3",
+  "connections": {
+    "Check tie": {
+      "main": [
+        [
+          {
+            "node": "Increase limitKNN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return class",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embed image": {
+      "main": [
+        [
+          {
+            "node": "Qdrant variables + embedding + KNN neigbours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Qdrant": {
+      "main": [
+        [
+          {
+            "node": "Propagate loop variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Majority Vote": {
+      "main": [
+        [
+          {
+            "node": "Check tie",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Test URL": {
+      "main": [
+        [
+          {
+            "node": "Embed image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increase limitKNN": {
+      "main": [
+        [
+          {
+            "node": "Query Qdrant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Image Test URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propagate loop variables": {
+      "main": [
+        [
+          {
+            "node": "Majority Vote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant variables + embedding + KNN neigbours": {
+      "main": [
+        [
+          {
+            "node": "Query Qdrant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

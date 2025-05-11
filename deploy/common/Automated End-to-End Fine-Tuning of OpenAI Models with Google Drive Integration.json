@@ -1,0 +1,267 @@
+{
+  "id": "gAzsjTGbfWuvAObi",
+  "meta": {
+    "instanceId": "a4bfc93e975ca233ac45ed7c9227d84cf5a2329310525917adaf3312e10d5462",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Fine-tuning with OpenAI models",
+  "tags": [
+    {
+      "id": "2VG6RbmUdJ2VZbrj",
+      "name": "Google Drive",
+      "createdAt": "2024-12-04T16:50:56.177Z",
+      "updatedAt": "2024-12-04T16:50:56.177Z"
+    },
+    {
+      "id": "paTcf5QZDJsC2vKY",
+      "name": "OpenAI",
+      "createdAt": "2024-12-04T16:52:10.768Z",
+      "updatedAt": "2024-12-04T16:52:10.768Z"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "ff65c2db-6a94-4e56-a10c-2538c9617df6",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        220,
+        320
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "208fc618-0543-4552-bd65-9c808c879d88",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        440,
+        320
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1wvlEcbxFIENvqL-bACzlLEfy5gA6uF9J",
+          "cachedResultUrl": "https://drive.google.com/file/d/1wvlEcbxFIENvqL-bACzlLEfy5gA6uF9J/view?usp=drivesdk",
+          "cachedResultName": "test_fine_tuning.jsonl"
+        },
+        "options": {
+          "binaryPropertyName": "data.jsonl",
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        },
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HEy5EuZkgPZVEa9w",
+          "name": "Google Drive account"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "3580d925-c8c9-446f-bfa4-faae5ed3f44a",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        500,
+        800
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "d309da46-c44e-47b7-bb46-5ee6fe7e6964",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        220,
+        800
+      ],
+      "webhookId": "88151d03-e7f5-4c9a-8190-7cff8e849ca2",
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "84b896f7-d1dd-4485-a088-3c7f8154a406",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        380,
+        1000
+      ],
+      "parameters": {
+        "model": "ft:gpt-4o-mini-2024-07-18:n3w-italia::AsVfsl7B",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "CDX6QM4gLYanh0P4",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "3bff93e4-70c3-48c7-b0b3-d2a9881689c4",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        220,
+        560
+      ],
+      "parameters": {
+        "width": 556.5145228215765,
+        "height": 211.35269709543567,
+        "content": "# 2단계\n\n훈련을 위한 .jsonl 파일이 업로드되면 (전체 프로세스 보기: https://platform.openai.com/finetune/), \"새 모델\"이 생성되어 API를 통해 사용할 수 있게 됩니다. OpenAI는 업로드된 .jsonl 파일을 기반으로 자동으로 훈련합니다. 훈련이 성공적이면, 새 모델이 API를 통해 접근할 수 있습니다.\n\n예: ft:gpt-4o-mini-2024-07-18:n3w-italia::XXXXX7B"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ea67edd7-986d-47cd-bc1a-5df49851e27b",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        220,
+        -5.676348547717737
+      ],
+      "parameters": {
+        "width": 777.3941908713687,
+        "height": 265.161825726141,
+        "content": "# 1단계\n\n훈련 파일 .jsonl을 다음 구문을 사용하여 생성하고 Drive에 업로드하세요.\n\n{\"messages\": [{\"role\": \"system\", \"content\": \"당신은 경험 많고 도움이 되는 여행 조수입니다.\"}, {\"role\": \"user\", \"content\": \"미국으로 여행하기 위해 필요한 문서는 무엇인가요?\"}, {\"role\": \"assistant\", \"content\": \"미국으로 여행하기 위해, 유효한 여권과 ESTA 승인이 필요합니다. 이는 온라인으로 신청할 수 있습니다. 귀하의 국적에 따른 특정 요구사항을 확인하세요.\"}]}\n....\n\n파일은 여기에 업로드될 것입니다: https://platform.openai.com/storage/files"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "87df3b85-01ac-41db-b5b6-a236871fa4e2",
+      "name": "Upload File",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        660,
+        320
+      ],
+      "parameters": {
+        "options": {
+          "purpose": "fine-tune"
+        },
+        "resource": "file",
+        "binaryPropertyName": "data.jsonl"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "CDX6QM4gLYanh0P4",
+          "name": "OpenAi account"
+        }
+      },
+      "typeVersion": 1.8
+    },
+    {
+      "id": "c8ec10d4-ff83-461f-94ac-45b68d298276",
+      "name": "Create Fine-tuning Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        900,
+        320
+      ],
+      "parameters": {
+        "url": "https://api.openai.com/v1/fine_tuning/jobs",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"training_file\": \"{{ $json.id }}\",\n \"model\": \"gpt-4o-mini-2024-07-18\"\n} ",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0WeSLPyZXOxqMuzn",
+          "name": "OpenAI API"
+        }
+      },
+      "typeVersion": 4.2
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a4aa95f5-132b-4aa3-a7f5-3bb316e00133",
+  "connections": {
+    "Upload File": {
+      "main": [
+        [
+          {
+            "node": "Create Fine-tuning Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Upload File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

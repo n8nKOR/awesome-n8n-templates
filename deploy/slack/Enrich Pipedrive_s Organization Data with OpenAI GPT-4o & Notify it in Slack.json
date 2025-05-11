@@ -1,0 +1,266 @@
+{
+  "id": "",
+  "meta": {
+    "instanceId": "",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "piepdrive-test",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "b2838678-c796-4c99-a3da-a2cd1b42ea97",
+      "name": "Pipedrive Trigger - An Organization is created",
+      "type": "n8n-nodes-base.pipedriveTrigger",
+      "position": [
+        820,
+        380
+      ],
+      "webhookId": "f5de09a8-6601-4ad5-8bc8-9b3f4b83e997",
+      "parameters": {
+        "action": "added",
+        "object": "organization"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "",
+          "name": "Pipedrive Connection"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5aa05d79-b2fa-4040-b4ca-cad83adf2798",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -20,
+        120
+      ],
+      "parameters": {
+        "width": 656.3637637842876,
+        "height": 1455.9537026322007,
+        "content": "# Pipedrive에서 조직이 생성될 때 GPT-4o를 사용하여 Pipedrive의 조직 데이터를 풍부하게 하다\n\n이 워크플로우는 **Pipedrive의 조직 객체에 노트를 추가하여 Pipedrive 조직의 데이터를 풍부하게 합니다**. 이 워크플로우는 Pipedrive 설정에 맞춤형 \"website\" 필드가 있다고 가정하며, 이 웹사이트에서 데이터를 스크래핑하여 OpenAI를 사용하여 노트를 생성합니다.\n\n## ⚠️ Disclaimer\n**이 워크플로우는 스크래핑 API를 사용합니다. 사용 전에, 해당 국가 또는 주의 웹 스크래핑 관련 규정을 준수하는지 확인하세요**.\n\n## Important Notes\n- 사용된 OpenAI 모델은 GPT-4o로, 큰 입력 토큰 컨텍스트 용량 때문에 선택되었습니다. 그러나 **가장 비싼 옵션**이므로 비용을 고려하세요.\n\n- OpenAI 노드의 시스템 프롬프트는 관련 정보를 생성하지만, 필요에 따라 **개선하거나 수정**할 수 있습니다.\n\n## **How It Works**\n\n### Node 1: `Pipedrive Trigger - An Organization is Created`\n이 노드는 워크플로우의 트리거입니다. **Pipedrive에서 조직 객체가 생성되면** 이 노드가 활성화되어 데이터를 가져옵니다. \"website\" 맞춤형 필드가 있어야 하며(n8n 노드에서 필드 이름은 Pipedrive 맞춤형 필드 이름이 아닌 랜덤 ID로 나타남).\n\n### Node 2: `ScrapingBee - Get Organization's Website's Homepage Content`\n이 노드는 **Pipedrive Organization에서 연결된 웹사이트의 URL에서 콘텐츠를 스크래핑**합니다. 워크플로우는 [ScrapingBee](https://www.scrapingbee.com/) API를 사용하지만, 원하는 API나 n8n의 HTTP 요청 노드를 사용할 수 있습니다.\n\n### Node 3: `OpenAI - Message GPT-4o with Scraped Data`\n이 노드는 이전 노드에서 스크래핑된 HTML 데이터를 **OpenAI GPT-4 모델에 전송**합니다. 시스템 프롬프트는 모델이 **회사 데이터(제품 또는 서비스, 경쟁자 등)를 추출**하도록 지시하며, Pipedrive Note에 최적화된 HTML 형식으로 출력합니다.\n\n### Node 4: `Pipedrive - Create a Note with OpenAI Output`\n이 노드는 **Pipedrive에서 생성된 Organization에 OpenAI 노드 출력을 사용하여 노트를 추가**합니다. 노트에는 회사 설명, 타겟 시장, 판매 제품, 그리고 경쟁자(만약 GPT-4가 확인할 수 있다면)가 포함됩니다.\n\n### Node 5 & 6: `HTML To Markdown` & `Code - Markdown to Slack Markdown`\n이 두 노드는 **HTML 출력을 Markdown으로, 그리고 Slack 전용 Markdown으로 변환**합니다.\n\nPipedrive에 생성된 노트는 **OpenAI 노드의 시스템 프롬프트에 따라 HTML 형식**입니다. 이를 Slack에 보내기 위해 Markdown으로 변환한 후 Slack-specific Markdown으로 변환합니다.\n\n### Node 7: `Slack - Notify`\n이 노드는 **이 워크플로우로 생성된 Pipedrive Organization 노트를 포함한 메시지를 Slack에 전송**합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "47ee8bfb-2f9d-4790-a929-1533215d6746",
+      "name": "Pipedrive - Create a Note with OpenAI output",
+      "type": "n8n-nodes-base.pipedrive",
+      "position": [
+        1640,
+        380
+      ],
+      "parameters": {
+        "content": "={{ $json.message.content }}",
+        "resource": "note",
+        "additionalFields": {
+          "org_id": "={{ $('Pipedrive Trigger - An Organization is created').item.json.meta.id }}"
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "",
+          "name": "Pipedrive Connection"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7783b531-0469-4bee-868e-4b26a1bb41ba",
+      "name": "Code - Markdown to Slack Markdown",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2080,
+        380
+      ],
+      "parameters": {
+        "jsCode": "const inputMarkdown = items[0].json.data;\n\nfunction convertMarkdownToSlackFormat(markdown) {\n let slackFormatted = markdown;\n \n // Convert headers\n slackFormatted = slackFormatted.replace(/^# (.*$)/gim, '*$1*');\n slackFormatted = slackFormatted.replace(/^## (.*$)/gim, '*$1*');\n \n // Convert unordered lists\n slackFormatted = slackFormatted.replace(/^\\* (.*$)/gim, '➡️ $1');\n \n // Convert tables\n const tableRegex = /\\n\\|.*\\|\\n\\|.*\\|\\n((\\|.*\\|\\n)+)/;\n const tableMatch = slackFormatted.match(tableRegex);\n if (tableMatch) {\n const table = tableMatch[0];\n const rows = table.split('\\n').slice(3, -1);\n const formattedRows = rows.map(row => {\n const columns = row.split('|').slice(1, -1).map(col => col.trim());\n return `*${columns[0]}*: ${columns[1]}`;\n }).join('\\n');\n slackFormatted = slackFormatted.replace(table, formattedRows);\n }\n \n return slackFormatted;\n}\n\nconst slackMarkdown = convertMarkdownToSlackFormat(inputMarkdown);\nconsole.log(slackMarkdown);\n\n// Return data\nreturn [{ slackFormattedMarkdown: slackMarkdown }];\n"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "cf2b02df-07e8-4ebb-ba3d-bfd294dcfab0",
+      "name": "Scrapingbee - Get Organization's URL content",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1040,
+        380
+      ],
+      "parameters": {
+        "url": "https://app.scrapingbee.com/api/v1",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "<YOUR_SCRAPINGBEE_API_KEY>"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.current.<random_api_id_custom_website_field> }}"
+            },
+            {
+              "name": "render_js",
+              "value": "false"
+            }
+          ]
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "906d44f0-7582-4742-9fd8-4c8dfba918e0",
+      "name": "HTML To Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "position": [
+        1860,
+        380
+      ],
+      "parameters": {
+        "html": "={{ $json.content }}",
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "8c1a5d64-4f38-4f9e-8878-443f750206b7",
+      "name": "Slack - Notify ",
+      "type": "n8n-nodes-base.slack",
+      "position": [
+        2300,
+        380
+      ],
+      "parameters": {
+        "text": "=*New Organizaton {{ $('Pipedrive Trigger - An Organization is created').item.json.current.name }} created on Pipedrive* :\n\n\n {{ $json.slackFormattedMarkdown }}",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "pipedrive-notification"
+        },
+        "otherOptions": {},
+        "authentication": "oAuth2"
+      },
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "",
+          "name": "Slack Connection"
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "2414a5d3-1d4b-447b-b401-4b6f823a0cf9",
+      "name": "OpenAI - Message GPT-4o with Scraped Data",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1260,
+        380
+      ],
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "GPT-4O"
+        },
+        "options": {},
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.data }}"
+            },
+            {
+              "role": "system",
+              "content": "You're an assistant that summarizes website content for CRM entries. The user will provide HTML content from a company's website. Your task is to analyze the HTML content and create a concise summary that includes:\n\n1. A brief description of the company's services or products.\n2. Any information about the company's target market or customer base.\n3. Key points about the company's unique selling propositions or competitive advantages.\n4. Based on the provided information, suggest potential competitors if you know any.\n\nFormat your response as HTML.\n\nExample response :\n\n <h1>Company Description</h1>\n <p>Company1 specializes in services related to electric vehicles. The company focuses on providing resources and information about electric car chargers, battery life, different car brands, and the environmental impact of electric vehicles.</p>\n\n <h2>Target Market</h2>\n <p>The target market for Company1 includes electric vehicle owners and potential buyers who are interested in making the shift from traditional fossil fuel vehicles to electric cars. The company also targets environmentally conscious consumers who are looking for sustainable mobility solutions.</p>\n\n <h2>Unique Selling Propositions</h2>\n <ul>\n <li>Comprehensive information about electric vehicle charging solutions, including how to install home charging stations.</li>\n <li>Detailed articles on the advantages of electric vehicles such as ecology and reliability.</li>\n <li>Educational resources on the autonomy and battery life of different electric car models.</li>\n <li>Insights into premier electric vehicle brands.</li>\n </ul>\n\n <h2>Potential Competitors</h2>\n <table border=\"1\">\n <tr>\n <th>Competitor Name</th>\n <th>Website</th>\n </tr>\n <tr>\n <td>Competitor1</td>\n <td><a href=\"https://www.example1.com\">https://www.example1.com</a></td>\n </tr>\n <tr>\n <td>Competitor2</td>\n <td><a href=\"https://www.example2.com\">https://www.example2.com</a></td>\n </tr>\n <tr>\n <td>Competitor3</td>\n <td><a href=\"https://www.example3.com\">https://www.example3.com</a></td>\n </tr>\n <tr>\n <td>Competitor4</td>\n <td><a href=\"https://www.example4.com\">https://www.example4.com</a></td>\n </tr>\n </table>\n"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAi Connection"
+        }
+      },
+      "typeVersion": 1.3
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "connections": {
+    "HTML To Markdown": {
+      "main": [
+        [
+          {
+            "node": "Code - Markdown to Slack Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Markdown to Slack Markdown": {
+      "main": [
+        [
+          {
+            "node": "Slack - Notify ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Message GPT-4o with Scraped Data": {
+      "main": [
+        [
+          {
+            "node": "Pipedrive - Create a Note with OpenAI output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pipedrive - Create a Note with OpenAI output": {
+      "main": [
+        [
+          {
+            "node": "HTML To Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrapingbee - Get Organization's URL content": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Message GPT-4o with Scraped Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pipedrive Trigger - An Organization is created": {
+      "main": [
+        [
+          {
+            "node": "Scrapingbee - Get Organization's URL content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

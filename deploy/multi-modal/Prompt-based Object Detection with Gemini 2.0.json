@@ -1,0 +1,367 @@
+{
+  "nodes": [
+    {
+      "id": "bae5d407-9210-4bd0-99a3-3637ee893065",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -1440,
+        -280
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "c5a14c8e-4aeb-4a4e-b202-f88e837b6efb",
+      "name": "Get Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -200,
+        -180
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b455afe0-2311-4d3f-8751-269624d76cf1",
+              "name": "coords",
+              "type": "array",
+              "value": "={{ $json.candidates[0].content.parts[0].text.parseJson() }}"
+            },
+            {
+              "id": "92f09465-9a0b-443c-aa72-6d208e4df39c",
+              "name": "width",
+              "type": "string",
+              "value": "={{ $('Get Image Info').item.json.size.width }}"
+            },
+            {
+              "id": "da98ce2a-4600-46a6-b4cb-159ea515cb50",
+              "name": "height",
+              "type": "string",
+              "value": "={{ $('Get Image Info').item.json.size.height }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "f24017c9-05bc-4f75-a18c-29efe99bfe0e",
+      "name": "Get Test Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1260,
+        -280
+      ],
+      "parameters": {
+        "url": "https://www.stonhambarns.co.uk/wp-content/uploads/jennys-ark-petting-zoo-for-website-6.jpg",
+        "options": {}
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "c0f6a9f7-ba65-48a3-8752-ce5d80fe33cf",
+      "name": "Gemini 2.0 Object Detection",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -680,
+        -180
+      ],
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n \"contents\": [{\n \"parts\":[\n {\"text\": \"I want to see all bounding boxes of rabbits in this image.\"},\n {\n \"inline_data\": {\n \"mime_type\":\"image/jpeg\",\n \"data\": $input.item.binary.data.data\n }\n }\n ]\n }],\n \"generationConfig\": {\n \"response_mime_type\": \"application/json\",\n \"response_schema\": {\n \"type\": \"ARRAY\",\n \"items\": {\n \"type\": \"OBJECT\",\n \"properties\": {\n \"box_2d\": {\"type\":\"ARRAY\", \"items\": { \"type\": \"NUMBER\" } },\n \"label\": { \"type\": \"STRING\"}\n }\n }\n }\n }\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dSxo6ns5wn658r8N",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "edbc1152-4642-4656-9a3a-308dae42bac6",
+      "name": "Scale Normalised Coords",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -20,
+        -180
+      ],
+      "parameters": {
+        "jsCode": "const { coords, width, height } = $input.first().json;\n\nconst scale = 1000;\nconst scaleCoordX = (val) => (val * width) / scale;\nconst scaleCoordY = (val) => (val * height) / scale;\n \nconst normalisedOutput = coords\n .filter(coord => coord.box_2d.length === 4)\n .map(coord => {\n return {\n xmin: coord.box_2d[1] ? scaleCoordX(coord.box_2d[1]) : coord.box_2d[1],\n xmax: coord.box_2d[3] ? scaleCoordX(coord.box_2d[3]) : coord.box_2d[3],\n ymin: coord.box_2d[0] ? scaleCoordY(coord.box_2d[0]) : coord.box_2d[0],\n ymax: coord.box_2d[2] ? scaleCoordY(coord.box_2d[2]) : coord.box_2d[2],\n }\n });\n\nreturn {\n json: {\n coords: normalisedOutput\n },\n binary: $('Get Test Image').first().binary\n}"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "e0380611-ac7d-48d8-8eeb-35de35dbe56a",
+      "name": "Draw Bounding Boxes",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        400,
+        -180
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "multiStep",
+        "operations": {
+          "operations": [
+            {
+              "color": "#ff00f277",
+              "operation": "draw",
+              "endPositionX": "={{ $json.coords[0].xmax }}",
+              "endPositionY": "={{ $json.coords[0].ymax }}",
+              "startPositionX": "={{ $json.coords[0].xmin }}",
+              "startPositionY": "={{ $json.coords[0].ymin }}"
+            },
+            {
+              "color": "#ff00f277",
+              "operation": "draw",
+              "endPositionX": "={{ $json.coords[1].xmax }}",
+              "endPositionY": "={{ $json.coords[1].ymax }}",
+              "startPositionX": "={{ $json.coords[1].xmin }}",
+              "startPositionY": "={{ $json.coords[1].ymin }}"
+            },
+            {
+              "color": "#ff00f277",
+              "operation": "draw",
+              "endPositionX": "={{ $json.coords[2].xmax }}",
+              "endPositionY": "={{ $json.coords[2].ymax }}",
+              "startPositionX": "={{ $json.coords[2].xmin }}",
+              "startPositionY": "={{ $json.coords[2].ymin }}"
+            },
+            {
+              "color": "#ff00f277",
+              "operation": "draw",
+              "endPositionX": "={{ $json.coords[3].xmax }}",
+              "endPositionY": "={{ $json.coords[3].ymax }}",
+              "startPositionX": "={{ $json.coords[3].xmin }}",
+              "startPositionY": "={{ $json.coords[3].ymin }}"
+            },
+            {
+              "color": "#ff00f277",
+              "operation": "draw",
+              "endPositionX": "={{ $json.coords[4].xmax }}",
+              "endPositionY": "={{ $json.coords[4].ymax }}",
+              "startPositionX": "={{ $json.coords[4].xmin }}",
+              "startPositionY": "={{ $json.coords[4].ymin }}"
+            },
+            {
+              "color": "#ff00f277",
+              "operation": "draw",
+              "cornerRadius": "=0",
+              "endPositionX": "={{ $json.coords[5].xmax }}",
+              "endPositionY": "={{ $json.coords[5].ymax }}",
+              "startPositionX": "={{ $json.coords[5].xmin }}",
+              "startPositionY": "={{ $json.coords[5].ymin }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "52daac1b-5ba3-4302-b47b-df3f410b40fc",
+      "name": "Get Image Info",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        -1080,
+        -280
+      ],
+      "parameters": {
+        "operation": "information"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0d2ab96a-3323-472d-82ff-2af5e7d815a1",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        740,
+        -460
+      ],
+      "parameters": {
+        "width": 440,
+        "height": 380,
+        "content": "그림 1. 객체 탐지 출력  \n![](https://res.cloudinary.com/daglih2g8/image/upload/f_auto,q_auto/v1/n8n-workflows/download_1_qmqyyo#full-width)"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c1806400-57da-4ef2-a50d-6ed211d5df29",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1520,
+        -480
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 600,
+        "height": 420,
+        "content": "## 1. 테스트 이미지 다운로드\n\n[HTTP 노드에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest)\n\n호환되는 이미지라면 무엇이든 괜찮습니다 ([문서 보기](https://ai.google.dev/gemini-api/docs/vision?lang=rest#technical-details-image)) 하지만 너무 복잡하지 않고 주제가 너무 모호하지 않은 것이 가장 좋습니다. 가장 중요한 것은 너비와 높이를 검색할 수 있어야 합니다. 이는 나중 단계에서 필요하기 때문입니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3ae12a7c-a20f-4087-868e-b118cc09fa9a",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -900,
+        -480
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 560,
+        "height": 540,
+        "content": "## 2. 프롬프트 기반 객체 탐지 사용\n\n[HTTP 노드에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest)\n\n우리는 이전에 일반화된 객체 탐지를 가지고 있었습니다 ([ResNet을 사용한 다른 템플릿 보기](https://n8n.io/workflows/2331-build-your-own-image-search-using-ai-object-detection-cdn-and-elasticsearch/)) 하지만 원하는 것을 프롬프트로 지정할 수 있는 것은 매우 흥미로운 제안입니다! 이는 후속 탐지 필터링의 노력을 줄일 수 있을 뿐만 아니라 \"감정\", \"지역성\", \"이상치\" 등과 같은 맥락적인 용례를 소개할 수 있습니다!\n\n나는 { \"box_2d\": { \"type\": \"array\", ... } } 출력 JSON 스키마가 Gemini가 좌표를 반환하도록 하는 데 가장 잘 작동한다는 것을 발견했습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "35673272-7207-41d1-985e-08032355846e",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        -400
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 520,
+        "height": 440,
+        "content": "## 3. 원본 이미지에 맞게 좌표 스케일 조정\n\n[코드 노드에 대해 자세히 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/)\n\nGemini 2.0 개요에 따르면, [바운딩 박스를 계산하는 방법](https://ai.google.dev/gemini-api/docs/models/gemini-v2?_gl=1*187cb6v*_up*MQ..*_ga*MTU1ODkzMDc0Mi4xNzM0NDM0NDg2*_ga_P1DBVKWT6V*MTczNDQzNDQ4Ni4xLjAuMTczNDQzNDQ4Ni4wLjAuMjEzNzc5MjU0Ng..#bounding-box)에, 좌표 값들을 재스케일해야 합니다. 왜냐하면 그것들은 0-1000 범위로 정규화되어 있기 때문입니다. 약간의 코드 노드가 도움이 될 수 있습니다!"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "d3d4470d-0fe1-47fd-a892-10a19b6a6ecc",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        80
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 340,
+        "height": 100,
+        "content": "Q. 왜 기본 LLM 노드를 사용하지 않나요?  \n작성 시점에서, Langchain 버전이 Gemini 2.0을 다중 모달 모델로 인식하지 않습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5b2c1eff-6329-4d9a-9d3d-3a48fb3bd753",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        220,
+        -400
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 500,
+        "height": 440,
+        "content": "## 4. 그리기!\n\n[이미지 편집 노드에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.editimage/)\n\n마지막으로 이 데모에서, 우리는 \"이미지 편집\" 노드를 사용하여 원본 이미지 위에 경계 상자를 그릴 수 있습니다. 내 테스트 실행에서, Gemini가 토끼 중 하나를 놓친 것을 볼 수 있습니다. 하지만 이것이 우리가 가지고 노는 실험 버전인 것을 고려하면, 그리 나쁘지 않은 작업을 한다는 것을 보니 꽤 좋습니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "965d791b-a183-46b0-b2a6-dd961d630c13",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1960,
+        -740
+      ],
+      "parameters": {
+        "width": 420,
+        "height": 680,
+        "content": "## 이를 시도해 보세요!\n### 이 n8n 템플릿은 Gemini 2.0의 새로운 Bounding Box 감지 기능을 워크플로에 사용하는 방법을 보여줍니다.\n\n주요 차이점은 이것이 이미지에 대한 프롬프트 기반 객체 감지를 가능하게 하며, 이는 이미지에 대한 맥락적 검색과 같은 작업에 매우 강력합니다. 예를 들어, \"이 이미지에서 모든 성인과 아이를 둘러싸는 Bounding Box를 넣으세요\" 또는 \"주차 공간 밖에 주차된 차량 주위에 Bounding Box를 넣으세요\".\n\n## 작동 원리\n* HTTP 노드를 통해 이미지를 다운로드하고, \"Edit Image\" 노드를 사용하여 파일의 너비와 높이를 추출합니다.\n* 이미지를 Gemini 2.0 API에 제공하여 요청된 주제의 Bounding Box 좌표를 파싱하고 반환합니다. 이 데모에서는 AI가 모든 토끼를 식별하도록 요청했습니다.\n* 좌표를 원본 이미지의 너비와 높이로 재조정하여 올바르게 정렬합니다.\n* 마지막으로 객체 감지의 정확도를 측정하기 위해 \"Edit Image\" 노드를 사용하여 Bounding Box를 원본 이미지에 그립니다.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d) 에 가입하거나 [Forum](https://community.n8n.io/)에서 문의하세요!\n\n즐거운 해킹!"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Variables": {
+      "main": [
+        [
+          {
+            "node": "Scale Normalised Coords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image Info": {
+      "main": [
+        [
+          {
+            "node": "Gemini 2.0 Object Detection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Test Image": {
+      "main": [
+        [
+          {
+            "node": "Get Image Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draw Bounding Boxes": {
+      "main": [
+        []
+      ]
+    },
+    "Scale Normalised Coords": {
+      "main": [
+        [
+          {
+            "node": "Draw Bounding Boxes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.0 Object Detection": {
+      "main": [
+        [
+          {
+            "node": "Get Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Test Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

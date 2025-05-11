@@ -1,0 +1,549 @@
+{
+  "nodes": [
+    {
+      "id": "38972c5c-09f4-4120-a468-731e720914e1",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        900,
+        -240
+      ],
+      "parameters": {
+        "text": "=Title: {{ $json.data.transcript.title }}\n\nParticipants: {{ $json.data.transcript.participants }}\n\nTranscript: {{ JSON.stringify($json.data.transcript.sentences) }}\n\nBullet gist:{{ $json.data.transcript.summary.bullet_gist }}",
+        "agent": "openAiFunctionsAgent",
+        "options": {
+          "systemMessage": "=You get my calls' transcripts from Firefiles.\nThere can be meetings about projects. You can understand if it's about a project if meeting's title contains \"project\". If so - you need to:\n1. Analyze transcript, use tool \"Create Tasks\" to create tasks for me in my AirTable base.\n2. You need to use tool \"Notify Client About Tasks\" to nofity client about his tasks.\n3. If transcript contains info there's a call needed - you'll use \"Create Event\" tool to create call on Google Meet\nCurrent date: {{ $now }}"
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.7
+    },
+    {
+      "id": "db5c1bfa-b979-4749-84c8-8cd7d777748c",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        880,
+        40
+      ],
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "9RivS2BmSh1DDBFm",
+          "name": "OpenAi account 3"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "334873ba-ec5c-42b3-b8d0-def79d07c0aa",
+      "name": "Create Tasks",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        1040,
+        40
+      ],
+      "parameters": {
+        "name": "create_task",
+        "schemaType": "manual",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Jo0BiizccacaChkH",
+          "cachedResultName": "Firefiles AI Agent"
+        },
+        "description": "=Use this tool to create a task. \nFor task creation use only action items for me [YOUR NAME HERE], don't use action items for other participants.",
+        "inputSchema": "{\n \"type\": \"object\",\n \"properties\": {\n \"items\": {\n \"type\": \"array\",\n \"description\": \"An array of tasks\",\n \"items\": {\n \"type\": \"object\",\n \"properties\": {\n \"name\": {\n \"type\": \"string\",\n \"description\": \"The name of the task\"\n },\n \"description\": {\n \"type\": \"string\",\n \"description\": \"A detailed description of the task\"\n },\n \"due_date\": {\n \"type\": \"string\",\n \"description\": \"Due Date\"\n },\n \"priority\": {\n \"type\": \"string\",\n \"description\": \"Priority. . Please capitalize first letter\"\n },\n \"project_name\": {\n \"type\": \"string\",\n \"description\": \"Name of the project. Word 'Project' shouldn't be included\"\n }\n },\n \"required\": [\n \"name\",\n \"description\",\n \"due_date\",\n \"priority\"\n ],\n \"additionalProperties\": false\n }\n }\n },\n \"required\": [\n \"items\"\n ],\n \"additionalProperties\": false\n}",
+        "specifyInputSchema": true
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "7fd03a80-71e9-4c47-9870-7a3ad4916149",
+      "name": "Notify Client About Tasks",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        1180,
+        40
+      ],
+      "webhookId": "519d9406-10ef-4ae1-a747-d278002cac9e",
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"participant_email\",\"participant email \",\"string\") }}",
+        "message": "=Summary:\n{{ $json.data.transcript.summary.bullet_gist }}\n\nAction Items:\n{{ $fromAI(\"participant_action_items\",\"participant action items \",\"string\") }}",
+        "options": {
+          "appendAttribution": false
+        },
+        "subject": "Meeting Summary",
+        "emailType": "text",
+        "descriptionType": "manual",
+        "toolDescription": "=Use the tool to notify a participant of the meeting with meeting summary and his tasks.\nIMPORTANT: \n1. Please notify participants except for me. My email: [YOUR EMAIL HERE]\n2. When working with tasks - please send only the participant's tasks."
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LhdnHxP8WcSDEHw3",
+          "name": "Gmail account 3"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "094a0e52-a4fa-4078-9b96-80568acb9c51",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        460,
+        420
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "e59e5a29-4509-45cc-9130-181ea432553c",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        680,
+        420
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "query.items"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "dc664650-f74e-4574-95a0-dd4a9bf181a1",
+      "name": "Create Task",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        900,
+        420
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appndgSF4faN4jPXi",
+          "cachedResultUrl": "https://airtable.com/appndgSF4faN4jPXi",
+          "cachedResultName": "Philipp's Base"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblaCSndQsSF3gq7Z",
+          "cachedResultUrl": "https://airtable.com/appndgSF4faN4jPXi/tblaCSndQsSF3gq7Z",
+          "cachedResultName": "Tasks"
+        },
+        "columns": {
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Project": "={{ [$json.project_name] }}",
+            "Due Date": "={{ $json.due_date }}",
+            "Priority": "={{ $json.priority }}",
+            "Description": "={{ $json.description }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Description",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "Low",
+                  "value": "Low"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                },
+                {
+                  "name": "Urgent",
+                  "value": "Urgent"
+                },
+                {
+                  "name": "low",
+                  "value": "low"
+                },
+                {
+                  "name": "medium",
+                  "value": "medium"
+                },
+                {
+                  "name": "urgent",
+                  "value": "urgent"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Priority",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Due Date",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Project",
+              "type": "array",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Project",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": []
+        },
+        "options": {
+          "typecast": true
+        },
+        "operation": "create"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "XT7hvl1w201jtBhx",
+          "name": "Philipp Airtable Personal Access Token account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "6d6f9094-b0b3-495e-ade8-d80c03e727b0",
+      "name": "Create Event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        1340,
+        40
+      ],
+      "parameters": {
+        "end": "={{ $fromAI(\"end_date_time\",\"Date and time of meeting end\",\"string\") }}",
+        "start": "={{ $fromAI(\"start_date_time\",\"Date and time of meeting start\",\"string\") }}",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "philipp@lowcoding.dev",
+          "cachedResultName": "philipp@lowcoding.dev"
+        },
+        "descriptionType": "manual",
+        "toolDescription": "=Use tool to create Google Calendar Event. Use this tool only when transcript contains information that call should be scheduled.",
+        "additionalFields": {
+          "summary": "={{ $fromAI(\"meeting_name\",\"Meeting name\",\"string\") }}",
+          "attendees": [
+            "={{ $fromAI(\"email\",\"client email\",\"string\") }}"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "E5Ufn31vrZLKzh4n",
+          "name": "Google Calendar account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "2406fc01-fd28-403c-9378-473e8748e0dd",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        480,
+        -240
+      ],
+      "webhookId": "df852a9f-5ea3-43f2-bd49-d045aba5e9c9",
+      "parameters": {
+        "path": "df852a9f-5ea3-43f2-bd49-d045aba5e9c9",
+        "options": {},
+        "httpMethod": "POST"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "fe28fa98-4946-4379-970e-6df1a79e2a1e",
+      "name": "Get Meeting Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        700,
+        -240
+      ],
+      "parameters": {
+        "url": "https://api.fireflies.ai/graphql",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"query\": \"query Transcript($transcriptId: String!) { transcript(id: $transcriptId) { title participants speakers { id name } sentences { speaker_name text } summary { bullet_gist } } }\",\n \"variables\": {\n \"transcriptId\": \"{{ $json.meetingId }}\"\n }\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [YOUR API KEY HERE]"
+            }
+          ]
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "5eadd00a-9095-4bf3-80ed-e7bc5c49390d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        620,
+        -360
+      ],
+      "parameters": {
+        "color": 4,
+        "height": 80,
+        "content": "Fireflies의 API 키를 교체하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "93cee18c-2215-4a63-af7b-ddf45729f5e4",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1180,
+        200
+      ],
+      "parameters": {
+        "color": 4,
+        "height": 80,
+        "content": "Airtable과 Google의 연결을 교체하세요."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4d792723-4507-486f-9dc7-62bf1b927edd",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        340
+      ],
+      "parameters": {
+        "width": 820,
+        "height": 280,
+        "content": "시나리오 2 - 작업 생성 도구"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c5520210-86db-4639-9f8c-ac9055407232",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        -460
+      ],
+      "parameters": {
+        "width": 1100,
+        "height": 760,
+        "content": "시나리오 1 - AI 에이전트"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "48d47e44-b7bf-49b3-814b-6969ce97108d",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        800,
+        180
+      ],
+      "parameters": {
+        "color": 4,
+        "height": 80,
+        "content": "OpenAI 연결 교체"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "afe4bffa-8937-4c31-8513-0acc6b8858ce",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -360,
+        60
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 280,
+        "height": 566,
+        "content": "### 설정 단계\n\n#### 준비\n1. **계정 생성**:\n - [N8N](https://n8n.partnerlinks.io/2hr10zpkki6a): 워크플로 자동화를 위해.\n - [Airtable](https://airtable.com/): 데이터베이스 호스팅 및 관리용.\n - [Fireflies](https://fireflies.ai/): 미팅 녹음용.\n\n#### N8N 워크플로\n\n1. **웹훅 구성**: \n - 미팅 완료 이벤트를 캡처하여 Fireflies와 통합할 웹훅을 설정합니다.\n\n2. **미팅 내용 검색**: \n - GraphQL API 요청을 사용하여 미팅 세부사항과 녹취록을 추출하며, 적절한 인증을 위해 Bearer 토큰을 사용합니다.\n\n3. **AI 처리 설정**: \n - AI 작업을 위한 시스템 메시지를 정의하고, 녹취록을 처리하기 위해 AI 채팅 모델(예: OpenAI의 GPT) 연결을 구성합니다.\n\n4. **작업 생성 로직**: \n - AI 출력에 기반하여 구조화된 작업을 생성하며, 필요한 세부사항을 캡처하고 Airtable에 레코드를 생성합니다.\n\n5. **클라이언트 알림**: \n - 이메일 노드를 사용하여 클라이언트에게 작업에 대해 알리며, 통신이 클라이언트별로 이루어지도록 합니다.\n\n6. **후속 호출 예약**: \n - 후속 미팅이 필요한 경우, 원래 미팅 맥락에서 세부사항을 채워 Google Calendar 이벤트를 설정합니다.\n\n7. **최종 테스트**: \n - 워크플로의 각 부분이 기능적으로 원활하게 작동하는지 테스트를 수행하며, 피드백에 따라 조정을 합니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "cbb81fa7-4a97-4a7e-82ce-05250b2c82cf",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -360,
+        -460
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 636.2128494576581,
+        "height": 497.1532689930921,
+        "content": "![5분 로고](https://cflobdhpqwnoisuctsoc.supabase.co/storage/v1/object/public/my_storage/banner.png)  \n## Airtable 및 Fireflies와 함께한 프로젝트 관리 및 회의용 AI 에이전트  \n**커뮤니티 [5minAI](https://www.skool.com/5minai-2861)의 [필립 베커](https://www.linkedin.com/in/philipp-bekher-5437171a4/)가 제작함**\n\n회의에서 나온 작업 항목을 관리하다 보면 종종 작업을 놓치거나 후속 조치가 부실해질 수 있습니다. 이 자동화는 회의 녹취록에서 자동으로 작업을 생성하여 모든 사람이 자신의 책임을 인지하고 의사소통을 원활하게 만들어 이 문제를 완화합니다.\n\n워크플로는 n8n을 활용하여 완료된 회의 녹취록을 감지하는 스마트 에이전트를 생성하며, AI를 사용하여 이를 처리하고 Airtable에 작업을 생성합니다. 주요 기능은 다음과 같습니다:  \n- 웹훅을 통해 완료된 회의 이벤트를 캡처합니다.  \n- API 호출을 사용하여 녹취록 및 참가자 등의 관련 회의 세부 정보를 추출합니다.  \n- 회의 논의에서 구조화된 작업을 생성하고 클라이언트에게 알림을 보냅니다."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "6d367721-875d-4d43-bd55-9801796a0e9f",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -60,
+        60
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 330.5152611046425,
+        "height": 239.5888196628349,
+        "content": "### ... 또는 설정 비디오 시청 [10분]  \n[![유튜브 링크](https://cflobdhpqwnoisuctsoc.supabase.co/storage/v1/object/public/my_storage/Video%2011%20-%20Fireflies%20Agent%20Blur.png)](https://www.youtube.com/watch?v=0TyX7G00x3A)"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Meeting Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Create Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Tasks": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Meeting Content": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Client About Tasks": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

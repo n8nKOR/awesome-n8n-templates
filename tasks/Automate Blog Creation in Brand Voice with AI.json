@@ -263,7 +263,7 @@
         "color": 7,
         "width": 606,
         "height": 264,
-        "content": "## 1. Import Existing Content\n[Read more about the HTML node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.html/)\n\nFirst, we'll need to gather existing content for the brand voice we want to replicate. This content can be blogs, social media posts or internal documents - the idea is to use this content to \"train\" our AI to produce content from the provided examples. One call out is that the quality and consistency of the content is important to get the desired results.\n\nIn this demonstration, we'll grab the latest blog posts off a corporate blog to use as an example. Since, the blog articles are likely consistent because of the source and narrower focus of the medium, it'll serve well to showcase this workflow."
+        "content": "## 1. 기존 콘텐츠 가져오기\n\n[HTML 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.html/)\n\n먼저, 복제하고 싶은 브랜드 목소리를 위한 기존 콘텐츠를 수집해야 합니다. 이 콘텐츠는 블로그, 소셜 미디어 게시물 또는 내부 문서일 수 있습니다 - 아이디어는 이 콘텐츠를 사용하여 AI를 \"훈련\"시켜 제공된 예제에서 콘텐츠를 생성하는 것입니다. 한 가지 주의할 점은 콘텐츠의 품질과 일관성이 원하는 결과를 얻는 데 중요하다는 것입니다.\n\n이 데모에서, 우리는 기업 블로그에서 최신 블로그 게시물을 가져와 예제로 사용할 것입니다. 블로그 기사가 출처와 매체의 더 좁은 초점 때문에 일관성이 있을 가능성이 높기 때문에, 이 워크플로를 보여주기 위해 잘 작동할 것입니다."
       },
       "typeVersion": 1
     },
@@ -279,7 +279,7 @@
         "color": 7,
         "width": 434,
         "height": 230,
-        "content": "## 2. Convert HTML to Markdown\n[Learn more about the Markdown node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.markdown)\n\nMarkdown is a great way to optimise the article data we're sending to the LLM because it reduces the amount of tokens required but keeps all relevant writing structure information.\n\nAlso useful to get Markdown output as a response because typically it's the format authors will write in."
+        "content": "## 2. HTML을 Markdown으로 변환\n\n[Markdown 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.markdown)\n\nMarkdown은 LLM에 보내는 기사 데이터를 최적화하는 훌륭한 방법입니다. 왜냐하면 필요한 토큰 수를 줄이면서도 모든 관련된 작성 구조 정보를 유지하기 때문입니다.\n\n응답으로 Markdown 출력을 얻는 것도 유용합니다. 왜냐하면 일반적으로 작가들이 작성하는 형식이기 때문입니다."
       },
       "typeVersion": 1
     },
@@ -295,7 +295,7 @@
         "color": 7,
         "width": 446,
         "height": 233,
-        "content": "## 3. Using AI to Analyse Article Structure and Writing Styles\n[Read more about the Basic LLM Chain node](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm)\n\nOur approach is to first perform a high-level analysis of all available articles in order to replicate their content layout and writing styles. This will act as a guideline to help the AI to structure our future articles."
+        "content": "## 3. AI를 사용하여 기사 구조와 작성 스타일 분석하기  \n[Basic LLM Chain 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm)  \n\n우리의 접근 방식은 먼저 모든 이용 가능한 기사에 대한 고수준 분석을 수행하여 그들의 내용 레이아웃과 작성 스타일을 복제하는 것입니다. 이는 AI가 우리의 미래 기사를 구성하는 데 도움이 되는 지침 역할을 할 것입니다."
       },
       "typeVersion": 1
     },
@@ -346,7 +346,7 @@
         "color": 7,
         "width": 446,
         "height": 253,
-        "content": "## 4. Using AI to Extract Voice Characteristics and Traits\n[Read more about the Information Extractor node](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor/)\n\nSecond, we'll use AI to analysis the brand voice characteristics of the previous articles. This picks out the tone, style and choice of language used and identifies them into categories. These categories will be used as guidelines for the AI to keep the future article consistent in tone and voice. "
+        "content": "## 4. AI를 사용하여 음성 특성과 특성 추출하기  \n[Information Extractor 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor/)  \n\n둘째, 우리는 AI를 사용하여 이전 기사의 브랜드 음성 특성을 분석할 것입니다. 이는 사용된 톤, 스타일 및 언어 선택을 골라내어 카테고리로 분류합니다. 이러한 카테고리는 AI가 미래의 기사를 톤과 음성에서 일관되게 유지하기 위한 지침으로 사용될 것입니다."
       },
       "typeVersion": 1
     },
@@ -362,7 +362,7 @@
         "color": 7,
         "width": 626,
         "height": 633,
-        "content": "## 5. Automate On-Brand Articles Using AI\n[Read more about the Information Extractor node](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor)\n\nFinally with this approach, we can feed both content and voice guidelines into our final LLM - our content generation agent - to produce any number of on-brand articles, social media posts etc.\n\nWhen it comes to assessing the output, note the AI does a pretty good job at simulating format and reusing common phrases and wording for the target article. However, this could become repetitive very quickly! Whilst AI can help speed up the process, a human touch may still be required to add a some variety."
+        "content": "## 5. AI를 사용하여 브랜드 일관성 있는 기사를 자동화\n\n[Information Extractor 노드에 대해 더 알아보기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor)\n\n마침내 이 접근 방식을 통해, 콘텐츠와 음성 지침을 우리의 최종 LLM(콘텐츠 생성 에이전트)에 공급하여 무제한의 브랜드 일관성 있는 기사, 소셜 미디어 게시물 등을 생산할 수 있습니다.\n\n출력을 평가할 때, AI가 대상 기사의 형식을 시뮬레이션하고 공통적인 구문과 단어를 재사용하는 데 꽤 잘 해낸다는 점에 유의하세요. 그러나 이것은 매우 빨리 반복적일 수 있습니다! AI가 프로세스를 가속화하는 데 도움이 될 수 있지만, 약간의 다양성을 더하기 위해 인간의 터치가 여전히 필요할 수 있습니다."
       },
       "typeVersion": 1
     },
@@ -418,7 +418,7 @@
         "color": 7,
         "width": 406,
         "height": 173,
-        "content": "## 6. Save Draft to Wordpress\n[Learn more about the Wordpress node](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.wordpress/)\n\nTo close out the template, we'll simple save our generated article as a draft which could allow human team members to review and validate the article before publishing."
+        "content": "## 6. 드래프트를 워드프레스에 저장  \n[Wordpress 노드에 대해 자세히 알아보기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.wordpress/)  \n\n템플릿을 마무르기 위해, 생성된 기사를 드래프트로 간단히 저장하겠습니다. 이는 인간 팀 멤버들이 기사를 게시하기 전에 검토하고 검증할 수 있게 합니다."
       },
       "typeVersion": 1
     },
@@ -434,7 +434,7 @@
         "color": 5,
         "width": 440,
         "height": 120,
-        "content": "### Q. Do I need to analyse Brand Voice for every article?\nA. No! I would recommend storing the results of the AI's analysis and re-use for a list of planned articles rather than generate anew every time."
+        "content": "Q. 매 기사마다 브랜드 보이스를 분석해야 하나요?  \nA. 아니요! AI의 분석 결과를 저장해 계획된 기사 목록에 재사용하는 것을 추천합니다. 매번 새로 생성하는 대신에요."
       },
       "typeVersion": 1
     },
@@ -450,7 +450,7 @@
         "color": 5,
         "width": 380,
         "height": 120,
-        "content": "### Q. Can I use other media than blog articles?\nA. Yes! This approach can use other source materials such as PDFs, as long as they can be produces in a text format to give to the LLM."
+        "content": "Q. 블로그 기사 외의 다른 미디어를 사용할 수 있나요?  \nA. 네! 이 접근 방식은 PDF와 같은 다른 소스 자료를 사용할 수 있습니다. 다만, LLM에게 제공할 수 있는 텍스트 형식으로 생성될 수 있는 한입니다."
       },
       "typeVersion": 1
     },
@@ -465,7 +465,7 @@
       "parameters": {
         "width": 400,
         "height": 800,
-        "content": "## Try It Out!\n### This n8n template demonstrates how to use AI to generate new on-brand written content by analysing previously published content.\n\nWith such an approach, it's possible to generate a steady stream of blog article drafts quickly with high consistency with your brand and existing content.\n\n### How it works\n* In this demonstration, the n8n.io blog is used as the source of existing published content and 5 of the latest articles are imported via the HTTP node.\n* The HTML node is extract the article bodies which are then converted to markdown for our LLMs.\n* We use LLM nodes to (1) understand the article structure and writing style and (2) identify the brand voice characteristics used in the posts.\n* These are then used as guidelines in our final LLM node when generating new articles.\n* Finally, a draft is saved to Wordpress for human editors to review or use as starting point for their own articles.\n\n### How to use\n* Update Step 1 to fetch data from your desired blog or change to fetch existing content in a different way.\n* Update Step 5 to provide your new article instruction. For optimal output, theme topics relevant to your brand.\n\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!\n\nHappy Hacking!"
+        "content": "## 시도해 보세요!\n### 이 n8n 템플릿은 AI를 사용하여 이전에 게시된 콘텐츠를 분석하여 새로운 브랜드에 맞는 서면 콘텐츠를 생성하는 방법을 보여줍니다.\n\n이러한 접근 방식을 통해 브랜드와 기존 콘텐츠와 높은 일관성을 유지하면서 블로그 기사 초안을 빠르게 지속적으로 생성할 수 있습니다.\n\n### 작동 원리\n* 이 데모에서 n8n.io 블로그를 기존 게시된 콘텐츠의 원본으로 사용하며, HTTP 노드를 통해 가장 최근 5개의 기사를 가져옵니다.\n* HTML 노드를 사용하여 기사 본문을 추출한 후, LLM을 위해 마크다운으로 변환합니다.\n* LLM 노드를 사용하여 (1) 기사 구조와 작성 스타일을 이해하고 (2) 게시물에서 사용된 브랜드 음성 특성을 식별합니다.\n* 이러한 내용을 최종 LLM 노드에서 지침으로 사용하여 새로운 기사를 생성합니다.\n* 마지막으로, 초안을 WordPress에 저장하여 인간 편집자가 검토하거나 자신의 기사 작성의 출발점으로 사용할 수 있습니다.\n\n### 사용 방법\n* 1단계에서 원하는 블로그에서 데이터를 가져오도록 업데이트하거나, 기존 콘텐츠를 다른 방식으로 가져오도록 변경합니다.\n* 5단계에서 새 기사 지시문을 제공하도록 업데이트합니다. 최적의 출력은 브랜드와 관련된 주제를 다루는 것입니다.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d) 커뮤니티에 참여하거나 [Forum](https://community.n8n.io/)에서 문의하세요!\n\n즐겁게 해킹하세요!"
       },
       "typeVersion": 1
     },

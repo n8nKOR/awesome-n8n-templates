@@ -12,7 +12,7 @@
         "color": 7,
         "width": 616.7964812508943,
         "height": 231.27721611949534,
-        "content": "# Generate new workflow version for specific notion db schema\nInput a Notion database URL and get an AI Assistant chatbot workflow for it based on this template: https://n8n.io/workflows/2413-notion-knowledge-base-ai-assistant/\n\nProject in notion: https://www.notion.so/n8n/Chat-with-notion-database-84eec91b74dd4e36ba97edda17c2c306"
+        "content": "# 특정 Notion DB 스키마에 대한 새 워크플로 버전 생성\nNotion 데이터베이스 URL을 입력하고, 이 템플릿을 기반으로 AI Assistant 채팅봇 워크플로를 받으세요: https://n8n.io/workflows/2413-notion-knowledge-base-ai-assistant/\n\nNotion 프로젝트: https://www.notion.so/n8n/Chat-with-notion-database-84eec91b74dd4e36ba97edda17c2c306"
       },
       "typeVersion": 1
     },
@@ -293,7 +293,7 @@
         "color": 7,
         "width": 747.234277816171,
         "height": 110.78786136085805,
-        "content": "## #1 Serve chat, get URL from user, pull new notion DB schema\nUses n8n Chat trigger. Notion node will fail if an invalid URL is used, or if n8n doesn't have access to it. Also attempts to strip non URL text input. Simplifies notion DB outputs for more efficient token usage in AI Agent."
+        "content": "## 1. 채팅 제공, 사용자에게서 URL 가져오기, 새로운 Notion DB 스키마 가져오기  \nn8n Chat 트리거를 사용합니다. 잘못된 URL이 사용되면 또는 n8n이 해당 URL에 접근할 수 없으면 Notion 노드가 실패합니다. 또한 URL이 아닌 텍스트 입력을 제거하려고 시도합니다. AI Agent에서 더 효율적인 토큰 사용을 위해 Notion DB 출력을 단순화합니다."
       },
       "typeVersion": 1
     },
@@ -309,7 +309,7 @@
         "color": 7,
         "width": 638.6509136143742,
         "height": 114.20873484539783,
-        "content": "## #2 GenAI step\nTakes 2 inputs: [original workflow template](https://n8n.io/workflows/2413-notion-knowledge-base-ai-assistant/) and new Notion database details from #1"
+        "content": "## 2. GenAI 단계  \n2개의 입력을 받음: [원본 워크플로 템플릿](https://n8n.io/workflows/2413-notion-knowledge-base-ai-assistant/) 그리고 #1에서 새로운 Notion 데이터베이스 세부사항"
       },
       "typeVersion": 1
     },
@@ -325,7 +325,7 @@
         "color": 7,
         "width": 727.8599253628195,
         "height": 111.9281525223713,
-        "content": "## #3 Does the new workflow look right?\nChecks for previously identified cases (e.g. LLM outputs placeholder for certain values) then does general LLM check on whether it looks like valid n8n workflow JSON."
+        "content": "## #3 새로운 워크플로우가 올바르게 보이나요?  \n이전에 식별된 사례를 확인합니다 (예: LLM이 특정 값에 대해 플레이스홀더를 출력하는 경우), 그 후 일반 LLM 검사를 통해 그것이 유효한 n8n 워크플로우 JSON처럼 보이는지 확인합니다."
       },
       "typeVersion": 1
     },
@@ -408,7 +408,7 @@
         "color": 7,
         "width": 343.3887397891673,
         "height": 132.30907857627597,
-        "content": "## #4 Respond to Chat trigger\nEach response to the chat trigger is one run. Data of the last node that runs in the workflow is sent to chat trigger, like `Return success to chat`"
+        "content": "#4 채팅 트리거에 응답  \n각 채팅 트리거에 대한 응답은 하나의 실행입니다. 워크플로우에서 실행되는 마지막 노드의 데이터가 채팅 트리거에 보내집니다, 예를 들어 `Return success to chat`처럼"
       },
       "typeVersion": 1
     },
@@ -509,7 +509,7 @@
         "color": 7,
         "width": 614.8565246662145,
         "height": 416.2640726760381,
-        "content": "## Watch a quick set up video 👇\n[![Notion AI Assistant Generator](https://uploads.n8n.io/devrel/notion-db-assistant-thumb#full-width)](https://youtu.be/iK87ppcaNgM)\n"
+        "content": "## 빠른 설정 비디오 보기 👇  \n[![Notion AI 어시스턴트 생성기](https://uploads.n8n.io/devrel/notion-db-assistant-thumb#full-width)](https://youtu.be/iK87ppcaNgM)"
       },
       "typeVersion": 1
     }

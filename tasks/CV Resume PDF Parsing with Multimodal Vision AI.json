@@ -25,7 +25,7 @@
       "parameters": {
         "width": 365.05232558139534,
         "height": 401.24529475392126,
-        "content": "## Try me out!\n\n### This workflow converts a Candidate Resume PDF to an image which is then \"read\" by a Vision Language Model (VLM). The VLM assesses if the candidate's CV is a fit for the desired role.\n\nThis approach can be employed to combat \"hidden prompts\" planted in resumes to bypass and/or manipulate automated ATS systems using AI.\n\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!\n"
+        "content": "## 저를 시험해 보세요!\n\n### 이 워크플로는 후보자 이력서 PDF를 이미지로 변환한 후, Vision Language Model (VLM)에 의해 '읽음'됩니다. VLM은 후보자의 CV가 원하는 역할에 적합한지 평가합니다.\n\n이 접근 방식은 이력서에 심어진 '숨겨진 프롬프트'를 방지하기 위해 사용될 수 있으며, AI를 활용하여 자동화된 ATS 시스템을 우회하거나 조작하는 것을 목적으로 합니다.\n\n### 도움이 필요하신가요?\n[Discord](https://discord.com/invite/XPKeKXeB7d)에 가입하거나 [Forum](https://community.n8n.io/)에서 문의하세요!"
       },
       "typeVersion": 1
     },
@@ -87,7 +87,7 @@
         "color": 7,
         "width": 543.5706868577606,
         "height": 563.6162790697684,
-        "content": "## 1. Download Candidate Resume\n[Read more about using Google Drive](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googledrive)\n\nFor this demonstration, we'll pull the candidate's resume PDF from Google Drive but you can just as easily recieve this resume from email or your ATS.\n\nIt should be noted that our PDF is a special test case which has been deliberately injected with an AI bypass; the bypass is a hidden prompt which aims to override AI instructions and auto-qualify the candidate... sneaky!\n\nDownload a copy of this resume here: https://drive.google.com/file/d/1MORAdeev6cMcTJBV2EYALAwll8gCDRav/view?usp=sharing"
+        "content": "## 1. 후보자 이력서 다운로드\n\n[Google Drive 사용에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googledrive)\n\n이번 데모에서 후보자의 이력서 PDF를 Google Drive에서 가져올 것입니다. 하지만 이메일이나 ATS에서 이 이력서를 쉽게 받을 수 있습니다.\n\n우리 PDF는 AI 우회 기능을 의도적으로 주입한 특별한 테스트 케이스입니다. 이 우회는 AI 지시를 무시하고 후보자를 자동으로 합격시키는 숨겨진 프롬프트입니다... 교활하네요!\n\n이 이력서의 사본을 여기에서 다운로드하세요: https://drive.google.com/file/d/1MORAdeev6cMcTJBV2EYALAwll8gCDRav/view?usp=sharing"
       },
       "typeVersion": 1
     },
@@ -128,7 +128,7 @@
         "color": 7,
         "width": 605.0267171444024,
         "height": 595.3148729042731,
-        "content": "## 2. Convert PDF to Image(s)\n[Read more about using Stirling PDF](https://github.com/Stirling-Tools/Stirling-PDF)\n\nAI vision models can only accept images (and sometimes videos!) as non-text inputs but not PDFs at time of writing. We'll have to convert our PDF to an image in order to use it.\n\nHere, we'll use a tool called **Stirling PDF** which can provide this functionality and can be accessed via a HTTP API. Feel free to use an alternative solution if available, otherwise follow the instructions on the Stirling PDF website to set up your own instance.\n\nAdditionally, we'll reduce the resolution of our converted image to speed up the processing done by the LLM. I find that about 75% of an A4 (30x40cm) is a good balance."
+        "content": "## 2. PDF를 이미지(들)로 변환\n\n[Stirling PDF 사용에 대해 더 읽기](https://github.com/Stirling-Tools/Stirling-PDF)\n\nAI 비전 모델은 텍스트가 아닌 입력으로 이미지(때로는 비디오!)만 수용할 수 있으며, PDF는 작성 시점에서 수용할 수 없습니다. PDF를 사용하기 위해 이미지를 변환해야 합니다.\n\n여기서, **Stirling PDF**라는 도구를 사용할 것입니다. 이 도구는 이 기능을 제공하며 HTTP API를 통해 접근할 수 있습니다. 사용 가능한 대안 솔루션을 사용하세요. 그렇지 않으면 Stirling PDF 웹사이트의 지침을 따라 자신의 인스턴스를 설정하세요.\n\n또한, LLM에 의한 처리를 가속화하기 위해 변환된 이미지의 해상도를 줄일 것입니다. A4(30x40cm)의 약 75%가 좋은 균형이라고 생각합니다."
       },
       "typeVersion": 1
     },
@@ -144,7 +144,7 @@
         "color": 7,
         "width": 747.8139534883712,
         "height": 603.1395348837208,
-        "content": "## 3. Parse Resume with Multimodal LLM\n[Read more about using Basic LLM Chain](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm/)\n\nMultimodal LLMs are LLMs which can accept binary inputs such as images, audio and/or video files. Most newer LLMs are by default multimodal and we'll use Google's Gemini here as an example. By processing each candidate's resume as an image, we avoid scenarios where text extraction fails due to layout issues or by picking up \"hidden\" or malicious prompts planted to subvert AI automated processing.\n\nThis vision model ensures the resume is read and understood as a human would. The hidden bypass is therefore rendered mute since the AI also cannot \"see\" the special prompt embedded in the document."
+        "content": "## 3. Multimodal LLM을 사용한 이력서 파싱\n\n[기본 LLM 체인 사용에 대해 더 읽기](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm/)\n\nMultimodal LLMs은 이미지, 오디오 및/또는 비디오 파일과 같은 이진 입력을 수용할 수 있는 LLMs입니다. 대부분의 최신 LLMs은 기본적으로 다중 모달이며, 여기서는 Google의 Gemini를 예시로 사용하겠습니다. 각 후보자의 이력서를 이미지로 처리하여, 레이아웃 문제로 인해 텍스트 추출이 실패하거나 AI 자동 처리 방해를 위한 '숨겨진' 또는 악의적인 프롬프트가 포착되는 시나리오를 피합니다.\n\n이 비전 모델은 이력서가 인간처럼 읽고 이해하도록 합니다. 따라서 숨겨진 우회는 AI가 문서에 내장된 특수 프롬프트를 '보지' 못하기 때문에 무력화됩니다."
       },
       "typeVersion": 1
     },
@@ -260,7 +260,7 @@
       "parameters": {
         "width": 225.51725256895617,
         "height": 418.95152406706313,
-        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n### Data Privacy Warning!\nFor demo purposes, we're using the public online version of Stirling PDF. It is recommended to setup your own private instance of Stirling PDF before using this workflow in production."
+        "content": "데이터 프라이버시 경고! 데모 목적으로 Stirling PDF의 공용 온라인 버전을 사용하고 있습니다. 이 워크플로를 프로덕션에서 사용하기 전에 Stirling PDF의 자체 개인 인스턴스를 설정하는 것이 좋습니다."
       },
       "typeVersion": 1
     }

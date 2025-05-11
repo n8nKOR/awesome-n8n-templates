@@ -130,7 +130,7 @@
         "color": 7,
         "width": 638,
         "height": 503,
-        "content": "## Generate HTML from user query\n\n**HTTP Request node**\n- Send the user query to OpenAI, with a defined JSON response format - *using HTTP Request node as it has not yet been implemented in the OpenAI nodes*\n- The response format is inspired by the [Structured Output defined in OpenAI Introduction post](https://openai.com/index/introducing-structured-outputs-in-the-api)\n- The output is a JSON containing HTML components and attributed\n\n\n**OpenAI node**\n- Format the response from the previous node from JSON format to HTML format"
+        "content": "## 사용자 쿼리에서 HTML 생성\n\n**HTTP 요청 노드**\n- 사용자 쿼리를 OpenAI에 보내기, 정의된 JSON 응답 형식으로 - *OpenAI 노드에서 아직 구현되지 않았으므로 HTTP 요청 노드를 사용*\n- 응답 형식은 [OpenAI 소개 게시물에서 정의된 Structured Output](https://openai.com/index/introducing-structured-outputs-in-the-api)에 영감을 받음\n- 출력은 HTML 구성 요소와 속성을 포함하는 JSON\n\n**OpenAI 노드**\n- 이전 노드의 응답을 JSON 형식에서 HTML 형식으로 변환\n\n### 출력"
       },
       "typeVersion": 1
     },
@@ -146,7 +146,7 @@
         "color": 7,
         "width": 768,
         "height": 503,
-        "content": "## Workflow: Dynamically generate an HTML page from a user request using OpenAI Structured Output\n\n**Overview**\n- This workflow is a experiment to build HTML pages from a user input using the new Structured Output from OpenAI.\n- The Structured Output could be used in a variety of cases. Essentially, it guarantees the output from the GPT will follow a defined structure (JSON object).\n- It uses Tailwind CSS to make it slightly nicer, but any\n\n**How it works**\n- Once active, go to the production URL and add what you'd like to build as the parameter \"query\"\n- Example: https://production_url.com?query=a%20signup%20form\n- OpenAI nodes will first output the UI as a JSON then convert it to HTML\n- Finally, the response is integrated in a HTML container and rendered to the user\n\n**Further thoughts**\n- Results are not yet amazing, it is hard to see the direct value of such an experiment\n- But it showcase the potential of the Structured Output. Being able to guarantee the output format is key to build robust AI applications."
+        "content": "## 워크플로: 동적으로 사용자 요청으로부터 HTML 페이지를 생성하는 OpenAI Structured Output 사용\n\n**개요**\n- 이 워크플로는 OpenAI의 새로운 Structured Output를 사용하여 사용자 입력으로부터 HTML 페이지를 구축하는 실험입니다.\n- Structured Output는 다양한 경우에 사용될 수 있습니다. 본질적으로, GPT의 출력이 정의된 구조(JSON 객체)를 따르도록 보장합니다.\n- Tailwind CSS를 사용하여 조금 더 멋지게 만들지만, 어떤\n\n**작동 방식**\n- 활성화되면, 프로덕션 URL로 이동하여 원하는 것을 \"query\" 파라미터로 추가하세요.\n- 예시: https://production_url.com?query=a%20signup%20form\n- OpenAI 노드가 먼저 UI를 JSON으로 출력한 다음 HTML로 변환합니다.\n- 마지막으로, 응답이 HTML 컨테이너에 통합되어 사용자에게 렌더링됩니다.\n\n**추가 생각**\n- 결과가 아직 놀라운 수준은 아니며, 이러한 실험의 직접적인 가치를 보기 어렵습니다.\n- 하지만 Structured Output의 잠재력을 보여줍니다. 출력 형식을 보장할 수 있다는 것은 강력한 AI 애플리케이션을 구축하는 데 핵심입니다."
       },
       "typeVersion": 1
     },

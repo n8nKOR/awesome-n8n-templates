@@ -337,7 +337,7 @@ OpenAI와 Gmail API를 활용한 기본적인 Gmail 이메일 라벨링 자동�
 ### 🔄 혼합 자동화 템플릿
 
 #### [Automate Sales Meeting Prep with AI & APIFY Sent To WhatsApp](https://raw.githubusercontent.com/n8nKOR/awesome-n8n-templates/refs/heads/main/deploy/mixed/Automate%20Sales%20Meeting%20Prep%20with%20AI%20%26%20APIFY%20Sent%20To%20WhatsApp.json)
-[![Automate Sales Meeting Prep with AI & APIFY Sent To WhatsApp](deploy/mixed/Automate%20Sales%20Meeting%20Prep%20with%20AI%20%26%20APIFY%20Sent%20To%20WhatsApp.png)](https://raw.githubusercontent.com/n8nKOR/awesome-n8n-templates/refs/heads/main/deploy/mixed/Automate%20Sales%20Meeting%20Prep%20with%20AI%20%26%20APIFY%20Sent%20To%20WhatsApp.json)
+[![Automate Sales Meeting Prep with AI & APIFY Sent To WhatsApp](deploy/mixed/Automate%20Sales%20Meeting%20Prep%20with%20AI%20&%20APIFY%20Sent%20To%20WhatsApp.png)](https://raw.githubusercontent.com/n8nKOR/awesome-n8n-templates/refs/heads/main/deploy/mixed/Automate%20Sales%20Meeting%20Prep%20with%20AI%20%26%20APIFY%20Sent%20To%20WhatsApp.json)
 
 AI와 APIFY를 활용한 영업 미팅 준비 자동화. 고객 정보를 수집하고 분석하여 WhatsApp으로 브리핑을 전송합니다.
 

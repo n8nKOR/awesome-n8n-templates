@@ -40,23 +40,13 @@
 
 ### [Build a Tax Code Assistant with Qdrant, Mistral.ai and OpenAI](Build%20a%20Tax%20Code%20Assistant%20with%20Qdrant,%20Mistral.ai%20and%20OpenAI.json)[![Build a Tax Code Assistant with Qdrant, Mistral.ai and OpenAI](Build%20a%20Tax%20Code%20Assistant%20with%20Qdrant,%20Mistral.ai%20and%20OpenAI.png)](Build%20a%20Tax%20Code%20Assistant%20with%20Qdrant,%20Mistral.ai%20and%20OpenAI.json)
 
-### [Chat Assistant (OpenAI assistant) with Postgres Memory And API Calling Capabalities](Chat%20Assistant%20(OpenAI%20assistant)%20with%20Postgres%20Memory%20And%20API%20Calling%20Capabalities.json)[![Chat Assistant (OpenAI assistant) with Postgres Memory And API Calling Capabalities](Chat%20Assistant%20(OpenAI%20assistant)%20with%20Postgres%20Memory%20And%20API%20Calling%20Capabalities.png)](Chat%20Assistant%20(OpenAI%20assistant)%20with%20Postgres%20Memory%20And%20API%20Calling%20Capabalities.json)
-
 ### [Chat with a Google Sheet using AI](Chat%20with%20a%20Google%20Sheet%20using%20AI.json)[![Chat with a Google Sheet using AI](Chat%20with%20a%20Google%20Sheet%20using%20AI.png)](Chat%20with%20a%20Google%20Sheet%20using%20AI.json)
 
 ### [Chat with GitHub API Documentation: RAG-Powered Chatbot with Pinecone & OpenAI](Chat%20with%20GitHub%20API%20Documentation_%20RAG-Powered%20Chatbot%20with%20Pinecone%20&%20OpenAI.json)[![Chat with GitHub API Documentation: RAG-Powered Chatbot with Pinecone & OpenAI](Chat%20with%20GitHub%20API%20Documentation_%20RAG-Powered%20Chatbot%20with%20Pinecone%20&%20OpenAI.png)](Chat%20with%20GitHub%20API%20Documentation_%20RAG-Powered%20Chatbot%20with%20Pinecone%20&%20OpenAI.json)
 
-### [Chat with local LLMs using n8n and Ollama](Chat%20with%20local%20LLMs%20using%20n8n%20and%20Ollama.json)[![Chat with local LLMs using n8n and Ollama](Chat%20with%20local%20LLMs%20using%20n8n%20and%20Ollama.png)](Chat%20with%20local%20LLMs%20using%20n8n%20and%20Ollama.json)
-
 ### [Chat with OpenAI Assistant (by adding a memory)](Chat%20with%20OpenAI%20Assistant%20(by%20adding%20a%20memory).json)[![Chat with OpenAI Assistant (by adding a memory)](Chat%20with%20OpenAI%20Assistant%20(by%20adding%20a%20memory).png)](Chat%20with%20OpenAI%20Assistant%20(by%20adding%20a%20memory).json)
 
-### [ChatGPT Automatic Code Review in Gitlab MR](ChatGPT%20Automatic%20Code%20Review%20in%20Gitlab%20MR.json)[![ChatGPT Automatic Code Review in Gitlab MR](ChatGPT%20Automatic%20Code%20Review%20in%20Gitlab%20MR.png)](ChatGPT%20Automatic%20Code%20Review%20in%20Gitlab%20MR.json)
-
-### [Complete business WhatsApp AI-Powered RAG Chatbot using OpenAI](Complete%20business%20WhatsApp%20AI-Powered%20RAG%20Chatbot%20using%20OpenAI.json)[![Complete business WhatsApp AI-Powered RAG Chatbot using OpenAI](Complete%20business%20WhatsApp%20AI-Powered%20RAG%20Chatbot%20using%20OpenAI.png)](Complete%20business%20WhatsApp%20AI-Powered%20RAG%20Chatbot%20using%20OpenAI.json)
-
 ### [Convert URL HTML to Markdown Format and Get Page Links](Convert%20URL%20HTML%20to%20Markdown%20Format%20and%20Get%20Page%20Links.json)[![Convert URL HTML to Markdown Format and Get Page Links](Convert%20URL%20HTML%20to%20Markdown%20Format%20and%20Get%20Page%20Links.png)](Convert%20URL%20HTML%20to%20Markdown%20Format%20and%20Get%20Page%20Links.json)
-
-### [Custom LangChain agent written in JavaScript](Custom%20LangChain%20agent%20written%20in%20JavaScript.json)[![Custom LangChain agent written in JavaScript](Custom%20LangChain%20agent%20written%20in%20JavaScript.png)](Custom%20LangChain%20agent%20written%20in%20JavaScript.json)
 
 ### [Customer Insights with Qdrant, Python and Information Extractor](Customer%20Insights%20with%20Qdrant,%20Python%20and%20Information%20Extractor.json)[![Customer Insights with Qdrant, Python and Information Extractor](Customer%20Insights%20with%20Qdrant,%20Python%20and%20Information%20Extractor.png)](Customer%20Insights%20with%20Qdrant,%20Python%20and%20Information%20Extractor.json)
 
@@ -77,8 +67,6 @@
 ### [Fetch Dynamic Prompts from GitHub and Auto-Populate n8n Expressions in Prompt](Fetch%20Dynamic%20Prompts%20from%20GitHub%20and%20Auto-Populate%20n8n%20Expressions%20in%20Prompt.json)[![Fetch Dynamic Prompts from GitHub and Auto-Populate n8n Expressions in Prompt](Fetch%20Dynamic%20Prompts%20from%20GitHub%20and%20Auto-Populate%20n8n%20Expressions%20in%20Prompt.png)](Fetch%20Dynamic%20Prompts%20from%20GitHub%20and%20Auto-Populate%20n8n%20Expressions%20in%20Prompt.json)
 
 ### [Force AI to use a specific output format](Force%20AI%20to%20use%20a%20specific%20output%20format.json)[![Force AI to use a specific output format](Force%20AI%20to%20use%20a%20specific%20output%20format.png)](Force%20AI%20to%20use%20a%20specific%20output%20format.json)
-
-### [Generate audio from text using OpenAI and Webhook / Text to Speech Workflow](Generate%20audio%20from%20text%20using%20OpenAI%20and%20Webhook%20_%20Text%20to%20Speech%20Workflow.json)[![Generate audio from text using OpenAI and Webhook / Text to Speech Workflow](Generate%20audio%20from%20text%20using%20OpenAI%20and%20Webhook%20_%20Text%20to%20Speech%20Workflow.png)](Generate%20audio%20from%20text%20using%20OpenAI%20and%20Webhook%20_%20Text%20to%20Speech%20Workflow.json)
 
 ### [Generate SEO Seed Keywords Using AI](Generate%20SEO%20Seed%20Keywords%20Using%20AI.json)[![Generate SEO Seed Keywords Using AI](Generate%20SEO%20Seed%20Keywords%20Using%20AI.png)](Generate%20SEO%20Seed%20Keywords%20Using%20AI.json)
 
@@ -123,9 +111,5 @@
 ### [Spot Workplace Discrimination Patterns with AI](Spot%20Workplace%20Discrimination%20Patterns%20with%20AI.json)[![Spot Workplace Discrimination Patterns with AI](Spot%20Workplace%20Discrimination%20Patterns%20with%20AI.png)](Spot%20Workplace%20Discrimination%20Patterns%20with%20AI.json)
 
 ### [Use AI to organize your Todoist Inbox](Use%20AI%20to%20organize%20your%20Todoist%20Inbox.json)[![Use AI to organize your Todoist Inbox](Use%20AI%20to%20organize%20your%20Todoist%20Inbox.png)](Use%20AI%20to%20organize%20your%20Todoist%20Inbox.json)
-
-### [Use OpenRouter in n8n versions _1.78](Use%20OpenRouter%20in%20n8n%20versions%20_1.78.json)[![Use OpenRouter in n8n versions _1.78](Use%20OpenRouter%20in%20n8n%20versions%20_1.78.png)](Use%20OpenRouter%20in%20n8n%20versions%20_1.78.json)
-
-### [Using External Workflows as Tools in n8n](Using%20External%20Workflows%20as%20Tools%20in%20n8n.json)[![Using External Workflows as Tools in n8n](Using%20External%20Workflows%20as%20Tools%20in%20n8n.png)](Using%20External%20Workflows%20as%20Tools%20in%20n8n.json)
 
 ### [Visualize your SQL Agent queries with OpenAI and Quickchart.io](Visualize%20your%20SQL%20Agent%20queries%20with%20OpenAI%20and%20Quickchart.io.json)[![Visualize your SQL Agent queries with OpenAI and Quickchart.io](Visualize%20your%20SQL%20Agent%20queries%20with%20OpenAI%20and%20Quickchart.io.png)](Visualize%20your%20SQL%20Agent%20queries%20with%20OpenAI%20and%20Quickchart.io.json)

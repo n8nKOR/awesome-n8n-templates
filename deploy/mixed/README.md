@@ -8,7 +8,7 @@
 
 ### [AI-Powered Information Monitoring with OpenAI, Google Sheets, Jina AI and Slack](AI-Powered%20Information%20Monitoring%20with%20OpenAI,%20Google%20Sheets,%20Jina%20AI%20and%20Slack.json)[![AI-Powered Information Monitoring with OpenAI, Google Sheets, Jina AI and Slack](AI-Powered%20Information%20Monitoring%20with%20OpenAI,%20Google%20Sheets,%20Jina%20AI%20and%20Slack.png)](AI-Powered%20Information%20Monitoring%20with%20OpenAI,%20Google%20Sheets,%20Jina%20AI%20and%20Slack.json)
 
-### [Automate Sales Meeting Prep with AI & APIFY Sent To WhatsApp](Automate%20Sales%20Meeting%20Prep%20with%20AI%20&%20APIFY%20Sent%20To%20WhatsApp.json)[![Automate Sales Meeting Prep with AI & APIFY Sent To WhatsApp](Automate%20Sales%20Meeting%20Prep%20with%20AI%20%26%20APIFY%20Sent%20To%20WhatsApp.png)](Automate%20Sales%20Meeting%20Prep%20with%20AI%20&%20APIFY%20Sent%20To%20WhatsApp.json)
+### [Automate Sales Meeting Prep with AI & APIFY Sent To WhatsApp](Automate%20Sales%20Meeting%20Prep%20with%20AI%20&%20APIFY%20Sent%20To%20WhatsApp.json)[![Automate Sales Meeting Prep with AI & APIFY Sent To WhatsApp](Automate%20Sales%20Meeting%20Prep%20with%20AI%20&%20APIFY%20Sent%20To%20WhatsApp.png)](Automate%20Sales%20Meeting%20Prep%20with%20AI%20&%20APIFY%20Sent%20To%20WhatsApp.json)
 
 ### [Email Subscription Service with n8n Forms, Airtable and AI-1](Email%20Subscription%20Service%20with%20n8n%20Forms,%20Airtable%20and%20AI-1.json)[![Email Subscription Service with n8n Forms, Airtable and AI-1](Email%20Subscription%20Service%20with%20n8n%20Forms,%20Airtable%20and%20AI-1.png)](Email%20Subscription%20Service%20with%20n8n%20Forms,%20Airtable%20and%20AI-1.json)
 

@@ -4,11 +4,11 @@
 
 ## 템플릿 목록
 
-### [Discord AI-powered bot](./Discord%20AI-powered%20bot.json)
-[![Discord AI-powered bot](./Discord%20AI-powered%20bot.png)](./Discord%20AI-powered%20bot.json)
+### [Discord AI-powered bot](Discord%20AI-powered%20bot.json)
+[![Discord AI-powered bot](Discord%20AI-powered%20bot.png)](Discord%20AI-powered%20bot.json)
 
-### [Share YouTube Videos with AI Summaries on Discord](./Share%20YouTube%20Videos%20with%20AI%20Summaries%20on%20Discord.json)
-[![Share YouTube Videos with AI Summaries on Discord](./Share%20YouTube%20Videos%20with%20AI%20Summaries%20on%20Discord.png)](./Share%20YouTube%20Videos%20with%20AI%20Summaries%20on%20Discord.json)
+### [Share YouTube Videos with AI Summaries on Discord](Share%20YouTube%20Videos%20with%20AI%20Summaries%20on%20Discord.json)
+[![Share YouTube Videos with AI Summaries on Discord](Share%20YouTube%20Videos%20with%20AI%20Summaries%20on%20Discord.png)](Share%20YouTube%20Videos%20with%20AI%20Summaries%20on%20Discord.json)
 
-### [Send daily translated Calvin and Hobbes Comics to Discord](./Send%20daily%20translated%20Calvin%20and%20Hobbes%20Comics%20to%20Discord.json)
-[![Send daily translated Calvin and Hobbes Comics to Discord](./Send%20daily%20translated%20Calvin%20and%20Hobbes%20Comics%20to%20Discord.png)](./Send%20daily%20translated%20Calvin%20and%20Hobbes%20Comics%20to%20Discord.json)
+### [Send daily translated Calvin and Hobbes Comics to Discord](Send%20daily%20translated%20Calvin%20and%20Hobbes%20Comics%20to%20Discord.json)
+[![Send daily translated Calvin and Hobbes Comics to Discord](Send%20daily%20translated%20Calvin%20and%20Hobbes%20Comics%20to%20Discord.png)](Send%20daily%20translated%20Calvin%20and%20Hobbes%20Comics%20to%20Discord.json)

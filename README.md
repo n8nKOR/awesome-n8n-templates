@@ -257,7 +257,7 @@ Airtable과 Fireflies를 연동한 프로젝트 관리 및 회의 관리 AI 에�
 동적 프롬프트를 사용한 AI 데이터 추출 시스템. Airtable과 연동하여 다양한 형태의 데이터를 자동으로 구조화합니다.
 
 #### [Sentiment Analysis Tracking on Support Issues with Linear and Slack](https://raw.githubusercontent.com/n8nKOR/awesome-n8n-templates/refs/heads/main/deploy/airtable/Sentiment%20Analysis%20Tracking%20on%20Support%20Issues%20with%20Linear%20and%20Slack-1.json)
-[![Sentiment Analysis Tracking on Support Issues with Linear and Slack](deploy/airtable/Sentiment%20Analysis%20Tracking%20on%20Support%20Issues with%20Linear%20and%20Slack-1.png)](https://raw.githubusercontent.com/n8nKOR/awesome-n8n-templates/refs/heads/main/deploy/airtable/Sentiment%20Analysis%20Tracking%20on%20Support%20Issues%20with%20Linear%20and%20Slack-1.json)
+[![Sentiment Analysis Tracking on Support Issues with Linear and Slack](deploy/airtable/Sentiment%20Analysis%20Tracking%20on%20Support%20Issues%20with%20Linear%20and%20Slack-1.png)](https://raw.githubusercontent.com/n8nKOR/awesome-n8n-templates/refs/heads/main/deploy/airtable/Sentiment%20Analysis%20Tracking%20on%20Support%20Issues%20with%20Linear%20and%20Slack-1.json)
 
 Linear와 Slack을 연동한 고객 지원 이슈의 감정 분석 추적 시스템. 고객 만족도를 실시간으로 모니터링합니다.
 

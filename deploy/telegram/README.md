@@ -16,9 +16,6 @@
 ### [Angie, Personal AI Assistant with Telegram Voice and Text](Angie,%20Personal%20AI%20Assistant%20with%20Telegram%20Voice%20and%20Text.json)
 [![Angie, Personal AI Assistant with Telegram Voice and Text](Angie,%20Personal%20AI%20Assistant%20with%20Telegram%20Voice%20and%20Text.png)](Angie,%20Personal%20AI%20Assistant%20with%20Telegram%20Voice%20and%20Text.json)
 
-### [Chat with OpenAI's GPT via a simple Telegram Bot](Chat%20with%20OpenAIs%20GPT%20via%20a%20simple%20Telegram%20Bot.json)
-*이미지 파일 없음*
-
 ### [DeepSeek AI Agent + Telegram + LONG TERM Memory](DeepSeek%20AI%20Agent%20+%20Telegram%20+%20LONG%20TERM%20Memory.json)
 [![DeepSeek AI Agent + Telegram + LONG TERM Memory](DeepSeek%20AI%20Agent%20+%20Telegram%20+%20LONG%20TERM%20Memory.png)](DeepSeek%20AI%20Agent%20+%20Telegram%20+%20LONG%20TERM%20Memory.json)
 
